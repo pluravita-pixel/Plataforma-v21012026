@@ -14,6 +14,7 @@ import { getAvailabilitySlots, createPendingAppointment, confirmAppointmentPayme
 import { validateDiscountCode } from "@/app/actions/discounts";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
+import { PaymentForm } from "@/components/payment/PaymentForm";
 
 interface Slot {
     id: string;
@@ -152,6 +153,11 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
     };
 
     const handleBooking = async () => {
+        // This now just moves to payment step
+        setStep(3);
+    };
+
+    const handlePaymentSuccess = async () => {
         if (!selectedSlot) return;
         setIsLoading(true);
 
@@ -174,19 +180,17 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
         });
 
         if (result.error || !result.appointmentId) {
-            toast.error("Error al iniciar la reserva. Inténtalo de nuevo.");
+            toast.error("Error al crear la reserva. Inténtalo de nuevo.");
             setIsLoading(false);
             return;
         }
 
-        // 2. Simulate Stripe Payment (Latency)
-        await new Promise(r => setTimeout(r, 1500));
-
-        // 3. Confirm Payment
+        // 2. Confirm Payment (since payment was already "processed")
         await confirmAppointmentPayment(result.appointmentId);
 
         setIsLoading(false);
         setStep(4); // Success Step
+        toast.success("¡Cita reservada exitosamente!");
     };
 
     // --- Helpers ---
@@ -359,79 +363,80 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
                                 <div className="flex gap-3">
                                     <Button variant="outline" onClick={() => setStep(1)} className="flex-1 rounded-xl h-12 font-bold border-gray-200">Atrás</Button>
                                     <Button
-                                        onClick={handleNextStep}
+                                        onClick={() => setStep(3)}
                                         disabled={!selectedSlot}
                                         className="flex-1 bg-[#4A3C31] hover:bg-[#3A2E26] text-white rounded-xl h-12 font-bold disabled:opacity-50 shadow-lg"
                                     >
-                                        Continuar
+                                        Continuar al Pago →
                                     </Button>
                                 </div>
                             </motion.div>
                         )}
 
-                        {/* STEP 3: PAYMENT & DISCOUNT */}
+
+                        {/* STEP 3: PAYMENT */}
                         {step === 3 && (
                             <motion.div
                                 key="step3"
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
-                                className="space-y-6"
                             >
-                                <div className="bg-gray-50 p-5 rounded-[1.5rem] space-y-3 border border-gray-100">
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-gray-500 font-bold">Sesión de Terapia</span>
-                                        <span className="font-bold text-[#4A3C31] text-lg">{price.toFixed(2)}€</span>
-                                    </div>
-                                    {appliedDiscount && (
-                                        <div className="flex justify-between items-center text-sm text-green-700 bg-green-50 p-3 rounded-xl border border-green-100">
-                                            <span className="font-bold flex items-center gap-2">
-                                                <CheckCircle2 className="h-4 w-4" />
-                                                Cupón {appliedDiscount.code}
-                                            </span>
-                                            <span className="font-bold">-{appliedDiscount.percent}%</span>
+                                {/* Discount Code Section - Before Payment */}
+                                <div className="space-y-4 mb-6">
+                                    <div className="bg-gray-50 p-5 rounded-[1.5rem] space-y-3 border border-gray-100">
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-gray-500 font-bold">Sesión de Terapia</span>
+                                            <span className="font-bold text-[#4A3C31] text-lg">{price.toFixed(2)}€</span>
                                         </div>
-                                    )}
-                                    <div className="border-t border-gray-200/50 pt-4 flex justify-between items-center">
-                                        <span className="font-black text-[#4A3C31] uppercase tracking-wider text-xs">Total a pagar</span>
-                                        <span className="font-black text-[#A68363] text-3xl">{finalPrice.toFixed(2)}€</span>
+                                        {appliedDiscount && (
+                                            <div className="flex justify-between items-center text-sm text-green-700 bg-green-50 p-3 rounded-xl border border-green-100">
+                                                <span className="font-bold flex items-center gap-2">
+                                                    <CheckCircle2 className="h-4 w-4" />
+                                                    Cupón {appliedDiscount.code}
+                                                </span>
+                                                <span className="font-bold">-{appliedDiscount.percent}%</span>
+                                            </div>
+                                        )}
+                                        <div className="border-t border-gray-200/50 pt-4 flex justify-between items-center">
+                                            <span className="font-black text-[#4A3C31] uppercase tracking-wider text-xs">Total a pagar</span>
+                                            <span className="font-black text-[#A68363] text-3xl">{finalPrice.toFixed(2)}€</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Discount Code Input */}
+                                    <div className="space-y-2">
+                                        <Label className="text-[#A68363] font-bold text-xs uppercase tracking-wider">Código de Descuento</Label>
+                                        <div className="flex gap-2">
+                                            <Input
+                                                placeholder="ej. PRIMERA25"
+                                                value={discountCode}
+                                                onChange={(e) => setDiscountCode(e.target.value)}
+                                                className="rounded-xl border-gray-200 focus:border-[#A68363] h-11"
+                                            />
+                                            <Button
+                                                type="button"
+                                                onClick={handleApplyDiscount}
+                                                className="bg-[#4A3C31] text-white rounded-xl px-4 h-11 font-bold shadow-md"
+                                            >
+                                                Aplicar
+                                            </Button>
+                                        </div>
+                                        {validationError && (
+                                            <p className="text-red-500 text-xs font-bold flex items-center gap-1 mt-1">
+                                                <AlertCircle className="h-3 w-3" />
+                                                {validationError}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
 
-                                {/* Discount Code Input */}
-                                <div className="space-y-2">
-                                    <Label className="text-[#A68363] font-bold text-xs uppercase tracking-wider">Código de Descuento</Label>
-                                    <div className="flex gap-2">
-                                        <Input
-                                            placeholder="ej. PRIMERA25"
-                                            value={discountCode}
-                                            onChange={(e) => setDiscountCode(e.target.value)}
-                                            className="rounded-xl border-gray-200 focus:border-[#A68363] h-11"
-                                        />
-                                        <Button
-                                            type="button"
-                                            onClick={handleApplyDiscount}
-                                            className="bg-[#4A3C31] text-white rounded-xl px-4 h-11 font-bold shadow-md"
-                                        >
-                                            Aplicar
-                                        </Button>
-                                    </div>
-                                    {validationError && (
-                                        <p className="text-red-500 text-xs font-bold flex items-center gap-1 mt-1">
-                                            <AlertCircle className="h-3 w-3" />
-                                            {validationError}
-                                        </p>
-                                    )}
-                                </div>
-
-                                <Button
-                                    onClick={handleBooking}
-                                    disabled={isLoading}
-                                    className="w-full bg-[#0077FF] hover:bg-[#0066CC] text-white rounded-xl h-14 font-bold text-lg shadow-xl shadow-blue-500/20 hover:shadow-blue-500/30 transition-all transform hover:-translate-y-0.5"
-                                >
-                                    {isLoading ? "Procesando..." : `Pagar ${finalPrice.toFixed(2)}€`}
-                                </Button>
-                                <Button variant="ghost" onClick={() => setStep(2)} className="w-full text-xs text-gray-400 font-bold hover:text-[#4A3C31]">Volver</Button>
+                                {/* Payment Form */}
+                                <PaymentForm
+                                    amount={finalPrice}
+                                    onSuccess={handlePaymentSuccess}
+                                    onCancel={() => setStep(2)}
+                                />
                             </motion.div>
                         )}
 
