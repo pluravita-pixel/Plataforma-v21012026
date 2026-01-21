@@ -11,10 +11,12 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Calendar as CalendarIcon, Clock, CreditCard, ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { getAvailabilitySlots, createPendingAppointment, confirmAppointmentPayment } from "@/app/actions/booking";
+import { checkUserExists } from "@/app/actions/auth";
 import { validateDiscountCode } from "@/app/actions/discounts";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { PaymentForm } from "@/components/payment/PaymentForm";
+import { useRouter } from "next/navigation";
 
 interface Slot {
     id: string;
@@ -28,10 +30,12 @@ interface BookingModalProps {
     psychologistName: string;
     price: number;
     currentUser: any | null;
+    customTrigger?: React.ReactNode;
 }
 
-export function BookingModal({ psychologistId, psychologistName, price, currentUser }: BookingModalProps) {
+export function BookingModal({ psychologistId, psychologistName, price, currentUser, customTrigger }: BookingModalProps) {
     const supabase = createClient();
+    const router = useRouter();
     const [step, setStep] = useState(1);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -96,29 +100,41 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
                     return;
                 }
 
-                // Attempt Registration
                 setIsLoading(true);
-                const { error } = await supabase.auth.signUp({
-                    email: formData.email,
-                    password: formData.password,
-                    options: {
-                        emailRedirectTo: typeof window !== 'undefined' ? window.location.href : undefined,
-                        data: { full_name: formData.name }
-                    }
-                });
-                setIsLoading(false);
+                try {
+                    // 1. Check if user already exists in DB
+                    const exists = await checkUserExists(formData.email);
 
-                if (error) {
-                    toast.error(error.message);
-                    return;
-                } else {
-                    toast.success("Cuenta creada. Por favor verifica tu email para continuar.");
-                    // In a real flow we might want to pause here, but user asked to continue booking if verified.
-                    // Since we can't auto-verify, we show a message.
-                    // BUT prompt says: "Que le ponga también que hace su el email de verificación... y ese link le devuelva esta misma página"
-                    // We will basically stop here or allow them to continue as "Pending"? 
-                    // Let's allow them to continue to pick a slot but warn them they need to verify before paying?
-                    // Or simpler: Just proceed with booking as a "guest" technically, but account is created in background.
+                    if (exists) {
+                        toast.info("Ya tienes una cuenta. Puedes continuar con la reserva y loguearte después.");
+                        // We allow them to continue to step 2 as "identified but not auth'd"
+                    } else {
+                        // 2. Attempt Registration ONLY if doesn't exist
+                        const { error } = await supabase.auth.signUp({
+                            email: formData.email,
+                            password: formData.password,
+                            options: {
+                                emailRedirectTo: typeof window !== 'undefined' ? window.location.href : undefined,
+                                data: { full_name: formData.name }
+                            }
+                        });
+
+                        if (error) {
+                            if (error.message.includes("already registered")) {
+                                toast.info("Ya tienes una cuenta. Continuando reserva...");
+                            } else {
+                                toast.error(error.message);
+                                setIsLoading(false);
+                                return;
+                            }
+                        } else {
+                            toast.success("Cuenta creada. Por favor verifica tu email luego.");
+                        }
+                    }
+                } catch (err) {
+                    console.error("User check error:", err);
+                } finally {
+                    setIsLoading(false);
                 }
             }
             setStep(2);
@@ -136,7 +152,7 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
         setValidationError("");
         if (!discountCode) return;
 
-        const result = await validateDiscountCode(discountCode, currentUser?.id || "guest");
+        const result = await validateDiscountCode(discountCode, currentUser?.id || "guest", formData.email);
 
         if (result.error) {
             setValidationError(result.error);
@@ -161,36 +177,44 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
         if (!selectedSlot) return;
         setIsLoading(true);
 
-        const finalPriceCalc = appliedDiscount
-            ? price * (1 - appliedDiscount.percent / 100)
-            : price;
+        try {
+            const finalPriceCalc = appliedDiscount
+                ? price * (1 - appliedDiscount.percent / 100)
+                : price;
 
-        // Determine Name to save
-        const patientName = isAnonymous ? "Usuario Anónimo" : formData.name;
+            // Determine Name to save
+            const anonymousId = Math.random().toString(36).substring(2, 8).toUpperCase();
+            const patientName = isAnonymous ? `Usuario-${anonymousId}` : formData.name;
 
-        // 1. Create Pending Appointment
-        const result = await createPendingAppointment({
-            patientName: patientName,
-            patientEmail: formData.email,
-            psychologistId,
-            slotId: selectedSlot.id,
-            startTime: selectedSlot.startTime,
-            discountCodeId: appliedDiscount?.id,
-            finalPrice: finalPriceCalc.toFixed(2)
-        });
+            // 1. Create Pending Appointment
+            const result = await createPendingAppointment({
+                patientName: patientName,
+                patientEmail: formData.email,
+                psychologistId,
+                slotId: selectedSlot.id,
+                startTime: selectedSlot.startTime,
+                discountCodeId: appliedDiscount?.id,
+                finalPrice: finalPriceCalc.toFixed(2),
+                isAnonymous: isAnonymous
+            });
 
-        if (result.error || !result.appointmentId) {
-            toast.error("Error al crear la reserva. Inténtalo de nuevo.");
+            if (result.error || !result.appointmentId) {
+                toast.error(result.error || "Error al crear la reserva. Inténtalo de nuevo.");
+                setIsLoading(false);
+                return;
+            }
+
+            // 2. Confirm Payment (since payment was already "processed")
+            await confirmAppointmentPayment(result.appointmentId);
+
+            setStep(4); // Success Step
+            toast.success("¡Cita reservada exitosamente!");
+        } catch (error) {
+            console.error("Payment success handling error:", error);
+            toast.error("Ocurrió un error al procesar tu cita. Por favor contacta a soporte.");
+        } finally {
             setIsLoading(false);
-            return;
         }
-
-        // 2. Confirm Payment (since payment was already "processed")
-        await confirmAppointmentPayment(result.appointmentId);
-
-        setIsLoading(false);
-        setStep(4); // Success Step
-        toast.success("¡Cita reservada exitosamente!");
     };
 
     // --- Helpers ---
@@ -215,9 +239,11 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button className="btn-premium text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all">
-                    Reservar Cita
-                </Button>
+                {customTrigger || (
+                    <Button className="btn-premium text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all">
+                        Reservar Cita
+                    </Button>
+                )}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px] p-0 bg-[#FDFCFB] overflow-hidden rounded-3xl border-none shadow-2xl">
 
@@ -307,8 +333,55 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
                                             />
                                             <p className="text-[10px] text-gray-400">Se creará una cuenta para que puedas gestionar tus citas.</p>
                                         </div>
+
+                                        <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-100 mt-4">
+                                            <div className="flex items-center gap-2">
+                                                <EyeOff className="h-4 w-4 text-[#A68363]" />
+                                                <div>
+                                                    <p className="text-sm font-bold text-[#4A3C31]">Modo Anónimo</p>
+                                                    <p className="text-[10px] text-gray-400">Ocultar mi nombre real al especialista</p>
+                                                </div>
+                                            </div>
+                                            <Switch
+                                                checked={isAnonymous}
+                                                onCheckedChange={setIsAnonymous}
+                                                className="data-[state=checked]:bg-[#A68363]"
+                                            />
+                                        </div>
                                     </div>
                                 )}
+
+                                {/* Discount Code Input (Moved from Step 3) */}
+                                <div className="space-y-2 pt-2 border-t border-gray-100 mt-2">
+                                    <Label className="text-[#A68363] font-bold text-[10px] uppercase tracking-wider">¿Tienes un código de descuento?</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            placeholder="ej. PRIMERA25"
+                                            value={discountCode}
+                                            onChange={(e) => setDiscountCode(e.target.value)}
+                                            className="rounded-xl border-gray-200 focus:border-[#A68363] h-10 text-sm"
+                                        />
+                                        <Button
+                                            type="button"
+                                            onClick={handleApplyDiscount}
+                                            className="bg-[#4A3C31] text-white rounded-xl px-4 h-10 text-xs font-bold shadow-md"
+                                        >
+                                            Aplicar
+                                        </Button>
+                                    </div>
+                                    {appliedDiscount && (
+                                        <p className="text-green-600 text-[10px] font-black uppercase flex items-center gap-1">
+                                            <CheckCircle2 className="h-3 w-3" />
+                                            Código {appliedDiscount.code} aplicado (-{appliedDiscount.percent}%)
+                                        </p>
+                                    )}
+                                    {validationError && (
+                                        <p className="text-red-500 text-[10px] font-bold flex items-center gap-1">
+                                            <AlertCircle className="h-3 w-3" />
+                                            {validationError}
+                                        </p>
+                                    )}
+                                </div>
 
                                 <Button
                                     onClick={handleNextStep}
@@ -403,32 +476,6 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
                                             <span className="font-black text-[#A68363] text-3xl">{finalPrice.toFixed(2)}€</span>
                                         </div>
                                     </div>
-
-                                    {/* Discount Code Input */}
-                                    <div className="space-y-2">
-                                        <Label className="text-[#A68363] font-bold text-xs uppercase tracking-wider">Código de Descuento</Label>
-                                        <div className="flex gap-2">
-                                            <Input
-                                                placeholder="ej. PRIMERA25"
-                                                value={discountCode}
-                                                onChange={(e) => setDiscountCode(e.target.value)}
-                                                className="rounded-xl border-gray-200 focus:border-[#A68363] h-11"
-                                            />
-                                            <Button
-                                                type="button"
-                                                onClick={handleApplyDiscount}
-                                                className="bg-[#4A3C31] text-white rounded-xl px-4 h-11 font-bold shadow-md"
-                                            >
-                                                Aplicar
-                                            </Button>
-                                        </div>
-                                        {validationError && (
-                                            <p className="text-red-500 text-xs font-bold flex items-center gap-1 mt-1">
-                                                <AlertCircle className="h-3 w-3" />
-                                                {validationError}
-                                            </p>
-                                        )}
-                                    </div>
                                 </div>
 
                                 {/* Payment Form */}
@@ -455,8 +502,14 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
                                 <p className="text-gray-500 max-w-[280px] mx-auto text-sm font-medium leading-relaxed">
                                     Hemos enviado los detalles de tu cita con {psychologistName} a <span className="text-[#4A3C31] font-bold">{formData.email}</span>.
                                 </p>
-                                <Button onClick={() => setIsOpen(false)} className="mt-8 bg-[#A68363] hover:bg-[#8C6B4D] text-white rounded-xl font-bold px-10 h-12 shadow-lg">
-                                    Entendido
+                                <Button
+                                    onClick={() => {
+                                        setIsOpen(false);
+                                        router.push('/patient/dashboard');
+                                    }}
+                                    className="mt-8 bg-[#A68363] hover:bg-[#8C6B4D] text-white rounded-xl font-bold px-10 h-12 shadow-lg"
+                                >
+                                    Ver mi Dashboard
                                 </Button>
                             </motion.div>
                         )}

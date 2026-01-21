@@ -209,10 +209,51 @@ export function PaymentForm({ amount, onSuccess, onCancel }: PaymentFormProps) {
             </div>
 
             {/* Test Card Notice */}
-            <div className="text-center pt-2">
-                <p className="text-xs text-gray-400 italic">
-                    💳 Modo de prueba: Usa cualquier número de 16 dígitos
-                </p>
+            <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <CreditCard className="h-5 w-5 text-purple-600" />
+                    </div>
+                    <div className="flex-1">
+                        <p className="text-sm font-bold text-purple-900 mb-2">💳 Tarjetas de Prueba</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-1 text-xs text-purple-700">
+                                <p className="font-bold underline mb-1">Opción 1 (Stripe)</p>
+                                <p><span className="font-bold">Número:</span> 4242 4242 4242 4242</p>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setCardNumber("4242 4242 4242 4242");
+                                        setCardName("PRUEBA TEST");
+                                        setExpiryDate("12/34");
+                                        setCvv("123");
+                                        toast.success("Opción 1 cargada");
+                                    }}
+                                    className="mt-2 text-[10px] font-black text-purple-600 hover:text-purple-800 uppercase tracking-widest"
+                                >
+                                    Usar Opción 1 →
+                                </button>
+                            </div>
+                            <div className="space-y-1 text-xs text-purple-700">
+                                <p className="font-bold underline mb-1">Opción 2 (Simulación)</p>
+                                <p><span className="font-bold">Número:</span> 1111 1111 1111 1111</p>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setCardNumber("1111 1111 1111 1111");
+                                        setCardName("TEST USER");
+                                        setExpiryDate("11/31");
+                                        setCvv("111");
+                                        toast.success("Opción 2 cargada");
+                                    }}
+                                    className="mt-2 text-[10px] font-black text-purple-600 hover:text-purple-800 uppercase tracking-widest"
+                                >
+                                    Usar Opción 2 →
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </form>
     );

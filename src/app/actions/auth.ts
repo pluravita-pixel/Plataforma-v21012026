@@ -3,11 +3,9 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
-import { db } from "@/db";
-import { users, psychologists, supportTickets } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { client } from "@/db"; // Importamos el cliente directo, NO Drizzle
 
-// Helper to get Supabase client
+// Helper para cliente Supabase
 const getSupabase = () => {
     return createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -19,22 +17,27 @@ export async function login(prevState: any, formData: FormData) {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const supabase = getSupabase();
+
     let redirectPath: string | null = null;
     let authError: string | null = null;
 
     try {
+        // 1. Autenticación con Supabase
         const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password,
         });
 
         if (error) {
+            console.error("Supabase Auth Error:", error.message);
             if (error.message.includes("Email not confirmed")) {
-                authError = "Debes confirmar tu correo electrónico antes de entrar.";
-            } else {
-                authError = "Email no registrado o contraseña incorrecta";
+                return { error: "Debes confirmar tu correo electrónico." };
             }
-        } else if (data.session && data.user) {
+            return { error: "Credenciales incorrectas." };
+        }
+
+        if (data.session && data.user) {
+            // 2. Establecer Cookie de Sesión
             const cookieStore = await cookies();
             cookieStore.set("session_id", data.session.access_token, {
                 httpOnly: true,
@@ -43,82 +46,109 @@ export async function login(prevState: any, formData: FormData) {
                 path: "/",
             });
 
-            // Update last login in both tables if applicable
+            // 3. Obtener Rol del Usuario (SQL DIRECTO)
             try {
-                await db.update(users)
-                    .set({ lastLogin: new Date() })
-                    .where(eq(users.id, data.user.id));
+                // Actualizamos last_login
+                await client`
+                    UPDATE users SET last_login = NOW() WHERE id = ${data.user.id}
+                `;
 
-                const userRecord = await db.query.users.findFirst({
-                    where: eq(users.id, data.user.id),
-                });
+                // Obtenemos el rol
+                const usersResult = await client`
+                    SELECT role FROM users WHERE id = ${data.user.id} LIMIT 1
+                `;
+                const user = usersResult[0];
 
-                if (userRecord?.role === 'admin') {
-                    redirectPath = "/admin/dashboard";
-                } else if (userRecord?.role === 'psychologist') {
-                    await db.update(psychologists)
-                        .set({ lastLogin: new Date() })
-                        .where(eq(psychologists.userId, data.user.id));
-                    redirectPath = "/psychologist/dashboard";
+                if (!user) {
+                    console.error("Usuario autenticado pero no encontrado en tabla users DB");
+                    // Fallback: intentar crearlo o enviarlo a patient
+                    redirectPath = "/patient/dashboard";
                 } else {
-                    redirectPath = "/patient/dashboard"; // Landing for patients
+                    // Lógica de Redirección Simple
+                    if (user.role === 'admin') {
+                        redirectPath = "/admin/dashboard";
+                    } else if (user.role === 'psychologist') {
+                        // Actualizar tabla psicólogos también
+                        await client`
+                            UPDATE psychologists SET last_login = NOW() WHERE user_id = ${data.user.id}
+                        `;
+                        redirectPath = "/psychologist/dashboard";
+                    } else {
+                        redirectPath = "/patient/dashboard";
+                    }
                 }
+
             } catch (dbError) {
-                console.error("DB Sync error:", dbError);
-                redirectPath = "/patient/dashboard"; // Fallback
+                console.error("Error crítico de base de datos al login:", dbError);
+                // Si falla la DB pero el login es correcto, mandamos al dashboard de paciente por defecto
+                // para no bloquear al usuario, aunque verá datos vacíos.
+                redirectPath = "/patient/dashboard";
             }
         }
     } catch (err) {
-        authError = "Error al iniciar sesión";
+        console.error("Error inesperado en login:", err);
+        authError = "Error del sistema al iniciar sesión";
     }
 
     if (authError) return { error: authError };
     if (redirectPath) redirect(redirectPath);
-    return { error: "Error inesperado" };
+    return { error: "No se pudo iniciar sesión." };
 }
 
-export async function loginAnonymously() {
+export async function getCurrentUser() {
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get("session_id")?.value;
+    if (!sessionId) return null;
+
     const supabase = getSupabase();
-    let redirectPath: string | null = null;
-    let authError: string | null = null;
+    const { data: { user }, error } = await supabase.auth.getUser(sessionId);
+
+    if (error || !user) return null;
 
     try {
-        const { data, error } = await supabase.auth.signInAnonymously();
+        // Fetch raw user data
+        const result = await client`
+            SELECT 
+                id, 
+                email, 
+                full_name as "fullName", 
+                phone, 
+                role, 
+                last_login as "lastLogin",
+                has_completed_affinity as "hasCompletedAffinity"
+            FROM users 
+            WHERE id = ${user.id} 
+            LIMIT 1
+        `;
 
-        if (error) {
-            authError = "No se pudo iniciar sesión como invitado: " + error.message;
-        } else if (data.session && data.user) {
-            const cookieStore = await cookies();
-            cookieStore.set("session_id", data.session.access_token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                maxAge: data.session.expires_in,
-                path: "/",
-            });
-
-            // Sync with DB
-            try {
-                await db.insert(users).values({
-                    id: data.user.id,
-                    email: `guest_${data.user.id}@pluravita.com`, // Artificial unique email for DB constraint
-                    fullName: "Invitado",
-                    role: "patient"
-                }).onConflictDoNothing();
-            } catch (dbError) {
-                console.error("DB Sync Error for guest:", dbError);
-            }
-
-            redirectPath = "/";
-        }
-    } catch (err) {
-        authError = "Ocurrió un error inesperado";
+        return result[0] || null;
+    } catch (e) {
+        console.error("Error getting current user:", e);
+        return null;
     }
-
-    if (authError) return { error: authError };
-    if (redirectPath) redirect(redirectPath);
-    return { error: "Error de flujo en el inicio de sesión de invitado" };
 }
 
+export async function logout() {
+    try {
+        const cookieStore = await cookies();
+        // Clear cookie explicitly with path and maxAge 0
+        cookieStore.set("session_id", "", {
+            path: "/",
+            maxAge: 0,
+            expires: new Date(0),
+        });
+
+        const supabase = getSupabase();
+        await supabase.auth.signOut();
+    } catch (error) {
+        console.error("Logout error:", error);
+    }
+
+    // Redirect must be outside try/catch or re-thrown if it's a "NEXT_REDIRECT" error
+    redirect("/");
+}
+
+// Mantenemos register simplificado también
 export async function register(prevState: any, formData: FormData) {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
@@ -135,50 +165,29 @@ export async function register(prevState: any, formData: FormData) {
         if (error) return { error: error.message };
 
         if (data.user) {
-            // 1. Check if the user was already pre-created by an admin
-            const existingUser = await db.query.users.findFirst({
-                where: eq(users.email, email),
-            });
+            // Verificar usuario existente (migración simple)
+            const existing = await client`SELECT * FROM users WHERE email = ${email} LIMIT 1`;
 
-            if (existingUser) {
-                // Merge logic: Migrate data from old stub to new account
-                if (existingUser.id !== data.user.id) {
-                    // a. Rename stub to free email
-                    await db.update(users)
-                        .set({ email: `old_${data.user.id}_${email}` })
-                        .where(eq(users.id, existingUser.id));
-
-                    // b. Insert new
-                    await db.insert(users).values({
-                        id: data.user.id,
-                        email: email,
-                        fullName: fullName,
-                        role: existingUser.role,
-                        hasCompletedAffinity: existingUser.hasCompletedAffinity,
-                    });
-
-                    // c. Migrate kids
-                    await db.update(psychologists)
-                        .set({ userId: data.user.id })
-                        .where(eq(psychologists.userId, existingUser.id));
-
-                    await db.update(supportTickets)
-                        .set({ userId: data.user.id })
-                        .where(eq(supportTickets.userId, existingUser.id));
-
-                    // d. Delete stub
-                    await db.delete(users).where(eq(users.id, existingUser.id));
+            if (existing.length > 0) {
+                const oldUser = existing[0];
+                // Lógica de migración si el ID no coincide (usuario pre-creado)
+                if (oldUser.id !== data.user.id) {
+                    await client`DELETE FROM users WHERE id = ${oldUser.id}`;
+                    // Re-insertamos con el nuevo ID de Supabase Auth
+                    await client`
+                        INSERT INTO users (id, email, full_name, role)
+                        VALUES (${data.user.id}, ${email}, ${fullName}, ${oldUser.role})
+                     `;
                 }
             } else {
-                // Regular registration for new users
-                await db.insert(users).values({
-                    id: data.user.id,
-                    email: email,
-                    fullName: fullName,
-                    role: "patient", // Default for direct web registrations
-                });
+                // Registro normal
+                await client`
+                    INSERT INTO users (id, email, full_name, role)
+                    VALUES (${data.user.id}, ${email}, ${fullName}, 'patient')
+                `;
             }
 
+            // Auto-login
             if (data.session) {
                 const cookieStore = await cookies();
                 cookieStore.set("session_id", data.session.access_token, {
@@ -189,43 +198,36 @@ export async function register(prevState: any, formData: FormData) {
                 });
                 redirect("/patient/dashboard");
             } else {
-                return { success: "Registro exitoso. Verifica tu email." };
+                return { success: "Registro exitoso. Revisa tu email." };
             }
         }
-    } catch (err) {
-        if ((err as Error).message === "NEXT_REDIRECT") throw err;
-        return { error: "Error en el registro" };
+    } catch (err: any) {
+        if (err.message === "NEXT_REDIRECT") throw err;
+        console.error("Error registro:", err);
+        return { error: "Error al registrarse." };
     }
 }
 
-export async function getCurrentUser() {
-    const cookieStore = await cookies();
-    const sessionId = cookieStore.get("session_id")?.value;
-    if (!sessionId) return null;
-
-    const supabase = getSupabase();
-    const { data: { user }, error } = await supabase.auth.getUser(sessionId);
-    if (error || !user) return null;
-
-    return await db.query.users.findFirst({
-        where: eq(users.id, user.id),
-    });
-}
-
-export async function logout() {
-    const cookieStore = await cookies();
-    cookieStore.delete("session_id");
-    redirect("/");
+// Funciones dummy para mantener compatibilidad si se importan en otros lados, 
+// pero idealmente no se deberían usar si no son críticas.
+export async function loginAnonymously() {
+    // Implementación simplificada si hiciera falta
+    return { error: "Deshabilitado temporalmente" };
 }
 
 export async function updateProfile(fullName: string) {
     const user = await getCurrentUser();
     if (!user) return { error: "No autorizado" };
+    await client`UPDATE users SET full_name = ${fullName} WHERE id = ${user.id}`;
+    return { success: "Actualizado" };
+}
 
+export async function checkUserExists(email: string) {
     try {
-        await db.update(users).set({ fullName }).where(eq(users.id, user.id));
-        return { success: "Perfil actualizado" };
+        const result = await client`SELECT id FROM users WHERE email = ${email} LIMIT 1`;
+        return result.length > 0;
     } catch (error) {
-        return { error: "Error al actualizar" };
+        console.error("Error checking user existence:", error);
+        return false;
     }
 }

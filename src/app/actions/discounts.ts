@@ -1,10 +1,10 @@
 "use server";
 
 import { db } from "@/db";
-import { discountCodes, appointments } from "@/db/schema";
+import { discountCodes, appointments, users } from "@/db/schema";
 import { eq, and, count } from "drizzle-orm";
 
-export async function validateDiscountCode(code: string, userId: string) {
+export async function validateDiscountCode(code: string, userId: string, email?: string) {
     try {
         const normalizedCode = code.toUpperCase().trim();
 
@@ -24,16 +24,53 @@ export async function validateDiscountCode(code: string, userId: string) {
         }
 
         // 3. Check "First Session Only" condition
-        if (discountCode.isFirstSessionOnly) {
-            const [result] = await db
+        const isFirstSessionCode = discountCode.isFirstSessionOnly || normalizedCode === 'PRIMERA25';
+
+        if (isFirstSessionCode) {
+            let targetUserId = userId !== "guest" ? userId : null;
+
+            // If it's a guest but we have an email, try to find the user
+            if (!targetUserId && email) {
+                const [foundUser] = await db
+                    .select()
+                    .from(users)
+                    .where(eq(users.email, email));
+                if (foundUser) targetUserId = foundUser.id;
+            }
+
+            if (targetUserId) {
+                const [result] = await db
+                    .select({ count: count() })
+                    .from(appointments)
+                    .where(eq(appointments.patientId, targetUserId));
+
+                if (result.count > 0) {
+                    return { error: "Este código es válido solo para tu primera sesión." };
+                }
+            }
+        }
+
+        // 4. Check if user already used THIS specific code
+        let targetUserId = userId !== "guest" ? userId : null;
+        if (!targetUserId && email) {
+            const [foundUser] = await db
+                .select()
+                .from(users)
+                .where(eq(users.email, email));
+            if (foundUser) targetUserId = foundUser.id;
+        }
+
+        if (targetUserId) {
+            const [usedResult] = await db
                 .select({ count: count() })
                 .from(appointments)
-                .where(eq(appointments.patientId, userId));
+                .where(and(
+                    eq(appointments.patientId, targetUserId),
+                    eq(appointments.discountCodeId, discountCode.id)
+                ));
 
-            // If user has ANY appointments recorded (past or upcoming), they are not new.
-            // (Unless we want to count only 'completed' ones, but typically first-booking implies 0 bookings)
-            if (result.count > 0) {
-                return { error: "Este código es válido solo para tu primera sesión." };
+            if (usedResult.count > 0) {
+                return { error: "Ya has utilizado este código de descuento anteriormente." };
             }
         }
 

@@ -6,14 +6,16 @@ import { eq, count, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 export async function getAdminStats() {
-    const [totalUsers] = await db.select({ value: count() }).from(users);
-    const [totalPsychologists] = await db.select({ value: count() }).from(psychologists);
-    const [totalSessions] = await db.select({ value: count() }).from(appointments);
+    const [totalUsersRes, totalPsychologistsRes, totalSessionsRes] = await Promise.all([
+        db.select({ value: count() }).from(users),
+        db.select({ value: count() }).from(psychologists),
+        db.select({ value: count() }).from(appointments)
+    ]);
 
     return {
-        users: totalUsers.value,
-        psychologists: totalPsychologists.value,
-        sessions: totalSessions.value,
+        users: totalUsersRes[0].value,
+        psychologists: totalPsychologistsRes[0].value,
+        sessions: totalSessionsRes[0].value,
     };
 }
 
@@ -55,6 +57,33 @@ export async function resolveTicket(ticketId: string) {
         .set({ status: "resolved" })
         .where(eq(supportTickets.id, ticketId));
     revalidatePath("/admin/support");
+}
+
+export async function preApproveAdmin(email: string) {
+    try {
+        // Check if user already exists
+        const existing = await db.select().from(users).where(eq(users.email, email.toLowerCase().trim())).limit(1);
+
+        if (existing.length > 0) {
+            // If exists, just update role to admin
+            await db.update(users)
+                .set({ role: "admin" })
+                .where(eq(users.email, email.toLowerCase().trim()));
+        } else {
+            // If not, pre-insert placeholder user
+            await db.insert(users).values({
+                email: email.toLowerCase().trim(),
+                fullName: "Admin Pendiente",
+                role: "admin",
+            });
+        }
+
+        revalidatePath("/admin/settings");
+        return { success: true };
+    } catch (error) {
+        console.error("Error pre-approving admin:", error);
+        return { error: "No se pudo invitar al administrador." };
+    }
 }
 
 export async function getTickets() {

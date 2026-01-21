@@ -19,6 +19,7 @@ export const psychologists = pgTable("psychologists", {
   fullName: text("full_name").notNull(),
   email: text("email"),
   totalSessions: integer("total_sessions").default(0),
+  completedSessions: integer("completed_sessions").default(0),
   totalPatients: integer("total_patients").default(0),
   activePatients: integer("active_patients").default(0),
   rating: text("rating").default("5.0"),
@@ -49,11 +50,16 @@ export const appointments = pgTable("appointments", {
   id: uuid("id").primaryKey().defaultRandom(),
   patientId: uuid("patient_id").references(() => users.id).notNull(),
   psychologistId: uuid("psychologist_id").references(() => psychologists.id).notNull(),
+  patientName: text("patient_name"), // Override for anonymity or custom names during booking
   date: timestamp("date").notNull(),
   reason: text("reason"),
   status: text("status").default("scheduled").notNull(), // scheduled, completed, cancelled
   price: decimal("price", { precision: 10, scale: 2 }),
   discountCodeId: uuid("discount_code_id").references(() => discountCodes.id),
+  psychologistNotes: text("psychologist_notes"), // Notes/tips from psychologist after session
+  improvementTips: text("improvement_tips"), // Personalized improvement tips
+  rating: integer("rating"), // Patient rating 1-5
+  isAnonymous: boolean("is_anonymous").default(false).notNull(), // New field for anonymous booking
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

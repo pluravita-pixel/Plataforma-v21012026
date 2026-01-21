@@ -41,12 +41,30 @@ const getSupabase = async () => {
     return supabase;
 };
 
-export async function uploadSessionFile(appointmentId: string, formData: FormData) {
-    const file = formData.get("file") as File;
-    const uploaderId = formData.get("uploaderId") as string;
+import { getCurrentUser } from "./auth";
+import { client } from "@/db";
 
-    if (!file || !appointmentId || !uploaderId) {
+export async function uploadSessionFile(appointmentId: string, formData: FormData) {
+    const user = await getCurrentUser();
+
+    if (!user || user.role !== 'psychologist') {
+        return { error: "Solo los psicólogos pueden subir archivos a las sesiones." };
+    }
+
+    const file = formData.get("file") as File;
+    if (!file || !appointmentId) {
         return { error: "Faltan datos para subir el archivo." };
+    }
+
+    // Verify appointment ownership
+    const results = await client`
+        SELECT id FROM appointments 
+        WHERE id = ${appointmentId} AND psychologist_id = (SELECT id FROM psychologists WHERE user_id = ${user.id} LIMIT 1)
+        LIMIT 1
+    `;
+
+    if (results.length === 0) {
+        return { error: "No tienes permisos para subir archivos a esta sesión." };
     }
 
     const supabase = await getSupabase();
@@ -55,7 +73,6 @@ export async function uploadSessionFile(appointmentId: string, formData: FormDat
     const fileExt = file.name.split('.').pop();
     const fileName = `${appointmentId}/${Date.now()}.${fileExt}`;
 
-    // Need to convert File to ArrayBuffer for supabase-js upload in Node environment
     const arrayBuffer = await file.arrayBuffer();
     const fileBuffer = Buffer.from(arrayBuffer);
 
@@ -72,21 +89,19 @@ export async function uploadSessionFile(appointmentId: string, formData: FormDat
         return { error: "Error al guardar el archivo en la nube." };
     }
 
-    // 2. Get Public URL (or Signed URL if private)
-    // Since we made the bucket private (good practice), we technically need signed URLs to view.
-    // For now, let's store the path. We will generate signed URLs on fetch.
     const filePath = uploadData.path;
 
     // 3. Save Metadata to DB
     try {
         await db.insert(sessionFiles).values({
             appointmentId,
-            uploaderId,
+            uploaderId: user.id,
             fileName: file.name,
-            fileUrl: filePath, // Storing the storage path
+            fileUrl: filePath,
             fileSize: file.size,
         });
 
+        revalidatePath(`/psychologist/dashboard`);
         revalidatePath(`/patient/dashboard`);
         return { success: true };
     } catch (dbError) {

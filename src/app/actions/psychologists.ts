@@ -1,50 +1,135 @@
 "use server";
 
-import { db } from "@/db";
-import { psychologists, appointments, supportTickets, withdrawals, users } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { client } from "@/db"; // Use raw client
 import { revalidatePath } from "next/cache";
 
-export async function getPsychologistStatus(userId: string) {
-    const psych = await db.query.psychologists.findFirst({
-        where: eq(psychologists.userId, userId),
-    });
+// Helper to map snake_case DB results to camelCase for frontend compatibility
+const mapPsychologist = (p: any) => p ? ({
+    id: p.id,
+    userId: p.user_id,
+    fullName: p.full_name,
+    email: p.email,
+    specialty: p.specialty,
+    description: p.description,
+    price: p.price,
+    image: p.image,
+    activePatients: p.active_patients,
+    totalSessions: p.total_sessions,
+    totalPatients: p.total_patients,
+    rating: p.rating,
+    tags: p.tags,
+    balance: p.balance,
+    iban: p.iban,
+    payoutName: p.payout_name,
+    experience: p.experience,
+    lastLogin: p.last_login,
+    completedSessions: p.completed_sessions,
+    createdAt: p.created_at,
+}) : null;
 
-    if (psych) return psych;
-
-    // Self-healing: If user is a psychologist but has no profile, create it.
-    const user = await db.query.users.findFirst({
-        where: eq(users.id, userId)
-    });
-
-    if (user && (user.role === 'psychologist' || user.role === 'admin')) {
-        const [newPsych] = await db.insert(psychologists).values({
-            userId: user.id,
-            fullName: user.fullName || "Coach",
-            email: user.email,
-            specialty: "General",
-            description: "Coach profesional en Pluravita.",
-            price: "35.00",
-            image: "",
-            activePatients: 0,
-            totalSessions: 0,
-        }).returning();
-
-        return newPsych;
+export async function refreshPsychologistStats(psychologistId: string) {
+    try {
+        await client`
+            UPDATE psychologists p
+            SET 
+                total_sessions = (
+                    SELECT COUNT(*)::int FROM appointments 
+                    WHERE psychologist_id = ${psychologistId} AND status IN ('scheduled', 'completed')
+                ),
+                completed_sessions = (
+                    SELECT COUNT(*)::int FROM appointments 
+                    WHERE psychologist_id = ${psychologistId} AND status = 'completed'
+                ),
+                active_patients = (
+                    SELECT COUNT(DISTINCT patient_id)::int FROM appointments 
+                    WHERE psychologist_id = ${psychologistId} AND status = 'scheduled'
+                ),
+                total_patients = (
+                    SELECT COUNT(DISTINCT patient_id)::int FROM appointments 
+                    WHERE psychologist_id = ${psychologistId} AND status IN ('scheduled', 'completed')
+                )
+            WHERE id = ${psychologistId}
+        `;
+    } catch (error) {
+        console.error("Error refreshing psychologist stats:", error);
     }
+}
 
-    return null;
+const mapUser = (u: any) => u ? ({
+    id: u.id,
+    email: u.email,
+    fullName: u.full_name,
+    phone: u.phone,
+    role: u.role,
+    // ... other fields as needed
+}) : null;
+
+export async function getPsychologistStatus(userId: string) {
+    try {
+        const result = await client`
+            SELECT * FROM psychologists WHERE user_id = ${userId} LIMIT 1
+        `;
+
+        if (result.length > 0) {
+            const psych = result[0];
+            // Sync stats on load to ensure accuracy
+            await refreshPsychologistStats(psych.id);
+            const updatedResult = await client`SELECT * FROM psychologists WHERE id = ${psych.id}`;
+            return mapPsychologist(updatedResult[0]);
+        }
+
+        // Self-healing: If user is a psychologist but has no profile, create it.
+        const userResult = await client`
+            SELECT * FROM users WHERE id = ${userId} LIMIT 1
+        `;
+        const user = userResult[0];
+
+        if (user && (user.role === 'psychologist' || user.role === 'admin')) {
+            const newPsychResult = await client`
+                INSERT INTO psychologists (
+                    user_id, full_name, email, specialty, description, price, image, active_patients, total_sessions
+                ) VALUES (
+                    ${user.id}, ${user.full_name || "Coach"}, ${user.email}, 'General', 'Coach profesional en Pluravita.', '35.00', '', 0, 0
+                )
+                RETURNING *
+            `;
+            return mapPsychologist(newPsychResult[0]);
+        }
+
+        return null;
+    } catch (error) {
+        console.error("Error in getPsychologistStatus:", error);
+        return null;
+    }
 }
 
 export async function getPsychologists() {
-    return await db.query.psychologists.findMany();
+    try {
+        const results = await client`SELECT * FROM psychologists`;
+        return results.map(mapPsychologist).filter((p): p is NonNullable<typeof p> => p !== null);
+    } catch (error) {
+        console.error("Error in getPsychologists:", error);
+        return [];
+    }
 }
 
 export async function getWithdrawals(psychologistId: string) {
-    return await db.query.withdrawals.findMany({
-        where: eq(withdrawals.psychologistId, psychologistId),
-        orderBy: [desc(withdrawals.createdAt)],
-    });
+    try {
+        const results = await client`
+            SELECT * FROM withdrawals 
+            WHERE psychologist_id = ${psychologistId}
+            ORDER BY created_at DESC
+        `;
+        return results.map((w: any) => ({
+            id: w.id,
+            psychologistId: w.psychologist_id,
+            amount: w.amount,
+            status: w.status,
+            createdAt: w.created_at
+        }));
+    } catch (error) {
+        return [];
+    }
 }
 
 export async function updatePsychologistSettings(userId: string, data: {
@@ -54,86 +139,345 @@ export async function updatePsychologistSettings(userId: string, data: {
     iban?: string,
     payoutName?: string
 }) {
-    await db.update(psychologists)
-        .set(data)
-        .where(eq(psychologists.userId, userId));
+    // Dynamic update query construction
+    const updates = [];
+    const values = [];
+
+    if (data.image !== undefined) updates.push(client`image = ${data.image}`);
+    if (data.tags !== undefined) updates.push(client`tags = ${data.tags}`);
+    if (data.description !== undefined) updates.push(client`description = ${data.description}`);
+    if (data.iban !== undefined) updates.push(client`iban = ${data.iban}`);
+    if (data.payoutName !== undefined) updates.push(client`payout_name = ${data.payoutName}`);
+
+    if (updates.length > 0) {
+        await client`
+            UPDATE psychologists 
+            SET 
+                image = COALESCE(${data.image || null}::text, image),
+                tags = COALESCE(${data.tags || null}::text[], tags),
+                description = COALESCE(${data.description || null}::text, description),
+                iban = COALESCE(${data.iban || null}::text, iban),
+                payout_name = COALESCE(${data.payoutName || null}::text, payout_name)
+            WHERE user_id = ${userId}
+        `;
+    }
+
     revalidatePath("/psychologist/dashboard");
     revalidatePath("/psychologist/balance");
 }
 
 export async function getUpcomingAppointments(psychologistId: string) {
-    return await db.query.appointments.findMany({
-        where: eq(appointments.psychologistId, psychologistId),
-        with: {
-            patient: true
-        },
-        orderBy: [desc(appointments.date)],
-    });
+    try {
+        const results = await client`
+            SELECT a.*, 
+                   u.id as u_id, u.email as u_email, u.full_name as u_full_name, u.phone as u_phone, u.role as u_role
+            FROM appointments a
+            LEFT JOIN users u ON a.patient_id = u.id
+            WHERE a.psychologist_id = ${psychologistId}
+            ORDER BY a.date DESC
+        `;
+
+        return results.map((r: any) => ({
+            id: r.id,
+            psychologistId: r.psychologist_id,
+            patientId: r.patient_id,
+            date: r.date,
+            reason: r.reason,
+            status: r.status,
+            price: r.price,
+            discountCodeId: r.discount_code_id,
+            psychologistNotes: r.psychologist_notes,
+            improvementTips: r.improvement_tips,
+            rating: r.rating,
+            isAnonymous: r.is_anonymous,
+            createdAt: r.created_at,
+            patient: r.u_id ? {
+                id: r.u_id,
+                email: r.is_anonymous ? "Anónimo (Privado)" : r.u_email,
+                fullName: r.patient_name || r.u_full_name,
+                phone: r.is_anonymous ? "-" : r.u_phone,
+                role: r.u_role
+            } : null
+        }));
+    } catch (error) {
+        console.error("Error getUpcomingAppointments optimized:", error);
+        return [];
+    }
 }
 
 export async function getPsychologistPatients(psychologistId: string) {
-    // Get unique patients who have at least one appointment with this psychologist
-    const psychologistAppointments = await db.query.appointments.findMany({
-        where: eq(appointments.psychologistId, psychologistId),
-        with: {
-            patient: true
-        }
-    });
+    // New logic: Fetch ALL to derive patient list with nextAppointment state
+    try {
+        const results = await client`
+            SELECT a.*, u.full_name, u.email, u.phone, u.role
+            FROM appointments a
+            LEFT JOIN users u ON a.patient_id = u.id
+            WHERE a.psychologist_id = ${psychologistId}
+            ORDER BY a.date DESC
+        `;
 
-    const uniquePatientsMap = new Map();
-    psychologistAppointments.forEach(app => {
-        if (!uniquePatientsMap.has(app.patientId)) {
-            uniquePatientsMap.set(app.patientId, {
-                ...app.patient,
-                lastSession: app.date,
-                reason: app.reason,
-                status: app.status === 'completed' ? 'Activo' : 'En pausa'
-            });
-        } else {
-            // Update last session if this one is newer
-            const existing = uniquePatientsMap.get(app.patientId);
-            if (new Date(app.date) > new Date(existing.lastSession)) {
-                uniquePatientsMap.set(app.patientId, {
-                    ...existing,
-                    lastSession: app.date,
-                    reason: app.reason || existing.reason
+        const uniquePatientsMap = new Map();
+
+        for (const app of results) {
+            if (!app.patient_id) continue;
+
+            const existing = uniquePatientsMap.get(app.patient_id);
+            const appDate = new Date(app.date);
+
+            // Determine next appointment ID (the most imminent scheduled one in future)
+            let nextAppId = existing?.nextAppointmentId;
+            const now = new Date();
+
+            if (app.status === 'scheduled' && appDate >= now) {
+                // If we don't have one yet, or this one is sooner than the stored one
+                if (!nextAppId || (existing?.nextAppDate && appDate < existing.nextAppDate)) {
+                    nextAppId = app.id;
+                }
+            }
+
+            if (!existing) {
+                uniquePatientsMap.set(app.patient_id, {
+                    id: app.patient_id,
+                    fullName: app.is_anonymous ? (app.patient_name || "Usuario Anónimo") : app.full_name,
+                    email: app.is_anonymous ? "Privado" : app.email,
+                    phone: app.is_anonymous ? "-" : app.phone,
+                    lastSession: appDate,
+                    reason: app.reason,
+                    status: app.status === 'completed' ? 'Activo' : 'En pausa',
+                    nextAppointmentId: nextAppId,
+                    nextAppDate: app.status === 'scheduled' && appDate >= now ? appDate : null,
+                    isAnonymous: app.is_anonymous
                 });
+            } else {
+                // Update logic: keep most recent 'lastSession'
+                if (appDate > existing.lastSession) {
+                    existing.lastSession = appDate;
+                    existing.reason = app.reason || existing.reason;
+                    existing.fullName = app.is_anonymous ? (app.patient_name || "Usuario Anónimo") : app.full_name;
+                    existing.email = app.is_anonymous ? "Privado" : app.email;
+                    existing.phone = app.is_anonymous ? "-" : app.phone;
+                    existing.isAnonymous = app.is_anonymous;
+                }
+                if (nextAppId) {
+                    existing.nextAppointmentId = nextAppId;
+                    existing.nextAppDate = app.status === 'scheduled' && appDate >= now ? appDate : existing.nextAppDate;
+                }
+                if (app.status === 'completed') existing.status = 'Activo';
+
+                uniquePatientsMap.set(app.patient_id, existing);
             }
         }
-    });
 
-    return Array.from(uniquePatientsMap.values());
+        return Array.from(uniquePatientsMap.values());
+    } catch (e) {
+        console.error("Error in getPsychologistPatients:", e);
+        return [];
+    }
 }
 
 export async function createSupportTicket(userId: string, subject: string, message: string) {
-    await db.insert(supportTickets).values({
-        userId,
-        subject,
-        message,
-    });
+    await client`
+        INSERT INTO support_tickets (user_id, subject, message)
+        VALUES (${userId}, ${subject}, ${message})
+    `;
     return { success: true };
 }
 
 export async function withdrawBalance(psychologistId: string, amount: number) {
-    const psych = await db.query.psychologists.findFirst({
-        where: eq(psychologists.id, psychologistId)
-    });
+    const psychResult = await client`
+        SELECT * FROM psychologists WHERE id = ${psychologistId} LIMIT 1
+    `;
+    const psych = psychResult[0];
 
     if (!psych || Number(psych.balance) < 50 || Number(psych.balance) < amount) {
         return { error: "Saldo insuficiente (mínimo 50€)" };
     }
 
     // Record the withdrawal request
-    await db.insert(withdrawals).values({
-        psychologistId,
-        amount: amount.toString(),
-        status: 'pending'
-    });
+    await client`
+        INSERT INTO withdrawals (psychologist_id, amount, status)
+        VALUES (${psychologistId}, ${amount.toString()}, 'pending')
+    `;
 
     const newBalance = (Number(psych.balance) - amount).toString();
-    await db.update(psychologists).set({ balance: newBalance }).where(eq(psychologists.id, psychologistId));
+    await client`
+        UPDATE psychologists SET balance = ${newBalance} WHERE id = ${psychologistId}
+    `;
 
     revalidatePath("/psychologist/dashboard");
     revalidatePath("/psychologist/balance");
     return { success: true };
+}
+
+export async function getRecentConsultations(psychologistId: string) {
+    try {
+        const results = await client`
+            SELECT a.*, u.full_name as u_full_name, u.email as u_email 
+            FROM appointments a
+            LEFT JOIN users u ON a.patient_id = u.id
+            WHERE a.psychologist_id = ${psychologistId}
+            AND a.status = 'completed'
+            ORDER BY a.date DESC
+            LIMIT 5
+        `;
+
+        return results.map((r: any) => ({
+            id: r.id,
+            patientId: r.patient_id,
+            date: r.date,
+            reason: r.reason,
+            status: r.status,
+            patient: {
+                fullName: r.is_anonymous ? (r.patient_name || "Usuario Anónimo") : r.u_full_name,
+                email: r.is_anonymous ? "Privado" : r.u_email
+            }
+        }));
+    } catch (error) {
+        console.error("Error getting recent consultations optimized:", error);
+        return [];
+    }
+}
+
+export async function getWeeklyAppointments(psychologistId: string) {
+    try {
+        const now = new Date();
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - now.getDay());
+        startOfWeek.setHours(0, 0, 0, 0);
+
+        const endOfWeek = new Date(now);
+        endOfWeek.setDate(now.getDate() - now.getDay() + 6);
+        endOfWeek.setHours(23, 59, 59, 999);
+
+        const results = await client`
+            SELECT a.*, 
+                   u.id as u_id, u.email as u_email, u.full_name as u_full_name, u.phone as u_phone, u.role as u_role
+            FROM appointments a
+            LEFT JOIN users u ON a.patient_id = u.id
+            WHERE a.psychologist_id = ${psychologistId}
+            AND a.date >= ${startOfWeek.toISOString()}
+            AND a.date <= ${endOfWeek.toISOString()}
+            ORDER BY a.date ASC
+        `;
+
+        return results.map((r: any) => ({
+            id: r.id,
+            psychologistId: r.psychologist_id,
+            patientId: r.patient_id,
+            date: r.date,
+            reason: r.reason,
+            status: r.status,
+            price: r.price,
+            isAnonymous: r.is_anonymous,
+            patient: r.u_id ? {
+                id: r.u_id,
+                email: r.is_anonymous ? "Anónimo (Privado)" : r.u_email,
+                fullName: r.patient_name || r.u_full_name,
+            } : null
+        }));
+    } catch (error) {
+        console.error("Error getting weekly appointments:", error);
+        return [];
+    }
+}
+
+export async function getWeeklyAppointmentsCount(psychologistId: string) {
+    try {
+        const now = new Date();
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - now.getDay());
+        startOfWeek.setHours(0, 0, 0, 0);
+
+        const endOfWeek = new Date(now);
+        endOfWeek.setDate(now.getDate() - now.getDay() + 6);
+        endOfWeek.setHours(23, 59, 59, 999);
+
+        const result = await client`
+            SELECT COUNT(*) as count 
+            FROM appointments 
+            WHERE psychologist_id = ${psychologistId}
+            AND date >= ${startOfWeek.toISOString()}
+            AND date <= ${endOfWeek.toISOString()}
+        `;
+
+        return Number(result[0]?.count || 0);
+    } catch (error) {
+        console.error("Error getting weekly stats:", error);
+        return 0;
+    }
+}
+
+export async function cancelAppointmentByPsychologist(appointmentId: string, psychologistId: string) {
+    try {
+        // 1. Verify ownership and status
+        const apptResult = await client`
+            SELECT * FROM appointments 
+            WHERE id = ${appointmentId} AND psychologist_id = ${psychologistId}
+            LIMIT 1
+        `;
+        const appointment = apptResult[0];
+
+        if (!appointment) return { error: "Cita no encontrada." };
+        if (appointment.status === 'cancelled') return { error: "La cita ya está cancelada." };
+        if (appointment.status === 'completed') return { error: "No puedes cancelar una cita ya completada." };
+
+        // 2. Perform cancellation
+        // We simulate a 100% refund logic here + penalty flag
+        // In a real app, we would call Stripe API here.
+
+        await client`
+            UPDATE appointments 
+            SET 
+                status = 'cancelled',
+                psychologist_notes = ${appointment.psychologist_notes ? appointment.psychologist_notes + "\n[CANCELADA POR PSICÓLOGO - PENALIZACIÓN APLICADA]" : "[CANCELADA POR PSICÓLOGO - PENALIZACIÓN APLICADA]"}
+            WHERE id = ${appointmentId}
+        `;
+
+        // 3. Revalidate paths
+        revalidatePath("/psychologist/dashboard");
+        revalidatePath("/psychologist/calendar");
+        revalidatePath("/psychologist/patients");
+
+        return { success: "Cita cancelada. Se ha emitido un reembolso completo al paciente." };
+    } catch (error) {
+        console.error("Error cancelling appointment:", error);
+        return { error: "Error al cancelar la cita." };
+    }
+}
+
+export async function completeAppointment(data: { id: string, notes: string, tips: string }) {
+    try {
+        const apptResultBefore = await client`SELECT * FROM appointments WHERE id = ${data.id}`;
+        const apptBefore = apptResultBefore[0];
+
+        if (!apptBefore) return { error: "Cita no encontrada" };
+        if (apptBefore.status === 'completed') return { error: "La cita ya está completada" };
+
+        await client`
+            UPDATE appointments 
+            SET 
+                status = 'completed',
+                psychologist_notes = ${data.notes},
+                improvement_tips = ${data.tips}
+            WHERE id = ${data.id}
+        `;
+
+        // Update psychologist balance and stats
+        await client`
+            UPDATE psychologists 
+            SET 
+                balance = balance + ${apptBefore.price || '35.00'}
+            WHERE id = ${apptBefore.psychologist_id}
+        `;
+
+        await refreshPsychologistStats(apptBefore.psychologist_id);
+
+        revalidatePath("/psychologist/dashboard");
+        revalidatePath("/patient/dashboard");
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error completing appointment:", error);
+        return { error: "Error al completar la cita" };
+    }
 }

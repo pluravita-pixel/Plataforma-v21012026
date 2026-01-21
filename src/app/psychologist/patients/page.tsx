@@ -24,13 +24,16 @@ export default async function PatientsPage() {
 
     return (
         <PatientsClient
+            psychologistId={psychologist.id}
             initialPatients={patients.map(p => ({
                 id: p.id,
                 fullName: p.fullName,
                 email: p.email,
                 lastSession: p.lastSession,
                 reason: p.reason,
-                status: p.status
+                status: p.status,
+                nextAppointmentId: p.nextAppointmentId,
+                nextAppDate: p.nextAppDate
             }))}
         />
     );

@@ -23,7 +23,7 @@ export default function AffinityResultsPage() {
                 getPsychologists(),
                 getCurrentUser()
             ])
-            setPsychologists(data)
+            setPsychologists(data as Psychologist[])
             setCurrentUser(user)
             setLoading(false)
         }
@@ -157,7 +157,7 @@ export default function AffinityResultsPage() {
                         <h2 className="text-2xl md:text-3xl font-extrabold text-[#4A3C31] flex items-center gap-3">
                             Coaches recomendados <span className="animate-bounce">👇</span>
                         </h2>
-                        <Link href="/register" className="text-[#A68363] font-bold text-sm hover:underline">
+                        <Link href={currentUser ? "/patient/search" : "/register"} className="text-[#A68363] font-bold text-sm hover:underline">
                             Ver todos los coaches
                         </Link>
                     </div>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { usePathname } from "next/navigation";
 import {
     User,
     LogOut,
@@ -26,10 +27,13 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 export function UserNav() {
+    const pathname = usePathname();
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [isPending, startTransition] = useTransition();
     const [isOpen, setIsOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const [newName, setNewName] = useState("");
     const [isUpdating, setIsUpdating] = useState(false);
 
@@ -49,8 +53,10 @@ export function UserNav() {
         fetchUser();
     }, []);
 
-    const handleLogout = async () => {
-        await logout();
+    const handleLogout = () => {
+        startTransition(async () => {
+            await logout();
+        });
     };
 
     const handleUpdateName = async () => {
@@ -120,25 +126,39 @@ export function UserNav() {
                             <p className="text-sm font-bold text-gray-900 truncate">{user.email}</p>
                         </div>
 
-                        {user.role === 'admin' && (
+                        {user.role === 'admin' && pathname !== '/admin/dashboard' && (
                             <Link
                                 href="/admin/dashboard"
                                 className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-[#F2EDE7] hover:text-[#A68363] transition-colors"
+                                onClick={() => setIsOpen(false)}
                             >
                                 <LayoutDashboard className="h-4 w-4" />
                                 Panel de Admin
                             </Link>
                         )}
 
-                        {user.role === 'psychologist' && (
+                        {user.role === 'psychologist' && pathname !== '/psychologist/dashboard' && (
                             <Link
                                 href="/psychologist/dashboard"
                                 className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-[#F2EDE7] hover:text-[#A68363] transition-colors"
+                                onClick={() => setIsOpen(false)}
                             >
                                 <LayoutDashboard className="h-4 w-4" />
                                 Panel de Coach
                             </Link>
                         )}
+
+                        {user.role === 'patient' && pathname !== '/patient/dashboard' && (
+                            <Link
+                                href="/patient/dashboard"
+                                className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-[#F2EDE7] hover:text-[#A68363] transition-colors"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                <LayoutDashboard className="h-4 w-4" />
+                                Mi Dashboard
+                            </Link>
+                        )}
+
 
                         <button
                             onClick={() => {
@@ -154,7 +174,10 @@ export function UserNav() {
                         <div className="h-px bg-gray-50 my-1" />
 
                         <button
-                            onClick={handleLogout}
+                            onClick={() => {
+                                setShowLogoutConfirm(true);
+                                setIsOpen(false);
+                            }}
                             className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                         >
                             <LogOut className="h-4 w-4" />
@@ -164,6 +187,7 @@ export function UserNav() {
                 </>
             )}
 
+            {/* Edit Profile Dialog */}
             <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
@@ -188,6 +212,37 @@ export function UserNav() {
                             className="bg-[#A68363] hover:opacity-90 text-white"
                         >
                             {isUpdating ? "Guardando..." : "Guardar cambios"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Logout Confirm Dialog */}
+            <Dialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
+                <DialogContent className="sm:max-w-[400px] rounded-[2rem]">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl font-bold text-gray-900 border-none">¿Cerrar sesión?</DialogTitle>
+                        <p className="text-gray-500 font-medium text-sm mt-2">
+                            ¿Estás seguro que quieres cerrar sesión?
+                        </p>
+                    </DialogHeader>
+                    <DialogFooter className="flex gap-3 sm:justify-end mt-4">
+                        <Button
+                            variant="ghost"
+                            onClick={() => setShowLogoutConfirm(false)}
+                            disabled={isPending}
+                            className="rounded-xl font-bold hover:bg-gray-100"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={handleLogout}
+                            disabled={isPending}
+                            className="rounded-xl font-bold bg-red-600 hover:bg-red-700 shadow-lg shadow-red-200 flex items-center gap-2"
+                        >
+                            {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+                            Aceptar
                         </Button>
                     </DialogFooter>
                 </DialogContent>

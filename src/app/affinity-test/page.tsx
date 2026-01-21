@@ -154,7 +154,7 @@ export default function AffinityTestPage() {
                     .single()
 
                 if (data?.has_completed_affinity) {
-                    router.push("/affinity-results")
+                    router.push("/patient/search")
                 }
             }
         }

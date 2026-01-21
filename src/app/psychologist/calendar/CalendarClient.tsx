@@ -13,6 +13,7 @@ import {
     Check as CheckUser,
     Lock
 } from "lucide-react";
+import Link from "next/link";
 import { createAvailabilitySlot, deleteAvailabilitySlot } from "@/app/actions/booking";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -135,8 +136,8 @@ export function CalendarClient({
                                 key={v}
                                 onClick={() => setView(v)}
                                 className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-300 ${view === v
-                                        ? "bg-white text-[#4A3C31] shadow-md transform scale-105"
-                                        : "text-gray-400 hover:text-gray-600"
+                                    ? "bg-white text-[#4A3C31] shadow-md transform scale-105"
+                                    : "text-gray-400 hover:text-gray-600"
                                     }`}
                             >
                                 {v}
@@ -149,8 +150,8 @@ export function CalendarClient({
                     <Button
                         onClick={() => setIsEditingAvailability(!isEditingAvailability)}
                         className={`rounded-xl px-6 h-11 font-bold text-sm transition-all duration-300 flex items-center gap-2 ${isEditingAvailability
-                                ? "bg-[#4A3C31] text-white hover:bg-[#2C241D] shadow-lg shadow-[#4A3C31]/20"
-                                : "bg-white text-[#4A3C31] border border-gray-200 hover:bg-[#F9F9F9]"
+                            ? "bg-[#4A3C31] text-white hover:bg-[#2C241D] shadow-lg shadow-[#4A3C31]/20"
+                            : "bg-white text-[#4A3C31] border border-gray-200 hover:bg-[#F9F9F9]"
                             }`}
                     >
                         {isEditingAvailability ? (
@@ -170,8 +171,8 @@ export function CalendarClient({
 
             {/* Main Calendar Card */}
             <div className={`bg-white rounded-[2.5rem] border transition-all duration-500 flex-1 flex flex-col overflow-hidden relative ${isEditingAvailability
-                    ? "border-[#A68363]/50 shadow-2xl shadow-[#A68363]/10"
-                    : "border-gray-100 shadow-xl shadow-gray-200/50"
+                ? "border-[#A68363]/50 shadow-2xl shadow-[#A68363]/10"
+                : "border-gray-100 shadow-xl shadow-gray-200/50"
                 }`}>
 
                 {/* Decoration Gradient (Top) */}
@@ -221,8 +222,8 @@ export function CalendarClient({
                                 <div className="p-5 text-center border-b border-gray-200 sticky top-0 z-10 bg-white/95 backdrop-blur-sm">
                                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#A68363] mb-1.5">{d.day}</p>
                                     <div className={`w-10 h-10 mx-auto flex items-center justify-center rounded-full text-lg font-black transition-all ${d.fullDate.toDateString() === new Date().toDateString()
-                                            ? "bg-[#4A3C31] text-white shadow-lg shadow-[#4A3C31]/30"
-                                            : "text-[#4A3C31]"
+                                        ? "bg-[#4A3C31] text-white shadow-lg shadow-[#4A3C31]/30"
+                                        : "text-[#4A3C31]"
                                         }`}>
                                         {d.date}
                                     </div>
@@ -249,7 +250,10 @@ export function CalendarClient({
                                             >
                                                 {/* 1. APPOINTMENT CARD */}
                                                 {appointment && (
-                                                    <div className="w-full h-full bg-white border-l-[3px] border-[#A68363] rounded-r-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all p-3 flex flex-col justify-center relative z-20 group/card">
+                                                    <Link
+                                                        href={`/psychologist/appointments/${appointment.id}`}
+                                                        className="w-full h-full bg-white border-l-[3px] border-[#A68363] rounded-r-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all p-3 flex flex-col justify-center relative z-20 group/card"
+                                                    >
                                                         <div className="flex items-center gap-2 mb-1">
                                                             <div className="bg-[#A68363]/10 p-1 rounded-md">
                                                                 <Clock className="h-3 w-3 text-[#A68363]" />
@@ -257,14 +261,14 @@ export function CalendarClient({
                                                             <span className="text-[10px] font-black uppercase tracking-wider text-[#A68363]">Confirmada</span>
                                                         </div>
                                                         <p className="text-xs font-bold text-[#4A3C31] truncate ml-1">{appointment.patientName}</p>
-                                                    </div>
+                                                    </Link>
                                                 )}
 
                                                 {/* 2. AVAILABLE SLOT */}
                                                 {!appointment && slot && !slot.isBooked && (
                                                     <div className={`w-full h-full rounded-xl flex flex-col justify-center items-center relative transition-all duration-300 border ${isEditingAvailability
-                                                            ? "bg-[#F2EDE7] border-[#A68363]/20 group/slot hover:border-[#A68363] hover:shadow-md"
-                                                            : "bg-gray-50/50 border-transparent hover:bg-gray-100"
+                                                        ? "bg-[#F2EDE7] border-[#A68363]/20 group/slot hover:border-[#A68363] hover:shadow-md"
+                                                        : "bg-gray-50/50 border-transparent hover:bg-gray-100"
                                                         }`}>
                                                         {isEditingAvailability ? (
                                                             <>

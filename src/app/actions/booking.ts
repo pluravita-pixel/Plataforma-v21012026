@@ -1,9 +1,10 @@
 "use server";
 
-import { db } from "@/db";
+import { db, client } from "@/db";
 import { psychologists, availabilitySlots, appointments, users } from "@/db/schema";
-import { eq, and, gte, lte, desc } from "drizzle-orm";
+import { eq, and, gte, lte, desc, sql, count } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { refreshPsychologistStats } from "./psychologists";
 
 // --- Availability Actions ---
 
@@ -64,67 +65,77 @@ export async function createPendingAppointment(data: {
     startTime: Date;
     discountCodeId?: string;
     finalPrice?: string;
+    isAnonymous?: boolean;
 }) {
     try {
-        // 1. Check if user exists, if not create a temporary/guest user or link to existing
-        // For simplicity, we'll try to find by email. If not found, we might need to handle registration or 
-        // create a "shadow" user. For this flow, let's assume we find by email or it fails if not registered
-        // BUT the requirements say "pida nombre, email", suggesting they might not be logged in. 
-        // Let's search for user by email.
-        const [existingUser] = await db.select().from(users).where(eq(users.email, data.patientEmail));
+        // 1. Ensure user exists (using raw client to avoid pooler issues)
+        const userResults = await client`SELECT id FROM users WHERE email = ${data.patientEmail} LIMIT 1`;
+        let userId = userResults[0]?.id;
 
-        let userId = existingUser?.id;
-
-        // If no user found, technically we should create one or prompt login.
-        // For this specific flow, let's return a specific status if user not found so the UI can redirect to register
-        // OR creates a guest user. Let's assume we CREATE a user implicitly or require auth. 
-        // Given earlier flows, let's require auth but maybe auto-create for smoother UX? 
-        // User said: "coger cita que me pida mi nombre, mi email". This implies guest checkout feel.
         if (!userId) {
-            // Create a lightweight user record (maybe with a temp password or just as a placeholder)
-            // simplified for this interaction:
-            // return { error: "User_Not_Found" }; // Let frontend handle
-            const [newUser] = await db.insert(users).values({
-                email: data.patientEmail,
-                fullName: data.patientName,
-                role: 'patient',
-                // password? 
-            }).returning();
-            userId = newUser.id;
+            // Check again inside a small retry or just try to insert
+            try {
+                const newUserResults = await client`
+                    INSERT INTO users (email, full_name, role)
+                    VALUES (${data.patientEmail}, ${data.patientName}, 'patient')
+                    RETURNING id
+                `;
+                userId = newUserResults[0].id;
+            } catch (insErr) {
+                // If it fails with duplicate key, fetch again
+                const finalCheck = await client`SELECT id FROM users WHERE email = ${data.patientEmail} LIMIT 1`;
+                userId = finalCheck[0]?.id;
+                if (!userId) throw insErr;
+            }
         }
 
-        // 2. Mark slot as booked (optimistic locking would be better but simple for now)
-        await db
-            .update(availabilitySlots)
-            .set({ isBooked: true })
-            .where(eq(availabilitySlots.id, data.slotId));
+        // 2. Mark slot as booked
+        await client`
+            UPDATE availability_slots 
+            SET is_booked = true 
+            WHERE id = ${data.slotId}
+        `;
 
         // 3. Create Appointment with 'pending_payment' status
-        const [newAppointment] = await db.insert(appointments).values({
-            patientId: userId,
-            psychologistId: data.psychologistId,
-            date: data.startTime,
-            price: data.finalPrice, // cast if needed
-            status: "pending_payment",
-            discountCodeId: data.discountCodeId
-        }).returning();
+        const apptResults = await client`
+            INSERT INTO appointments (
+                patient_id, psychologist_id, patient_name, date, price, status, discount_code_id, is_anonymous
+            ) VALUES (
+                ${userId}, ${data.psychologistId}, ${data.patientName || null}, ${data.startTime.toISOString()}, 
+                ${data.finalPrice || null}, 'pending_payment', ${data.discountCodeId || null}, ${data.isAnonymous || false}
+            )
+            RETURNING id
+        `;
 
-        return { success: true, appointmentId: newAppointment.id };
+        return { success: true, appointmentId: apptResults[0].id };
 
-    } catch (error) {
-        console.error("Booking error:", error);
-        return { error: "Booking failed" };
+    } catch (error: any) {
+        console.error("Booking error details:", error);
+        return { error: `No se pudo crear la reserva: ${error.message || 'Error desconocido'}. Por favor intenta de nuevo.` };
     }
 }
 
 export async function confirmAppointmentPayment(appointmentId: string) {
-    await db
-        .update(appointments)
-        .set({ status: "scheduled" }) // or 'paid'
-        .where(eq(appointments.id, appointmentId));
+    try {
+        // 1. Mark as scheduled using raw client
+        await client`
+            UPDATE appointments 
+            SET status = 'scheduled' 
+            WHERE id = ${appointmentId}
+        `;
 
-    // Also likely want to update user sessionsCount etc.
-    revalidatePath("/dashboard");
+        // 2. Fetch psychologist_id to refresh stats
+        const results = await client`SELECT psychologist_id FROM appointments WHERE id = ${appointmentId} LIMIT 1`;
+        if (results[0]) {
+            await refreshPsychologistStats(results[0].psychologist_id);
+        }
+
+        revalidatePath("/patient/dashboard");
+        revalidatePath("/psychologist/dashboard");
+        revalidatePath("/psychologist/patients");
+    } catch (error) {
+        console.error("Error confirming payment:", error);
+    }
 }
 
 export async function getPatientAppointments(patientId: string) {
