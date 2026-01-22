@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { getCurrentUser } from "@/app/actions/auth";
 import { getPsychologistStatus, getPsychologistPatients } from "@/app/actions/psychologists";
 import { redirect } from "next/navigation";

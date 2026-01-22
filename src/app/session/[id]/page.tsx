@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { getCurrentUser } from "@/app/actions/auth";
 import { client } from "@/db";
 import { redirect } from "next/navigation";

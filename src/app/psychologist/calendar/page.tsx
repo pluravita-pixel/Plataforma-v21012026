@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { getCurrentUser } from "@/app/actions/auth";
 import { getPsychologistStatus, getUpcomingAppointments } from "@/app/actions/psychologists";
 import { getAvailabilitySlots } from "@/app/actions/booking";

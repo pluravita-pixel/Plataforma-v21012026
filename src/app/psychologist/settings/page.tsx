@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { getCurrentUser } from "@/app/actions/auth";
 import { getMyTickets } from "@/app/actions/support";
 import { redirect } from "next/navigation";
