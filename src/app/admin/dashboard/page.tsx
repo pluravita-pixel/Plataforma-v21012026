@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { getAdminStats, getAllUsers, getAllPsychologists } from "@/app/actions/admin";
 import {
     Users,

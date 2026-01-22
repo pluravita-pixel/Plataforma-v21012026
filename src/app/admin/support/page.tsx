@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { getAllTickets, resolveTicket } from "@/app/actions/support";
 import {
     LifeBuoy,
@@ -42,8 +43,8 @@ export default async function AdminSupportPage() {
                         <div
                             key={ticket.id}
                             className={`bg-white rounded-[2rem] border transition-all duration-300 ${ticket.status === 'open'
-                                    ? 'border-blue-100 shadow-sm hover:shadow-md'
-                                    : 'border-gray-100 opacity-75'
+                                ? 'border-blue-100 shadow-sm hover:shadow-md'
+                                : 'border-gray-100 opacity-75'
                                 }`}
                         >
                             <div className="p-8">
