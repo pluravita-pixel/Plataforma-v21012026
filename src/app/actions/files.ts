@@ -29,8 +29,13 @@ const getSupabase = async () => {
     // For Storage, we need the user to be authenticated.
     // Let's try to set the session.
 
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder";
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url || !key || url.includes("placeholder")) {
+        console.error("CRITICAL: Supabase environment variables are missing in getSupabase (files.ts)!");
+        throw new Error("Servidor no configurado correctamente (Supabase URL/Key missing)");
+    }
 
     const supabase = createClient(
         url,

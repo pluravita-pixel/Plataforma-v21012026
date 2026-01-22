@@ -7,8 +7,14 @@ import { client } from "@/db"; // Importamos el cliente directo, NO Drizzle
 
 // Helper para cliente Supabase
 const getSupabase = () => {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder";
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url || !key || url.includes("placeholder")) {
+        console.error("CRITICAL: Supabase environment variables are missing!");
+        throw new Error("Configuración del servidor incompleta (Supabase URL/Key missing)");
+    }
+
     return createClient(url, key);
 };
 
@@ -230,9 +236,12 @@ export async function register(prevState: any, formData: FormData) {
             }
         }
     } catch (err: any) {
-        if (err.message === "NEXT_REDIRECT") throw err;
-        console.error("Error registro:", err);
-        return { error: "Error al registrarse." };
+        if (err.message?.includes("NEXT_REDIRECT")) throw err;
+        console.error("Error crítico en proceso de registro:", err);
+
+        // Return a more descriptive error if possible
+        const errorMessage = err instanceof Error ? err.message : "Error desconocido";
+        return { error: `Error del sistema: ${errorMessage}` };
     }
 }
 
