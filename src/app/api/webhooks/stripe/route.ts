@@ -4,13 +4,14 @@ import { headers } from "next/headers";
 import { client } from "@/db";
 import { confirmAppointmentPayment } from "@/app/actions/booking";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY || "", {
     apiVersion: "2024-12-18.acacia" as any,
 });
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export async function POST(req: Request) {
+    const stripe = getStripe();
     const body = await req.text();
     const sig = (await headers()).get("stripe-signature");
 

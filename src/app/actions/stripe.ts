@@ -3,16 +3,18 @@
 import Stripe from "stripe";
 import { client } from "@/db";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error("STRIPE_SECRET_KEY is not defined");
-}
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2024-12-18.acacia" as any,
-});
+const getStripe = () => {
+    if (!process.env.STRIPE_SECRET_KEY) {
+        throw new Error("STRIPE_SECRET_KEY is not defined");
+    }
+    return new Stripe(process.env.STRIPE_SECRET_KEY, {
+        apiVersion: "2024-12-18.acacia" as any,
+    });
+};
 
 export async function createCheckoutSession(appointmentId: string, returnUrl?: string) {
     try {
+        const stripe = getStripe();
         const base = process.env.NEXT_PUBLIC_APP_URL || "";
         const finalReturnUrl = returnUrl || `${base}/patient/dashboard`;
 
