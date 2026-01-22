@@ -5,6 +5,9 @@ import { MessageCircle, Facebook, Twitter, Linkedin, Instagram, Youtube } from "
 import Link from "next/link";
 import { useModals } from "@/components/modal-provider";
 import { UserNav } from "@/components/user-nav";
+import { useState, useEffect } from "react";
+import { getCurrentUser } from "@/app/actions/auth";
+import { useRouter } from "next/navigation";
 
 export default function MarketingLayout({
     children,
@@ -12,6 +15,23 @@ export default function MarketingLayout({
     children: React.ReactNode;
 }) {
     const { openAffinityModal } = useModals();
+    const router = useRouter();
+    const [hasCompletedTest, setHasCompletedTest] = useState(false);
+
+    useEffect(() => {
+        getCurrentUser().then(user => {
+            if (user) {
+                setHasCompletedTest(user.hasCompletedAffinity);
+            }
+        });
+    }, []);
+
+    const handleCoachesLinkClick = (e: React.MouseEvent) => {
+        if (hasCompletedTest) {
+            e.preventDefault();
+            router.push("/patient/search");
+        }
+    };
 
     return (
         <div className="min-h-screen flex flex-col font-sans">
@@ -28,7 +48,13 @@ export default function MarketingLayout({
 
                     {/* Desktop Nav */}
                     <nav className="hidden lg:flex items-center gap-8 text-sm font-medium text-gray-600 ml-auto mr-8">
-                        <Link href="/affinity-test" className="text-[#6B6B6B] hover:text-[#A68363] transition-colors">Coaches en línea</Link>
+                        <Link
+                            href="/affinity-test"
+                            onClick={handleCoachesLinkClick}
+                            className="text-[#6B6B6B] hover:text-[#A68363] transition-colors"
+                        >
+                            Coaches en línea
+                        </Link>
                         <Link href="#" className="text-[#6B6B6B] hover:text-[#A68363] transition-colors">Precios</Link>
                         <Link href="#faq" className="text-[#6B6B6B] hover:text-[#A68363] transition-colors">Preguntas frecuentes</Link>
                     </nav>

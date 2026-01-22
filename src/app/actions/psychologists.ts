@@ -9,10 +9,12 @@ const mapPsychologist = (p: any) => p ? ({
     userId: p.user_id,
     fullName: p.full_name,
     email: p.email,
+    username: p.username,
     specialty: p.specialty,
     description: p.description,
     price: p.price,
     image: p.image,
+    languages: p.languages,
     activePatients: p.active_patients,
     totalSessions: p.total_sessions,
     totalPatients: p.total_patients,
@@ -21,7 +23,6 @@ const mapPsychologist = (p: any) => p ? ({
     balance: p.balance,
     iban: p.iban,
     payoutName: p.payout_name,
-    experience: p.experience,
     lastLogin: p.last_login,
     completedSessions: p.completed_sessions,
     createdAt: p.created_at,
@@ -137,7 +138,11 @@ export async function updatePsychologistSettings(userId: string, data: {
     tags?: string[],
     description?: string,
     iban?: string,
-    payoutName?: string
+    payoutName?: string,
+    username?: string,
+    specialty?: string,
+    price?: string,
+    languages?: string[]
 }) {
     // Dynamic update query construction
     const updates = [];
@@ -157,13 +162,18 @@ export async function updatePsychologistSettings(userId: string, data: {
                 tags = COALESCE(${data.tags || null}::text[], tags),
                 description = COALESCE(${data.description || null}::text, description),
                 iban = COALESCE(${data.iban || null}::text, iban),
-                payout_name = COALESCE(${data.payoutName || null}::text, payout_name)
+                payout_name = COALESCE(${data.payoutName || null}::text, payout_name),
+                username = COALESCE(${data.username || null}::text, username),
+                specialty = COALESCE(${data.specialty || null}::text, specialty),
+                price = COALESCE(${data.price || null}::numeric, price),
+                languages = COALESCE(${data.languages || null}::text[], languages)
             WHERE user_id = ${userId}
         `;
     }
 
     revalidatePath("/psychologist/dashboard");
     revalidatePath("/psychologist/balance");
+    revalidatePath("/psychologist/profile");
 }
 
 export async function getUpcomingAppointments(psychologistId: string) {

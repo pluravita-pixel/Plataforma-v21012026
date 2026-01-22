@@ -114,18 +114,18 @@ export default function AddPsychologistPage() {
                 <div className="space-y-6">
                     <div className="bg-[#0077FF] p-10 rounded-[3rem] text-white shadow-2xl shadow-blue-200">
                         <h3 className="text-xl font-black mb-6 uppercase tracking-tight">Información de Seguridad</h3>
-                        <p className="text-white/80 leading-relaxed mb-8 flex items-start gap-4">
+                        <div className="text-white/80 leading-relaxed mb-8 flex items-start gap-4">
                             <div className="mt-1 p-2 bg-white/20 rounded-lg">
                                 <CheckCircle2 className="h-4 w-4" />
                             </div>
                             Al añadir un coach, este se marcará con acceso especial en el sistema.
-                        </p>
-                        <p className="text-white/80 leading-relaxed flex items-start gap-4">
+                        </div>
+                        <div className="text-white/80 leading-relaxed flex items-start gap-4">
                             <div className="mt-1 p-2 bg-white/20 rounded-lg">
                                 <CheckCircle2 className="h-4 w-4" />
                             </div>
                             Si el usuario ya estaba registrado como paciente, su cuenta se convertirá automáticamente.
-                        </p>
+                        </div>
                     </div>
 
                     <div className="bg-gray-50 border-2 border-dashed border-gray-200 p-8 rounded-[3rem] text-center">

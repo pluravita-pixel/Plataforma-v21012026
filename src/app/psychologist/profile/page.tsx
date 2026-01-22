@@ -28,9 +28,10 @@ export default async function ProfilePage() {
                 fullName: psychologist.fullName,
                 description: psychologist.description,
                 specialty: psychologist.specialty,
-                experience: psychologist.experience,
+                username: psychologist.username,
                 image: psychologist.image,
                 price: psychologist.price,
+                languages: psychologist.languages,
                 tags: psychologist.tags
             }}
         />

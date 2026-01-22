@@ -110,7 +110,7 @@ export default function AppointmentDetailsClient({ appointment, coachId }: Appoi
                 {appointment.status === 'scheduled' && (
                     <div className="flex gap-4">
                         <Button
-                            onClick={() => window.open(`https://meet.jit.si/pluravita-${appointment.id}`, '_blank')}
+                            onClick={() => router.push(`/session/${appointment.id}`)}
                             className="flex-1 bg-[#4A3C31] hover:bg-[#2C241D] text-white font-bold h-12 rounded-xl shadow-lg shadow-[#4A3C31]/20"
                         >
                             <Video className="h-4 w-4 mr-2" />

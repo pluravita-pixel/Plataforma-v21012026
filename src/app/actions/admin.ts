@@ -29,23 +29,69 @@ export async function getAllPsychologists() {
 
 export async function createPsychologistProfile(name: string, email: string) {
     try {
-        // In a real app, you'd also create an auth user or invite them.
-        // For now, we seed the DB.
-        const [newUser] = await db.insert(users).values({
-            email,
-            fullName: name,
-            role: "psychologist",
-        }).returning();
+        const normalizedEmail = email.toLowerCase().trim();
 
-        await db.insert(psychologists).values({
-            userId: newUser.id,
-            fullName: name,
-            email: email,
-            specialty: "General",
-        });
+        // Check if user already exists
+        const existing = await db.select().from(users).where(eq(users.email, normalizedEmail)).limit(1);
+
+        let userId: string;
+
+        if (existing.length > 0) {
+            // User already exists - update their role to psychologist
+            const [updatedUser] = await db.update(users)
+                .set({
+                    role: "psychologist",
+                    fullName: name // Update name if provided
+                })
+                .where(eq(users.email, normalizedEmail))
+                .returning();
+
+            userId = updatedUser.id;
+
+            // Check if psychologist profile already exists
+            const existingPsych = await db.select()
+                .from(psychologists)
+                .where(eq(psychologists.userId, userId))
+                .limit(1);
+
+            if (existingPsych.length > 0) {
+                // Psychologist profile already exists, just update it
+                await db.update(psychologists)
+                    .set({
+                        fullName: name,
+                        email: normalizedEmail,
+                    })
+                    .where(eq(psychologists.userId, userId));
+            } else {
+                // Create new psychologist profile
+                await db.insert(psychologists).values({
+                    userId: userId,
+                    fullName: name,
+                    email: normalizedEmail,
+                    specialty: "General",
+                });
+            }
+        } else {
+            // User doesn't exist - create a "pending" user that will be completed on registration
+            const [newUser] = await db.insert(users).values({
+                email: normalizedEmail,
+                fullName: name,
+                role: "psychologist",
+            }).returning();
+
+            userId = newUser.id;
+
+            // Create psychologist profile for the pending user
+            await db.insert(psychologists).values({
+                userId: userId,
+                fullName: name,
+                email: normalizedEmail,
+                specialty: "General",
+            });
+        }
 
         revalidatePath("/admin/dashboard");
-        return { success: true };
+        return { success: true, message: existing.length > 0 ? "Psicólogo actualizado correctamente" : "Psicólogo pre-registrado. Recibirá acceso al registrarse." };
     } catch (error) {
         console.error("Error:", error);
         return { error: "No se pudo crear el perfil" };

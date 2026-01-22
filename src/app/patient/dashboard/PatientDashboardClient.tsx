@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { BookingModal } from "@/components/booking/BookingModal";
 
 interface PatientDashboardClientProps {
@@ -20,6 +21,7 @@ interface PatientDashboardClientProps {
 }
 
 export default function PatientDashboardClient({ initialData }: PatientDashboardClientProps) {
+    const router = useRouter();
     const { user, nextAppointment, recommendedCoaches } = initialData;
 
     return (
@@ -72,7 +74,7 @@ export default function PatientDashboardClient({ initialData }: PatientDashboard
                                 </div>
 
                                 <Button
-                                    onClick={() => window.open(`https://meet.jit.si/pluravita-${nextAppointment.id}`, '_blank')}
+                                    onClick={() => router.push(`/session/${nextAppointment.id}`)}
                                     className="w-full md:w-auto bg-[#4A3C31] hover:bg-black text-white font-black uppercase tracking-widest text-xs rounded-2xl px-10 h-16 shadow-xl shadow-[#4A3C31]/20 transition-all hover:-translate-y-1 active:scale-95"
                                 >
                                     <span className="flex items-center gap-2">

@@ -15,16 +15,17 @@ export const users = pgTable("users", {
 
 export const psychologists = pgTable("psychologists", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id").references(() => users.id).notNull(),
+  userId: uuid("user_id").references(() => users.id, { onUpdate: "cascade" }).notNull(),
   fullName: text("full_name").notNull(),
   email: text("email"),
+  username: text("username").unique(), // Unique username for public profile URL
   totalSessions: integer("total_sessions").default(0),
   completedSessions: integer("completed_sessions").default(0),
   totalPatients: integer("total_patients").default(0),
   activePatients: integer("active_patients").default(0),
   rating: text("rating").default("5.0"),
   specialty: text("specialty"),
-  experience: text("experience"), // Description of years/type
+  languages: text("languages").array(), // Languages: Español, Inglés, Francés, Alemán
   image: text("image"),
   description: text("description"),
   iban: text("iban"),
@@ -48,7 +49,7 @@ export const discountCodes = pgTable("discount_codes", {
 
 export const appointments = pgTable("appointments", {
   id: uuid("id").primaryKey().defaultRandom(),
-  patientId: uuid("patient_id").references(() => users.id).notNull(),
+  patientId: uuid("patient_id").references(() => users.id, { onUpdate: "cascade" }).notNull(),
   psychologistId: uuid("psychologist_id").references(() => psychologists.id).notNull(),
   patientName: text("patient_name"), // Override for anonymity or custom names during booking
   date: timestamp("date").notNull(),
@@ -59,13 +60,15 @@ export const appointments = pgTable("appointments", {
   psychologistNotes: text("psychologist_notes"), // Notes/tips from psychologist after session
   improvementTips: text("improvement_tips"), // Personalized improvement tips
   rating: integer("rating"), // Patient rating 1-5
-  isAnonymous: boolean("is_anonymous").default(false).notNull(), // New field for anonymous booking
+  paymentStatus: text("payment_status").default("unpaid").notNull(), // unpaid, paid, refunded
+  stripeSessionId: text("stripe_session_id"),
+  isAnonymous: boolean("is_anonymous").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const supportTickets = pgTable("support_tickets", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id").references(() => users.id).notNull(),
+  userId: uuid("user_id").references(() => users.id, { onUpdate: "cascade" }).notNull(),
   subject: text("subject").notNull(),
   message: text("message").notNull(),
   status: text("status").default("open").notNull(), // open, resolved
@@ -148,7 +151,7 @@ export const availabilitySlots = pgTable("availability_slots", {
 export const sessionFiles = pgTable("session_files", {
   id: uuid("id").primaryKey().defaultRandom(),
   appointmentId: uuid("appointment_id").references(() => appointments.id).notNull(),
-  uploaderId: uuid("uploader_id").references(() => users.id).notNull(), // Who uploaded it
+  uploaderId: uuid("uploader_id").references(() => users.id, { onUpdate: "cascade" }).notNull(), // Who uploaded it
   fileName: text("file_name").notNull(),
   fileUrl: text("file_url").notNull(),
   fileSize: integer("file_size"), // in bytes

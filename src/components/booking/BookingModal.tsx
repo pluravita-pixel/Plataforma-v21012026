@@ -9,14 +9,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Calendar as CalendarIcon, Clock, CreditCard, ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, Eye, EyeOff } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, CreditCard, ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, Eye, EyeOff, Lock } from "lucide-react";
 import { getAvailabilitySlots, createPendingAppointment, confirmAppointmentPayment } from "@/app/actions/booking";
+import { createCheckoutSession } from "@/app/actions/stripe";
 import { checkUserExists } from "@/app/actions/auth";
 import { validateDiscountCode } from "@/app/actions/discounts";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { PaymentForm } from "@/components/payment/PaymentForm";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface Slot {
     id: string;
@@ -38,6 +39,8 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
     const router = useRouter();
     const [step, setStep] = useState(1);
     const [isOpen, setIsOpen] = useState(false);
+    const [isCanceledReturn, setIsCanceledReturn] = useState(false);
+    const searchParams = useSearchParams();
 
     // Form Data
     const [formData, setFormData] = useState({ name: "", email: "", password: "" });
@@ -62,7 +65,7 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
     // Payment/Loading States
     const [isLoading, setIsLoading] = useState(false);
 
-    // --- Init Data on Open ---
+    // --- Init Data on Open & Handle Canceled Return ---
     useEffect(() => {
         if (isOpen && currentUser) {
             setFormData(prev => ({
@@ -72,6 +75,33 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
             }));
         }
     }, [isOpen, currentUser]);
+
+    useEffect(() => {
+        const checkCanceled = () => {
+            const isCanceled = searchParams.get("canceled") === "true";
+            const apptId = searchParams.get("appt");
+            const storedPsychId = localStorage.getItem("last_psych_id");
+
+            if (isCanceled && storedPsychId === psychologistId) {
+                // Recover data
+                const savedData = localStorage.getItem("booking_form_data");
+                const savedSlot = localStorage.getItem("booking_selected_slot");
+
+                if (savedData) setFormData(JSON.parse(savedData));
+                if (savedSlot) setSelectedSlot(JSON.parse(savedSlot));
+
+                setIsOpen(true);
+                setStep(3);
+                setIsCanceledReturn(true);
+
+                // Clear state from URL
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, '', newUrl);
+            }
+        };
+
+        checkCanceled();
+    }, [searchParams, psychologistId]);
 
     // --- Fetch Slots ---
     useEffect(() => {
@@ -173,7 +203,7 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
         setStep(3);
     };
 
-    const handlePaymentSuccess = async () => {
+    const handleStripePayment = async () => {
         if (!selectedSlot) return;
         setIsLoading(true);
 
@@ -199,20 +229,33 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
             });
 
             if (result.error || !result.appointmentId) {
-                toast.error(result.error || "Error al crear la reserva. Inténtalo de nuevo.");
+                toast.error(result.error || "Error al crear la reserva");
                 setIsLoading(false);
                 return;
             }
 
-            // 2. Confirm Payment (since payment was already "processed")
-            await confirmAppointmentPayment(result.appointmentId);
+            // 2. Create Stripe Checkout Session
+            const returnUrl = typeof window !== 'undefined' ? window.location.origin + window.location.pathname : undefined;
 
-            setStep(4); // Success Step
-            toast.success("¡Cita reservada exitosamente!");
+            // Save state for recovery
+            localStorage.setItem("booking_form_data", JSON.stringify(formData));
+            localStorage.setItem("booking_selected_slot", JSON.stringify(selectedSlot));
+            localStorage.setItem("last_psych_id", psychologistId);
+
+            const stripeResult = await createCheckoutSession(result.appointmentId, returnUrl);
+
+            if (stripeResult.error || !stripeResult.url) {
+                toast.error(stripeResult.error || "Error al conectar con Stripe");
+                setIsLoading(false);
+                return;
+            }
+
+            // 3. Redirect to Stripe
+            window.location.href = stripeResult.url;
+
         } catch (error) {
-            console.error("Payment success handling error:", error);
-            toast.error("Ocurrió un error al procesar tu cita. Por favor contacta a soporte.");
-        } finally {
+            console.error("Stripe redirect error:", error);
+            toast.error("Error al iniciar el pago");
             setIsLoading(false);
         }
     };
@@ -447,7 +490,7 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
                         )}
 
 
-                        {/* STEP 3: PAYMENT */}
+                        {/* STEP 3: PAYMENT SUMMARY & REDIRECT */}
                         {step === 3 && (
                             <motion.div
                                 key="step3"
@@ -455,13 +498,27 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
                             >
-                                {/* Discount Code Section - Before Payment */}
+                                {isCanceledReturn && (
+                                    <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 mb-6 flex items-start gap-3">
+                                        <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+                                        <div>
+                                            <p className="text-sm font-black text-amber-900">Has cancelado el pago</p>
+                                            <p className="text-xs text-amber-700">Tus datos y el horario siguen reservados por unos minutos. Si quieres proceder, pulsa el botón de abajo.</p>
+                                        </div>
+                                    </div>
+                                )}
                                 <div className="space-y-4 mb-6">
                                     <div className="bg-gray-50 p-5 rounded-[1.5rem] space-y-3 border border-gray-100">
                                         <div className="flex justify-between items-center text-sm">
-                                            <span className="text-gray-500 font-bold">Sesión de Terapia</span>
-                                            <span className="font-bold text-[#4A3C31] text-lg">{price.toFixed(2)}€</span>
+                                            <span className="text-gray-500 font-bold">Sesión con {psychologistName}</span>
+                                            <span className="font-bold text-[#4A3C31]">{price.toFixed(2)}€</span>
                                         </div>
+                                        {selectedSlot && (
+                                            <div className="flex justify-between items-center text-sm">
+                                                <span className="text-gray-500 font-bold">Fecha y Hora</span>
+                                                <span className="font-bold text-[#4A3C31]">{format(new Date(selectedSlot.startTime), "d 'de' MMMM, HH:mm", { locale: es })}</span>
+                                            </div>
+                                        )}
                                         {appliedDiscount && (
                                             <div className="flex justify-between items-center text-sm text-green-700 bg-green-50 p-3 rounded-xl border border-green-100">
                                                 <span className="font-bold flex items-center gap-2">
@@ -472,18 +529,31 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
                                             </div>
                                         )}
                                         <div className="border-t border-gray-200/50 pt-4 flex justify-between items-center">
-                                            <span className="font-black text-[#4A3C31] uppercase tracking-wider text-xs">Total a pagar</span>
+                                            <span className="font-black text-[#4A3C31] uppercase tracking-wider text-xs">Total</span>
                                             <span className="font-black text-[#A68363] text-3xl">{finalPrice.toFixed(2)}€</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Payment Form */}
-                                <PaymentForm
-                                    amount={finalPrice}
-                                    onSuccess={handlePaymentSuccess}
-                                    onCancel={() => setStep(2)}
-                                />
+                                <div className="space-y-4">
+                                    <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-start gap-3">
+                                        <Lock className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                                        <p className="text-xs text-blue-700">
+                                            Serás redirigido a la pasarela segura de <span className="font-bold">Stripe</span> para completar tu pago.
+                                        </p>
+                                    </div>
+
+                                    <div className="flex gap-3">
+                                        <Button variant="outline" onClick={() => setStep(2)} className="flex-1 rounded-xl h-12 font-bold border-gray-200">Atrás</Button>
+                                        <Button
+                                            onClick={handleStripePayment}
+                                            disabled={isLoading}
+                                            className="flex-1 bg-[#A68363] hover:bg-[#8C6B4D] text-white rounded-xl h-12 font-bold shadow-lg"
+                                        >
+                                            {isLoading ? "Cargando..." : `Pagar con Stripe →`}
+                                        </Button>
+                                    </div>
+                                </div>
                             </motion.div>
                         )}
 

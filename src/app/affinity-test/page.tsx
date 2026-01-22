@@ -8,6 +8,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { supabase } from "@/lib/supabase"
+import { markTestAsCompleted } from "@/app/actions/auth"
 
 const STEPS = [
     {
@@ -168,13 +169,7 @@ export default function AffinityTestPage() {
         setIsSearching(true)
 
         try {
-            const { data: { user } } = await supabase.auth.getUser()
-            if (user) {
-                await supabase
-                    .from('users')
-                    .update({ has_completed_affinity: true })
-                    .eq('id', user.id)
-            }
+            await markTestAsCompleted()
         } catch (error) {
             console.error("Error updating test status:", error)
         }

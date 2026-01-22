@@ -101,7 +101,7 @@ export async function createPendingAppointment(data: {
             INSERT INTO appointments (
                 patient_id, psychologist_id, patient_name, date, price, status, discount_code_id, is_anonymous
             ) VALUES (
-                ${userId}, ${data.psychologistId}, ${data.patientName || null}, ${data.startTime.toISOString()}, 
+                ${userId}, ${data.psychologistId}, ${data.patientName || null}, ${new Date(data.startTime).toISOString()}, 
                 ${data.finalPrice || null}, 'pending_payment', ${data.discountCodeId || null}, ${data.isAnonymous || false}
             )
             RETURNING id

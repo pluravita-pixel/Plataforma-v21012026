@@ -150,7 +150,7 @@ export async function logout() {
 
 // Mantenemos register simplificado también
 export async function register(prevState: any, formData: FormData) {
-    const email = formData.get("email") as string;
+    const email = (formData.get("email") as string).toLowerCase().trim();
     const password = formData.get("password") as string;
     const fullName = formData.get("fullName") as string;
     const supabase = getSupabase();
@@ -165,22 +165,43 @@ export async function register(prevState: any, formData: FormData) {
         if (error) return { error: error.message };
 
         if (data.user) {
-            // Verificar usuario existente (migración simple)
+            // Check if user exists (Pre-seeded by Admin)
             const existing = await client`SELECT * FROM users WHERE email = ${email} LIMIT 1`;
 
+            let role = 'patient';
+
             if (existing.length > 0) {
+                // User was pre-registered by admin
                 const oldUser = existing[0];
-                // Lógica de migración si el ID no coincide (usuario pre-creado)
+                role = oldUser.role; // Preserve the pre-assigned role (psychologist/admin)
+
+                // Sync the pre-seeded user ID with the new Supabase Auth ID
+                // This preserves relationships handling ON UPDATE CASCADE automatically
                 if (oldUser.id !== data.user.id) {
-                    await client`DELETE FROM users WHERE id = ${oldUser.id}`;
-                    // Re-insertamos con el nuevo ID de Supabase Auth
-                    await client`
-                        INSERT INTO users (id, email, full_name, role)
-                        VALUES (${data.user.id}, ${email}, ${fullName}, ${oldUser.role})
-                     `;
+                    try {
+                        await client`
+                            UPDATE users 
+                            SET id = ${data.user.id},
+                                full_name = ${fullName || oldUser.full_name}
+                            WHERE id = ${oldUser.id}
+                        `;
+
+                        // If this is a psychologist, also update the psychologist profile
+                        if (role === 'psychologist') {
+                            await client`
+                                UPDATE psychologists 
+                                SET user_id = ${data.user.id},
+                                    full_name = ${fullName || oldUser.full_name}
+                                WHERE user_id = ${oldUser.id}
+                            `;
+                        }
+                    } catch (migrationError) {
+                        console.error("Error migrating user ID:", migrationError);
+                        // Fallback mostly for safety, though update is preferred
+                    }
                 }
             } else {
-                // Registro normal
+                // New User Registration (not pre-registered)
                 await client`
                     INSERT INTO users (id, email, full_name, role)
                     VALUES (${data.user.id}, ${email}, ${fullName}, 'patient')
@@ -196,7 +217,15 @@ export async function register(prevState: any, formData: FormData) {
                     maxAge: data.session.expires_in,
                     path: "/",
                 });
-                redirect("/patient/dashboard");
+
+                // Determine redirect based on role
+                if (role === 'psychologist') {
+                    redirect("/psychologist/dashboard");
+                } else if (role === 'admin') {
+                    redirect("/admin/dashboard");
+                } else {
+                    redirect("/patient/dashboard");
+                }
             } else {
                 return { success: "Registro exitoso. Revisa tu email." };
             }
@@ -229,5 +258,22 @@ export async function checkUserExists(email: string) {
     } catch (error) {
         console.error("Error checking user existence:", error);
         return false;
+    }
+}
+
+export async function markTestAsCompleted() {
+    const user = await getCurrentUser();
+    if (!user) return { error: "No autorizado" };
+
+    try {
+        await client`
+            UPDATE users 
+            SET has_completed_affinity = true 
+            WHERE id = ${user.id}
+        `;
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error marking test as completed:", error);
+        return { error: error.message };
     }
 }

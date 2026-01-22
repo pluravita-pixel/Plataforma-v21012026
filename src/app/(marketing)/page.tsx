@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Play } from "lucide-react";
+import { Play, Search as SearchIcon, Calendar as CalendarIcon, Video as VideoIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useModals } from "@/components/modal-provider";
 import {
     Accordion,
@@ -14,19 +15,87 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 import { getGlobalStats } from "@/app/actions/stats";
+import { getCurrentUser } from "@/app/actions/auth";
 
 export default function LandingPage() {
-    const { openAffinityModal } = useModals();
+    const { openAffinityModal, openTestCompletedModal } = useModals();
+    const router = useRouter();
     const [stats, setStats] = useState({ realUsers: 0, realSessions: 0, realCoaches: 0 });
+    const [hasCompletedTest, setHasCompletedTest] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
         getGlobalStats().then(setStats);
+        getCurrentUser().then(user => {
+            if (user) {
+                setIsLoggedIn(true);
+                setHasCompletedTest(user.hasCompletedAffinity);
+            }
+        });
     }, []);
 
+    const handleBrowsingClick = (e: React.MouseEvent) => {
+        if (hasCompletedTest) {
+            e.preventDefault();
+            router.push("/patient/search");
+        }
+    };
+
+    const handleAnsweringClick = () => {
+        if (hasCompletedTest) {
+            openTestCompletedModal();
+        } else {
+            openAffinityModal();
+        }
+    };
+
     const landingStats = [
-        { number: `+ ${stats.realUsers}`, label: "Vidas transformadas", quote: '"Cada persona tiene una historia única de cambio"' },
-        { number: `+ ${stats.realSessions}`, label: "Sesiones completadas", quote: '"Cada sesión es un paso hacia tu bienestar"' },
-        { number: `+ ${stats.realCoaches}`, label: "Coaches en línea", quote: '"Listos para escucharte cuando lo necesites"' }
+        { number: "Transforma tu vida", label: "Tu proceso empieza hoy", quote: '"Cada persona tiene una historia única de cambio"' },
+        { number: "Sesiones a medida", label: "Adaptadas a ti", quote: '"Cada sesión es un paso hacia tu bienestar"' },
+        { number: "Coaches preparados", label: "Profesionales expertos", quote: '"Listos para escucharte cuando lo necesites"' }
+    ];
+
+    const faqs = [
+        {
+            question: "¿Qué es pluravita?",
+            answer: "Pluravita es una plataforma de bienestar que conecta a personas con coaches certificados en línea para sesiones de acompañamiento emocional y desarrollo personal. Ofrecemos un espacio seguro, privado y accesible desde cualquier lugar para que puedas trabajar en tu mejor versión."
+        },
+        {
+            question: "¿Cómo puedo pagar mis citas en pluravita?",
+            answer: "Aceptamos todas las tarjetas de crédito y débito (Visa, Mastercard, American Express). Todos los pagos se procesan de forma segura a través de nuestra plataforma, garantizando la protección de tus datos financieros."
+        },
+        {
+            question: "¿Qué puedo esperar de un proceso de coaching?",
+            answer: "El coaching es un proceso de acompañamiento donde trabajarás junto a un profesional para alcanzar tus objetivos, superar obstáculos y mejorar tu bienestar. Es un espacio libre de juicios, confidencial y enfocado en tu crecimiento personal y profesional."
+        },
+        {
+            question: "¿Cuánto dura un proceso de coaching?",
+            answer: "La duración varía según cada persona y sus objetivos particulares. Algunos procesos pueden requerir pocas sesiones para temas puntuales, mientras que otros pueden extenderse para un trabajo más profundo. Tú y tu coach definirán juntos el ritmo y la duración adecuada."
+        },
+        {
+            question: "¿Qué sucede en una sesión?",
+            answer: "En una sesión típica, conversarás con tu coach sobre tus retos y metas. El coach utilizará diversas técnicas y herramientas para ayudarte a ganar claridad, explorar nuevas perspectivas y definir planes de acción concretos para tu vida diaria."
+        },
+        {
+            question: "¿Cómo puedo saber si estoy progresando?",
+            answer: "Notarás cambios en tu forma de abordar situaciones cotidianas, mayor claridad mental, mejor gestión emocional y el cumplimiento de las metas que te trazaste al inicio. Además, revisarás periódicamente tus avances junto con tu coach."
+        },
+        {
+            question: "¿Cómo puedo elegir al coach adecuado?",
+            answer: "Contamos con un Test de Afinidad inteligente que te sugiere los coaches más compatibles contigo basándose en tus necesidades. También puedes explorar los perfiles detallados, ver sus videos de presentación y leer reseñas de otros usuarios."
+        },
+        {
+            question: "¿Qué requisitos cumplen los coaches de pluravita?",
+            answer: "Todos nuestros coaches pasan por un riguroso proceso de selección. Verificamos sus credenciales académicas, certificaciones, años de experiencia y calidad humana para asegurar que recibas el mejor acompañamiento posible."
+        },
+        {
+            question: "¿Qué enfoque es el mejor para mí?",
+            answer: "No existe un enfoque único para todos. Cada coach tiene especialidades diferentes (vida, carrera, relaciones, etc.). Nuestro sistema de recomendación te ayudará a encontrar el enfoque que mejor se alinee con lo que buscas trabajar."
+        },
+        {
+            question: "¿Es normal sentir nervios antes de empezar?",
+            answer: "¡Totalmente! Dar el primer paso hacia el autocuidado puede generar incertidumbre. Es una señal de que estás saliendo de tu zona de confort para crecer. Nuestros coaches están entrenados para crear un ambiente cálido y seguro desde el primer minuto."
+        }
     ];
 
     return (
@@ -52,6 +121,7 @@ export default function LandingPage() {
                         <div className="flex flex-col sm:flex-row gap-4">
                             <Button
                                 asChild
+                                onClick={handleBrowsingClick}
                                 className="bg-[#A68363] hover:opacity-90 text-white font-bold text-lg px-8 py-6 rounded-lg shadow-lg shadow-gray-200"
                             >
                                 <Link href="/affinity-test">Ver coaches en línea</Link>
@@ -151,6 +221,7 @@ export default function LandingPage() {
                 <div className="mt-12">
                     <Button
                         asChild
+                        onClick={handleBrowsingClick}
                         className="bg-[#A68363] hover:opacity-90 text-white font-bold py-6 px-8 rounded-lg text-lg shadow-lg shadow-gray-200"
                     >
                         <Link href="/affinity-test">Ver coaches disponibles</Link>
@@ -183,6 +254,7 @@ export default function LandingPage() {
                             </p>
                             <Button
                                 asChild
+                                onClick={handleBrowsingClick}
                                 className="btn-premium text-white font-bold py-6 px-10 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300"
                             >
                                 <Link href="/affinity-test">Elegir coach</Link>
@@ -213,7 +285,7 @@ export default function LandingPage() {
                         <div className="pt-4">
                             <p className="text-[#4A3C31] font-medium mb-6">Haz de tu paz mental una prioridad. ¿Comenzamos juntos?</p>
                             <Button
-                                onClick={openAffinityModal}
+                                onClick={handleAnsweringClick}
                                 className="bg-[#A68363] hover:opacity-90 text-white font-bold py-6 px-8 rounded-lg shadow-lg w-full md:w-auto"
                             >
                                 Sí, quiero comenzar
@@ -250,7 +322,7 @@ export default function LandingPage() {
                                 Tómate unos minutos para responder nuestro test, descubre a tu coach ideal y comienza tu proceso de forma <span className="font-bold">fácil, segura y privada</span> en pluravita.
                             </p>
                             <Button
-                                onClick={openAffinityModal}
+                                onClick={handleAnsweringClick}
                                 className="bg-[#A68363] hover:opacity-90 text-white font-bold py-6 px-8 rounded-lg shadow-lg w-full"
                             >
                                 Responder test
@@ -265,24 +337,13 @@ export default function LandingPage() {
                 <h2 className="text-3xl font-bold text-[#1F2937] text-center mb-12">Preguntas frecuentes</h2>
 
                 <Accordion type="single" collapsible className="w-full space-y-4">
-                    {[
-                        "¿Qué es pluravita?",
-                        "¿Cómo puedo pagar mis citas en pluravita?",
-                        "¿Qué puedo esperar de un proceso terapéutico?",
-                        "¿Cuánto dura un proceso terapéutico?",
-                        "¿Qué sucede en una sesión de terapia?",
-                        "¿Cómo puedo saber si estoy progresando en terapia?",
-                        "¿Cómo puedo elegir al coach adecuado?",
-                        "¿Qué características debe tener un buen coach?",
-                        "¿Qué modelo terapéutico es el mejor para mí?",
-                        "¿Por qué da miedo iniciar terapia y cómo superarlo?",
-                    ].map((question, i) => (
-                        <AccordionItem key={i} value={`item-${i}`} className="border rounded-xl px-6 data-[state=open]:border-blue-200 data-[state=open]:bg-blue-50/30">
+                    {faqs.map((faq, i) => (
+                        <AccordionItem key={i} value={`item-${i}`} className="border rounded-xl px-6 data-[state=open]:border-[#A68363]/50 data-[state=open]:bg-[#A68363]/5">
                             <AccordionTrigger className="text-left font-medium text-[#4A3C31] hover:text-[#A68363] hover:no-underline py-6">
-                                {question}
+                                {faq.question}
                             </AccordionTrigger>
-                            <AccordionContent className="text-[#6B6B6B] pb-6">
-                                Aquí iría la respuesta detallada para "{question}". En pluravita nos aseguramos de resolver todas tus dudas para que inicies tu proceso con total confianza.
+                            <AccordionContent className="text-[#6B6B6B] pb-6 leading-relaxed">
+                                {faq.answer}
                             </AccordionContent>
                         </AccordionItem>
                     ))}
@@ -290,23 +351,4 @@ export default function LandingPage() {
             </section>
         </div>
     );
-}
-
-// Simple Icon Components for the "How it Works" section
-function SearchIcon(props: any) {
-    return (
-        <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
-    )
-}
-
-function CalendarIcon(props: any) {
-    return (
-        <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" /></svg>
-    )
-}
-
-function VideoIcon(props: any) {
-    return (
-        <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m22 8-6 4 6 4V8Z" /><rect width="14" height="12" x="2" y="6" rx="2" ry="2" /></svg>
-    )
 }

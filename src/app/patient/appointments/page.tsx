@@ -12,9 +12,11 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { getAllPatientAppointments, cancelAppointment } from "@/app/actions/patient";
 
 export default function PatientAppointmentsPage() {
+    const router = useRouter();
     const [allAppointments, setAllAppointments] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showCancelModal, setShowCancelModal] = useState(false);
@@ -102,7 +104,7 @@ export default function PatientAppointmentsPage() {
 
                                         <div className="flex flex-col sm:flex-row gap-3">
                                             <Button
-                                                onClick={() => window.open(`https://meet.jit.si/pluravita-${appointment.id}`, '_blank')}
+                                                onClick={() => router.push(`/session/${appointment.id}`)}
                                                 className="bg-[#4A3C31] hover:bg-black text-white font-black uppercase tracking-tighter rounded-2xl px-8 h-14 shadow-xl shadow-[#4A3C31]/20 transition-all hover:-translate-y-1 active:scale-95"
                                             >
                                                 Ir a Sesión
