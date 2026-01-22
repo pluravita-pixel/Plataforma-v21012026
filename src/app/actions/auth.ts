@@ -10,9 +10,14 @@ const getSupabase = () => {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-    if (!url || !key || url.includes("placeholder")) {
-        console.error("CRITICAL: Supabase environment variables are missing!");
-        throw new Error("Configuración del servidor incompleta (Supabase URL/Key missing)");
+    // During build time on Vercel, these might be missing.
+    // We shouldn't throw here or the build will fail.
+    if (!url || !key) {
+        if (process.env.NODE_ENV === "production" && !process.env.NEXT_PHASE?.includes("build")) {
+            console.error("Supabase keys missing at runtime!");
+        }
+        // Return a dummy client that will fail gracefully if used, or handle carefully
+        return createClient(url || "https://placeholder.supabase.co", key || "placeholder");
     }
 
     return createClient(url, key);
