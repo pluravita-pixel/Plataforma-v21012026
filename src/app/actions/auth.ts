@@ -277,3 +277,24 @@ export async function markTestAsCompleted() {
         return { error: error.message };
     }
 }
+
+export async function resetPassword(prevState: any, formData: FormData) {
+    const email = formData.get("email") as string;
+    const supabase = getSupabase();
+
+    try {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,
+        });
+
+        if (error) {
+            return { error: error.message };
+        }
+
+        return { success: "Se ha enviado un enlace a tu correo para restablecer tu contraseña." };
+    } catch (err) {
+        console.error("Error en resetPassword:", err);
+        return { error: "Error al intentar restablecer la contraseña." };
+    }
+}
+
