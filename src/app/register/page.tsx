@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = 'force-dynamic';
 
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";

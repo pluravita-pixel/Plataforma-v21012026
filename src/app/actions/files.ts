@@ -29,9 +29,12 @@ const getSupabase = async () => {
     // For Storage, we need the user to be authenticated.
     // Let's try to set the session.
 
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder";
+
     const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        url,
+        key,
         {
             global: {
                 headers: sessionId ? { Authorization: `Bearer ${sessionId}` } : {}

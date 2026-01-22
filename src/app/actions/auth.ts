@@ -7,10 +7,9 @@ import { client } from "@/db"; // Importamos el cliente directo, NO Drizzle
 
 // Helper para cliente Supabase
 const getSupabase = () => {
-    return createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder";
+    return createClient(url, key);
 };
 
 export async function login(prevState: any, formData: FormData) {
