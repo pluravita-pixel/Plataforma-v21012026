@@ -45,7 +45,7 @@ export default function PatientProfilePage() {
         if (result.error) {
             toast.error(result.error);
         } else {
-            toast.success("Perfil actualizado correctamente");
+            toast.success(result.message || "Perfil actualizado correctamente");
         }
     };
 

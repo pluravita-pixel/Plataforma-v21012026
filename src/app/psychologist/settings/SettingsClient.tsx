@@ -21,6 +21,7 @@ import {
     History
 } from "lucide-react";
 import { updateUserAccount } from "@/app/actions/users";
+import { resetPassword } from "@/app/actions/auth"; // Import resetPassword
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -40,6 +41,25 @@ export function SettingsClient({ user, initialTickets = [] }: SettingsClientProp
     const [phone, setPhone] = useState(user.phone || "");
     const [isSaving, setIsSaving] = useState(false);
     const [notifications, setNotifications] = useState(true);
+
+    // New state for password reset and resource popup
+    const [isResettingPassword, setIsResettingPassword] = useState(false);
+    const [selectedResource, setSelectedResource] = useState<{ title: string, content: string } | null>(null);
+
+    const handleResetPassword = async () => {
+        setIsResettingPassword(true);
+        const formData = new FormData();
+        formData.append("email", user.email);
+
+        const result = await resetPassword(null, formData);
+        setIsResettingPassword(false);
+
+        if (result.success) {
+            toast.success(result.success);
+        } else {
+            toast.error(result.error || "Error al enviar el correo de recuperación");
+        }
+    };
 
     const handleSaveAccount = async () => {
         setIsSaving(true);
@@ -116,14 +136,20 @@ export function SettingsClient({ user, initialTickets = [] }: SettingsClientProp
                     </div>
 
                     <div className="space-y-4">
-                        <button className="w-full flex items-center justify-between p-4 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all group">
+                        <button
+                            onClick={handleResetPassword}
+                            disabled={isResettingPassword}
+                            className="w-full flex items-center justify-between p-4 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all group"
+                        >
                             <div className="flex items-center gap-4">
-                                <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+                                <div className="p-2 bg-[#A68363]/10 rounded-lg text-[#A68363]">
                                     <Shield className="h-4 w-4" />
                                 </div>
                                 <div className="text-left">
                                     <p className="font-bold text-gray-900 text-sm">Cambiar Contraseña</p>
-                                    <p className="text-xs text-gray-500">Mediante Supabase Auth</p>
+                                    <p className="text-xs text-gray-500">
+                                        {isResettingPassword ? "Enviando..." : "Enviar email de recuperación"}
+                                    </p>
                                 </div>
                             </div>
                             <ChevronRightIcon className="h-4 w-4 text-gray-300 group-hover:text-gray-500 transition-colors" />
@@ -147,7 +173,7 @@ export function SettingsClient({ user, initialTickets = [] }: SettingsClientProp
                         </div>
                         <button
                             onClick={() => setNotifications(!notifications)}
-                            className={`w-12 h-6 rounded-full transition-all relative ${notifications ? "bg-[#0077FF]" : "bg-gray-300"
+                            className={`w-12 h-6 rounded-full transition-all relative ${notifications ? "bg-[#A68363]" : "bg-gray-300"
                                 }`}
                         >
                             <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${notifications ? "left-7" : "left-1"
@@ -155,8 +181,6 @@ export function SettingsClient({ user, initialTickets = [] }: SettingsClientProp
                         </button>
                     </div>
                 </div>
-
-                {/* --- NUEVAS SECCIONES SOLICITADAS --- */}
 
                 {/* Quick Start Guide Section */}
                 <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm space-y-8">
@@ -179,8 +203,8 @@ export function SettingsClient({ user, initialTickets = [] }: SettingsClientProp
                                 title: "Completa tu perfil al 100%",
                                 description: "Los usuarios confían más en perfiles con descripciones detalladas y formación.",
                                 icon: CheckCircle2,
-                                color: "text-blue-500",
-                                bg: "bg-blue-50"
+                                color: "text-[#A68363]",
+                                bg: "bg-[#A68363]/10"
                             },
                             {
                                 title: "Sincroniza tu calendario",
@@ -219,19 +243,10 @@ export function SettingsClient({ user, initialTickets = [] }: SettingsClientProp
 
                 {/* Support Center Section */}
                 <div className="space-y-6">
-                    {/* Live Support Card */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="bg-[#0077FF] p-8 rounded-3xl text-white shadow-xl shadow-blue-100 md:col-span-1">
-                            <MessageCircle className="h-10 w-10 mb-6 opacity-80" />
-                            <h3 className="text-xl font-bold mb-2">Chat en vivo</h3>
-                            <p className="text-white/70 text-sm leading-relaxed mb-6">Estamos disponibles de Lunes a Viernes de 9:00 a 18:00.</p>
-                            <button className="w-full bg-white text-[#0077FF] font-black py-3 rounded-xl text-xs hover:bg-blue-50 transition-all shadow-lg active:scale-95 uppercase tracking-wider">
-                                Iniciar Chat
-                            </button>
-                        </div>
 
-                        {/* Recent Tickets Container */}
-                        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm md:col-span-2 flex flex-col">
+                        {/* Recent Tickets Container - Full Width */}
+                        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm md:col-span-3 flex flex-col">
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 bg-gray-50 rounded-xl">
@@ -249,11 +264,11 @@ export function SettingsClient({ user, initialTickets = [] }: SettingsClientProp
                                             <div className="flex flex-col gap-1">
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">#{ticket.id.slice(0, 6)}</span>
-                                                    <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${ticket.status === 'open' ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-500'}`}>
+                                                    <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${ticket.status === 'open' ? 'bg-[#A68363]/10 text-[#A68363]' : 'bg-gray-100 text-gray-500'}`}>
                                                         {ticket.status === 'open' ? 'Abierto' : 'Resuelto'}
                                                     </span>
                                                 </div>
-                                                <p className="text-xs font-bold text-gray-900 group-hover:text-[#0077FF] transition-colors">{ticket.subject}</p>
+                                                <p className="text-xs font-bold text-gray-900 group-hover:text-[#A68363] transition-colors">{ticket.subject}</p>
                                                 <p className="text-[10px] text-gray-400 font-medium">Enviado {format(new Date(ticket.createdAt), "d MMM, HH:mm", { locale: es })}</p>
                                             </div>
                                             <ChevronRightIcon className="h-4 w-4 text-gray-300 group-hover:text-gray-500 transition-colors" />
@@ -277,13 +292,38 @@ export function SettingsClient({ user, initialTickets = [] }: SettingsClientProp
                             <h3 className="font-black text-gray-900 uppercase text-sm tracking-wide">Recursos Populares</h3>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            {["Optimizar Perfil", "Guía de Cobros", "IA en Sesiones", "Cancelaciones"].map((item, i) => (
-                                <button key={i} className="p-4 rounded-2xl bg-[#FAFAFA] border border-gray-50 hover:border-[#0077FF]/30 text-xs font-bold text-gray-600 hover:text-[#0077FF] transition-all text-center">
-                                    {item}
+                            {[
+                                { title: "Optimizar Perfil", content: "Asegúrate de tener una foto profesional y una descripción clara de tu especialidad." },
+                                { title: "Guía de Cobros", content: "Los pagos se procesan los días 1 y 15 de cada mes. Añade tu cuenta bancaria en Ajustes." },
+                                { title: "IA en Sesiones", content: "Nuestras herramientas de IA te ayudan a tomar notas y sugerir temas, pero tú tienes el control." },
+                                { title: "Cancelaciones", content: "Si cancelas con menos de 24h, se aplicará una penalización. Consulta la política completa." }
+                            ].map((item, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => setSelectedResource(item)}
+                                    className="p-4 rounded-2xl bg-[#FAFAFA] border border-gray-50 hover:border-[#A68363]/30 text-xs font-bold text-gray-600 hover:text-[#A68363] transition-all text-center"
+                                >
+                                    {item.title}
                                 </button>
                             ))}
                         </div>
                     </div>
+
+                    {/* Resource Popup (No Transition) */}
+                    {selectedResource && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setSelectedResource(null)}>
+                            <div className="bg-white p-8 rounded-3xl max-w-sm w-full mx-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                                <h3 className="text-xl font-black text-[#4A3C31] mb-2">{selectedResource.title}</h3>
+                                <p className="text-gray-600 mb-6">{selectedResource.content}</p>
+                                <button
+                                    onClick={() => setSelectedResource(null)}
+                                    className="w-full bg-[#4A3C31] text-white font-bold py-3 rounded-xl hover:bg-[#2C241D]"
+                                >
+                                    Entendido
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

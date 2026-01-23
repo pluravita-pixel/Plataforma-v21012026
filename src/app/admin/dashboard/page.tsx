@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { getAdminStats, getAllUsers, getAllPsychologists } from "@/app/actions/admin";
+import { getAdminStats, getAllPsychologists } from "@/app/actions/admin";
 import {
     Users,
     UserCheck,
@@ -9,21 +9,28 @@ import {
     Search,
     Filter,
     MoreHorizontal,
-    Activity
+    Activity,
+    Euro
 } from "lucide-react";
 
 export default async function AdminDashboard() {
-    const [statsData, recentUsers, allPsychologists] = await Promise.all([
+    const [statsData, allPsychologists] = await Promise.all([
         getAdminStats(),
-        getAllUsers(),
         getAllPsychologists()
     ]);
 
     const stats = [
-        { label: "Usuarios Totales", value: statsData.users, icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
-        { label: "Coaches Activos", value: statsData.psychologists, icon: UserCheck, color: "text-emerald-600", bg: "bg-emerald-50" },
-        { label: "Sesiones Totales", value: statsData.sessions, icon: Activity, color: "text-purple-600", bg: "bg-purple-50" },
-        { label: "Conversión", value: "0%", icon: BarChart3, color: "text-orange-600", bg: "bg-orange-50" },
+        { label: "Coaches Registrados", value: statsData.psychologists, icon: UserCheck, color: "text-emerald-600", bg: "bg-emerald-50" },
+        { label: "Citas Totales", value: statsData.sessions, icon: Activity, color: "text-purple-600", bg: "bg-purple-50" },
+        {
+            label: "Ingresos Totales",
+            // @ts-ignore
+            value: `€${statsData.revenue.toFixed(2)}`,
+            icon: Euro,
+            color: "text-blue-600",
+            bg: "bg-blue-50"
+        },
+        { label: "Usuarios Totales", value: statsData.users, icon: Users, color: "text-orange-600", bg: "bg-orange-50" },
     ];
 
     return (

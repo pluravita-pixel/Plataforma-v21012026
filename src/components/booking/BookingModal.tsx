@@ -32,13 +32,14 @@ interface BookingModalProps {
     price: number;
     currentUser: any | null;
     customTrigger?: React.ReactNode;
+    defaultOpen?: boolean;
 }
 
-export function BookingModal({ psychologistId, psychologistName, price, currentUser, customTrigger }: BookingModalProps) {
+export function BookingModal({ psychologistId, psychologistName, price, currentUser, customTrigger, defaultOpen = false }: BookingModalProps) {
     const supabase = createClient();
     const router = useRouter();
     const [step, setStep] = useState(1);
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(defaultOpen);
     const [isCanceledReturn, setIsCanceledReturn] = useState(false);
     const searchParams = useSearchParams();
 

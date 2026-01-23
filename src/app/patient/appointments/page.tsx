@@ -103,12 +103,18 @@ export default function PatientAppointmentsPage() {
                                         </div>
 
                                         <div className="flex flex-col sm:flex-row gap-3">
-                                            <Button
-                                                onClick={() => router.push(`/session/${appointment.id}`)}
-                                                className="bg-[#4A3C31] hover:bg-black text-white font-black uppercase tracking-tighter rounded-2xl px-8 h-14 shadow-xl shadow-[#4A3C31]/20 transition-all hover:-translate-y-1 active:scale-95"
-                                            >
-                                                Ir a Sesión
-                                            </Button>
+                                            {new Date() < new Date(new Date(appointment.date).getTime() + 60 * 60 * 1000) ? (
+                                                <Button
+                                                    onClick={() => router.push(`/session/${appointment.id}`)}
+                                                    className="bg-[#4A3C31] hover:bg-black text-white font-black uppercase tracking-tighter rounded-2xl px-8 h-14 shadow-xl shadow-[#4A3C31]/20 transition-all hover:-translate-y-1 active:scale-95"
+                                                >
+                                                    Ir a Sesión
+                                                </Button>
+                                            ) : (
+                                                <div className="flex items-center justify-center bg-gray-100 text-gray-400 font-bold rounded-2xl px-8 h-14 uppercase tracking-wider text-xs border border-gray-200 cursor-not-allowed">
+                                                    Finalizada
+                                                </div>
+                                            )}
                                             <Button
                                                 variant="outline"
                                                 onClick={() => {

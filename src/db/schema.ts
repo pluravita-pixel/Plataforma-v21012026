@@ -71,7 +71,9 @@ export const supportTickets = pgTable("support_tickets", {
   userId: uuid("user_id").references(() => users.id, { onUpdate: "cascade" }).notNull(),
   subject: text("subject").notNull(),
   message: text("message").notNull(),
+  adminResponse: text("admin_response"),
   status: text("status").default("open").notNull(), // open, resolved
+  isRead: boolean("is_read").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

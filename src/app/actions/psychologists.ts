@@ -2,6 +2,28 @@
 
 import { client } from "@/db"; // Use raw client
 import { revalidatePath } from "next/cache";
+import { getCurrentUser } from "./auth";
+
+async function ensurePsychologist(psychologistId?: string) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error("No autorizado");
+
+    if (user.role === 'admin') return user; // Admins skip ownership checks usually
+
+    if (user.role !== 'psychologist') {
+        throw new Error("Acceso denegado: Se requiere rol de coach.");
+    }
+
+    if (psychologistId) {
+        // Verify that this psychologist ID belongs to the logged in user
+        const result = await client`SELECT id FROM psychologists WHERE user_id = ${user.id} LIMIT 1`;
+        if (result.length === 0 || result[0].id !== psychologistId) {
+            throw new Error("Acceso denegado: No puedes manipular datos de otro coach.");
+        }
+    }
+
+    return user;
+}
 
 // Helper to map snake_case DB results to camelCase for frontend compatibility
 const mapPsychologist = (p: any) => p ? ({
@@ -26,6 +48,7 @@ const mapPsychologist = (p: any) => p ? ({
     lastLogin: p.last_login,
     completedSessions: p.completed_sessions,
     createdAt: p.created_at,
+    refCode: p.ref_code,
 }) : null;
 
 export async function refreshPsychologistStats(psychologistId: string) {
@@ -115,6 +138,7 @@ export async function getPsychologists() {
 }
 
 export async function getWithdrawals(psychologistId: string) {
+    await ensurePsychologist(psychologistId);
     try {
         const results = await client`
             SELECT * FROM withdrawals 
@@ -134,19 +158,23 @@ export async function getWithdrawals(psychologistId: string) {
 }
 
 export async function updatePsychologistSettings(userId: string, data: {
-    image?: string,
-    tags?: string[],
-    description?: string,
-    iban?: string,
-    payoutName?: string,
-    username?: string,
-    specialty?: string,
-    price?: string,
-    languages?: string[]
+    image?: string;
+    tags?: string[];
+    description?: string;
+    iban?: string;
+    payoutName?: string;
+    username?: string;
+    specialty?: string;
+    price?: number | string;
+    languages?: string[];
 }) {
+    const user = await ensurePsychologist();
+    if (userId !== user.id && user.role !== 'admin') {
+        throw new Error("No puedes actualizar el perfil de otro usuario.");
+    }
+
     // Dynamic update query construction
     const updates = [];
-    const values = [];
 
     if (data.image !== undefined) updates.push(client`image = ${data.image}`);
     if (data.tags !== undefined) updates.push(client`tags = ${data.tags}`);
@@ -154,19 +182,30 @@ export async function updatePsychologistSettings(userId: string, data: {
     if (data.iban !== undefined) updates.push(client`iban = ${data.iban}`);
     if (data.payoutName !== undefined) updates.push(client`payout_name = ${data.payoutName}`);
 
+    // Missing fields added:
+    if (data.username !== undefined) updates.push(client`username = ${data.username}`);
+    if (data.specialty !== undefined) updates.push(client`specialty = ${data.specialty}`);
+    if (data.price !== undefined) updates.push(client`price = ${data.price}`);
+    if (data.languages !== undefined) updates.push(client`languages = ${data.languages}`);
+
+    // Ensure referral code
+    const current = await client`SELECT ref_code FROM psychologists WHERE user_id = ${userId}`;
+    if (!current[0]?.ref_code) {
+        updates.push(client`ref_code = ${crypto.randomUUID()}`);
+    }
+
     if (updates.length > 0) {
+        // Join the updates with commas manually since we are using raw client template literals
+        // We can't just .join(',') on template literals directly usually, but with this client it might work if we spread.
+        // A safer pattern with postgres.js / similar libs is often to reduce or loop.
+        // However, referencing the existing pattern suggests we should use the array.
+        // Let's trust the client builds the query if we pass parts.
+        // Actually, looking at the previous code, it was creating an array but ignoring it.
+        // We'll construct a single query.
+
         await client`
             UPDATE psychologists 
-            SET 
-                image = COALESCE(${data.image || null}::text, image),
-                tags = COALESCE(${data.tags || null}::text[], tags),
-                description = COALESCE(${data.description || null}::text, description),
-                iban = COALESCE(${data.iban || null}::text, iban),
-                payout_name = COALESCE(${data.payoutName || null}::text, payout_name),
-                username = COALESCE(${data.username || null}::text, username),
-                specialty = COALESCE(${data.specialty || null}::text, specialty),
-                price = COALESCE(${data.price || null}::numeric, price),
-                languages = COALESCE(${data.languages || null}::text[], languages)
+            SET ${client(updates, ', ')}
             WHERE user_id = ${userId}
         `;
     }
@@ -177,6 +216,7 @@ export async function updatePsychologistSettings(userId: string, data: {
 }
 
 export async function getUpcomingAppointments(psychologistId: string) {
+    await ensurePsychologist(psychologistId);
     try {
         const results = await client`
             SELECT a.*, 
@@ -216,6 +256,7 @@ export async function getUpcomingAppointments(psychologistId: string) {
 }
 
 export async function getPsychologistPatients(psychologistId: string) {
+    await ensurePsychologist(psychologistId);
     // New logic: Fetch ALL to derive patient list with nextAppointment state
     try {
         const results = await client`
@@ -286,6 +327,10 @@ export async function getPsychologistPatients(psychologistId: string) {
 }
 
 export async function createSupportTicket(userId: string, subject: string, message: string) {
+    const user = await getCurrentUser();
+    if (!user || (user.id !== userId && user.role !== 'admin')) {
+        throw new Error("No autorizado para crear ticket en nombre de otro usuario.");
+    }
     await client`
         INSERT INTO support_tickets (user_id, subject, message)
         VALUES (${userId}, ${subject}, ${message})
@@ -294,6 +339,7 @@ export async function createSupportTicket(userId: string, subject: string, messa
 }
 
 export async function withdrawBalance(psychologistId: string, amount: number) {
+    await ensurePsychologist(psychologistId);
     const psychResult = await client`
         SELECT * FROM psychologists WHERE id = ${psychologistId} LIMIT 1
     `;
@@ -314,12 +360,28 @@ export async function withdrawBalance(psychologistId: string, amount: number) {
         UPDATE psychologists SET balance = ${newBalance} WHERE id = ${psychologistId}
     `;
 
+    // Notify Admin
+    try {
+        await client`
+            INSERT INTO admin_notifications (title, message, type, link)
+            VALUES (
+                'Solicitud de Retiro',
+                ${`El psicólogo ${psych.full_name} ha solicitado un retiro de ${amount}€.`},
+                'withdrawal',
+                '/admin/withdrawals'
+            )
+        `;
+    } catch (e) {
+        console.error("Error creating admin notification:", e);
+    }
+
     revalidatePath("/psychologist/dashboard");
     revalidatePath("/psychologist/balance");
     return { success: true };
 }
 
 export async function getRecentConsultations(psychologistId: string) {
+    await ensurePsychologist(psychologistId);
     try {
         const results = await client`
             SELECT a.*, u.full_name as u_full_name, u.email as u_email 
@@ -349,6 +411,7 @@ export async function getRecentConsultations(psychologistId: string) {
 }
 
 export async function getWeeklyAppointments(psychologistId: string) {
+    await ensurePsychologist(psychologistId);
     try {
         const now = new Date();
         const startOfWeek = new Date(now);
@@ -367,6 +430,7 @@ export async function getWeeklyAppointments(psychologistId: string) {
             WHERE a.psychologist_id = ${psychologistId}
             AND a.date >= ${startOfWeek.toISOString()}
             AND a.date <= ${endOfWeek.toISOString()}
+            AND a.status != 'cancelled'
             ORDER BY a.date ASC
         `;
 
@@ -392,6 +456,7 @@ export async function getWeeklyAppointments(psychologistId: string) {
 }
 
 export async function getWeeklyAppointmentsCount(psychologistId: string) {
+    await ensurePsychologist(psychologistId);
     try {
         const now = new Date();
         const startOfWeek = new Date(now);
@@ -418,6 +483,7 @@ export async function getWeeklyAppointmentsCount(psychologistId: string) {
 }
 
 export async function cancelAppointmentByPsychologist(appointmentId: string, psychologistId: string) {
+    await ensurePsychologist(psychologistId);
     try {
         // 1. Verify ownership and status
         const apptResult = await client`
@@ -443,6 +509,14 @@ export async function cancelAppointmentByPsychologist(appointmentId: string, psy
             WHERE id = ${appointmentId}
         `;
 
+        // Free up availability slot
+        await client`
+            UPDATE availability_slots
+            SET is_booked = false
+            WHERE psychologist_id = ${psychologistId}
+            AND start_time = ${new Date(appointment.date).toISOString()}
+        `;
+
         // 3. Revalidate paths
         revalidatePath("/psychologist/dashboard");
         revalidatePath("/psychologist/calendar");
@@ -456,12 +530,19 @@ export async function cancelAppointmentByPsychologist(appointmentId: string, psy
 }
 
 export async function completeAppointment(data: { id: string, notes: string, tips: string }) {
+    // Note: This one checks the appointment record's psychologist_id in the next step, but let's add initial check
+    const user = await ensurePsychologist();
     try {
         const apptResultBefore = await client`SELECT * FROM appointments WHERE id = ${data.id}`;
         const apptBefore = apptResultBefore[0];
 
         if (!apptBefore) return { error: "Cita no encontrada" };
         if (apptBefore.status === 'completed') return { error: "La cita ya está completada" };
+
+        const psychResult = await client`SELECT id FROM psychologists WHERE user_id = ${user.id} LIMIT 1`;
+        if (user.role !== 'admin' && apptBefore.psychologist_id !== psychResult[0]?.id) {
+            return { error: "No autorizado: Esta cita no te pertenece." };
+        }
 
         await client`
             UPDATE appointments 

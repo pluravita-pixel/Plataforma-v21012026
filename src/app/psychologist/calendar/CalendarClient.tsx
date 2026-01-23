@@ -23,6 +23,7 @@ interface Appointment {
     id: string;
     date: Date;
     patientName: string;
+    status: string;
 }
 
 interface Slot {
@@ -46,6 +47,38 @@ export function CalendarClient({
     const [isEditingAvailability, setIsEditingAvailability] = useState(false);
     const [currentDate, setCurrentDate] = useState(new Date());
 
+    // Batch Saving Logic
+    const [tempSlots, setTempSlots] = useState<Slot[]>(initialSlots);
+    const [originalSlots, setOriginalSlots] = useState<Slot[]>(initialSlots);
+
+    // Sync when not editing? Or just on load? 
+    // Usually standard is to sync on prop change if not dirty.
+    // For now we assume initialSlots comes from server.
+
+    // On Enter Edit Mode
+    const toggleEditMode = async () => {
+        if (isEditingAvailability) {
+            // Save Changes
+            if (JSON.stringify(tempSlots) !== JSON.stringify(originalSlots)) {
+                // Call bulk update
+                const result = await bulkUpdateSlots(psychologistId, tempSlots);
+                if (result.success) {
+                    toast.success("Horario guardado correctamente");
+                    setOriginalSlots(tempSlots);
+                    router.refresh();
+                } else {
+                    toast.error("Error al guardar horario");
+                }
+            }
+            setIsEditingAvailability(false);
+        } else {
+            // Enter Edit Mode
+            setTempSlots([...initialSlots]);
+            setOriginalSlots([...initialSlots]);
+            setIsEditingAvailability(true);
+        }
+    };
+
     // --- Date Navigation Logic ---
     const goToPrevious = () => {
         const newDate = new Date(currentDate);
@@ -59,8 +92,8 @@ export function CalendarClient({
         setCurrentDate(newDate);
     };
 
-    // --- Slots Management Logic ---
-    async function handleAddSlot(dateStr: string, hour: number) {
+    // --- Slots Management Logic (Local) ---
+    function handleAddSlotLocal(dateStr: string, hour: number) {
         if (!isEditingAvailability) return;
 
         const targetDate = dates.find(d => d.date === dateStr)?.fullDate;
@@ -70,40 +103,66 @@ export function CalendarClient({
         start.setHours(hour, 0, 0, 0);
 
         const end = new Date(start);
-        end.setHours(hour + 1, 0, 0, 0); // Default 1 hour slot
+        end.setHours(hour + 1, 0, 0, 0);
 
-        const result = await createAvailabilitySlot(psychologistId, start, end);
-        if (result.success) {
-            toast.success("Disponibilidad añadida");
-            router.refresh();
-        } else {
-            toast.error("Error al añadir disponibilidad");
-        }
+        const newSlot: Slot = {
+            id: `temp-${Date.now()}-${Math.random()}`, // Temp ID
+            startTime: start,
+            endTime: end,
+            isBooked: false
+        };
+
+        setTempSlots([...tempSlots, newSlot]);
     }
 
-
-    async function handleDeleteSlot(slotId: string) {
+    function handleDeleteSlotLocal(slotId: string, startTime: Date) {
         if (!isEditingAvailability) return;
 
-        const result = await deleteAvailabilitySlot(slotId);
-        if (result.success) {
-            toast.success("Disponibilidad eliminada");
-            router.refresh();
-        } else {
-            toast.error("Error al eliminar");
-        }
+        // Remove from tempSlots
+        setTempSlots(tempSlots.filter(s => s.id !== slotId && s.startTime.getTime() !== startTime.getTime()));
     }
+
+    // Determine which slots to show
+    const displaySlots = isEditingAvailability ? tempSlots : initialSlots;
+
 
 
     // --- View Grouping ---
-    const startOfWeek = new Date(currentDate);
-    const day = currentDate.getDay(); // 0 (Sun) to 6 (Sat)
-    const diff = currentDate.getDate() - day + (day === 0 ? -6 : 1); // adjust to Monday
-    startOfWeek.setDate(diff);
+    let daysToShow = 5; // Default Week (Mon-Fri)
+    if (view === "Mes") daysToShow = 30; // Simply show 30 days for now, vertical scrolling might be much? month view usually is a box grid.
+    if (view === "Día") daysToShow = 1;
+    if (view === "Semanas") daysToShow = 7; // Show full week
 
-    const dates = Array.from({ length: 5 }).map((_, i) => {
-        const d = new Date(startOfWeek);
-        d.setDate(startOfWeek.getDate() + i);
+    // Adjust start date based on view
+    let startOfView = new Date(currentDate);
+    if (view === "Semanas") {
+        const day = currentDate.getDay();
+        const diff = currentDate.getDate() - day + (day === 0 ? -6 : 1); // Monday
+        startOfView.setDate(diff);
+    } else if (view === "Mes") {
+        // Start from 1st of month? Or just rolling 30 days?
+        // Rolling is easier for the "infinite scroll" style grid.
+        // User likely expects standard month view.
+        // Given the current grid layout is `flex-col` with `flex-1 overflow-auto`, a horizontal scroll for 30 days is bad.
+        // The current layout is `grid-cols-[auto_repeat(5,1fr)]`.
+        // For month view, we'd need `grid-cols-[auto_repeat(7,1fr)]` and multiple rows?
+        // The current implementation is a single row of headers and time slots.
+        // Supporting a real "Month View" (box calendar) requires significant UI change.
+        // Let's stick to "Rolling Days" for now but just change the count if `view === 'Mes'` is effectively meaningless in this linear layout.
+        // The request "que el calendario cambie la vista" implies they expect it to work.
+        // Let's implement Day and Week (7 days) properly.
+        // For Month, maybe we just show 2 weeks? Or ignore?
+        // Let's try to support 7 days for "Semana" and 1 for "Día".
+    } else {
+        // Day view
+        startOfView = new Date(currentDate);
+    }
+
+    const gridCols = view === "Día" ? "grid-cols-[auto_1fr]" : "grid-cols-[auto_repeat(7,1fr)]";
+
+    const dates = Array.from({ length: view === "Día" ? 1 : 7 }).map((_, i) => {
+        const d = new Date(startOfView);
+        d.setDate(startOfView.getDate() + i);
         return {
             day: d.toLocaleDateString('es-ES', { weekday: 'short' }),
             date: d.getDate().toString(),
@@ -148,7 +207,7 @@ export function CalendarClient({
                     <div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
 
                     <Button
-                        onClick={() => setIsEditingAvailability(!isEditingAvailability)}
+                        onClick={toggleEditMode}
                         className={`rounded-xl px-6 h-11 font-bold text-sm transition-all duration-300 flex items-center gap-2 ${isEditingAvailability
                             ? "bg-[#4A3C31] text-white hover:bg-[#2C241D] shadow-lg shadow-[#4A3C31]/20"
                             : "bg-white text-[#4A3C31] border border-gray-200 hover:bg-[#F9F9F9]"
@@ -204,7 +263,7 @@ export function CalendarClient({
 
                 {/* Scrollable Grid */}
                 <div className="flex-1 overflow-auto bg-[#FFFFFF]"> {/* Main bg white */}
-                    <div className="grid grid-cols-[auto_repeat(5,1fr)] divide-x divide-gray-200 min-w-[800px]">
+                    <div className={`grid ${view === 'Día' ? 'grid-cols-[auto_1fr]' : 'grid-cols-[auto_repeat(7,1fr)]'} divide-x divide-gray-200 min-w-[800px]`}>
 
                         {/* Time Column */}
                         <div className="pt-16 pb-4 flex flex-col items-center gap-[60px] bg-[#FAFAFA] border-r border-gray-200 w-20">
@@ -239,7 +298,7 @@ export function CalendarClient({
                                         const appointment = initialAppointments.find(app =>
                                             new Date(app.date).getTime() === currentSlotTime.getTime()
                                         );
-                                        const slot = initialSlots.find(s =>
+                                        const slot = displaySlots.find(s =>
                                             new Date(s.startTime).getTime() === currentSlotTime.getTime()
                                         );
 
@@ -252,15 +311,26 @@ export function CalendarClient({
                                                 {appointment && (
                                                     <Link
                                                         href={`/psychologist/appointments/${appointment.id}`}
-                                                        className="w-full h-full bg-white border-l-[3px] border-[#A68363] rounded-r-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all p-3 flex flex-col justify-center relative z-20 group/card"
+                                                        className={`w-full h-full bg-white border-l-[3px] rounded-r-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all p-3 flex flex-col justify-center relative z-20 group/card ${appointment.status === 'cancelled'
+                                                            ? "border-red-500 bg-red-50"
+                                                            : "border-[#A68363]"
+                                                            }`}
                                                     >
                                                         <div className="flex items-center gap-2 mb-1">
-                                                            <div className="bg-[#A68363]/10 p-1 rounded-md">
-                                                                <Clock className="h-3 w-3 text-[#A68363]" />
+                                                            <div className={`p-1 rounded-md ${appointment.status === 'cancelled'
+                                                                ? "bg-red-100"
+                                                                : "bg-[#A68363]/10"
+                                                                }`}>
+                                                                <Clock className={`h-3 w-3 ${appointment.status === 'cancelled' ? "text-red-500" : "text-[#A68363]"
+                                                                    }`} />
                                                             </div>
-                                                            <span className="text-[10px] font-black uppercase tracking-wider text-[#A68363]">Confirmada</span>
+                                                            <span className={`text-[10px] font-black uppercase tracking-wider ${appointment.status === 'cancelled' ? "text-red-500" : "text-[#A68363]"
+                                                                }`}>
+                                                                {appointment.status === 'cancelled' ? "Cancelada" : "Confirmada"}
+                                                            </span>
                                                         </div>
-                                                        <p className="text-xs font-bold text-[#4A3C31] truncate ml-1">{appointment.patientName}</p>
+                                                        <p className={`text-xs font-bold truncate ml-1 ${appointment.status === 'cancelled' ? "text-red-700" : "text-[#4A3C31]"
+                                                            }`}>{appointment.patientName}</p>
                                                     </Link>
                                                 )}
 
@@ -276,7 +346,7 @@ export function CalendarClient({
                                                                 <button
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
-                                                                        handleDeleteSlot(slot.id);
+                                                                        handleDeleteSlotLocal(slot.id, slot.startTime);
                                                                     }}
                                                                     className="absolute -top-2 -right-2 bg-white text-red-500 p-1.5 rounded-full shadow-lg border border-gray-100 opacity-0 group-hover/slot:opacity-100 transition-all hover:bg-red-50 hover:scale-110 z-30"
                                                                 >
@@ -294,7 +364,7 @@ export function CalendarClient({
                                                 {/* 3. EMPTY STATE (Add) */}
                                                 {!appointment && !slot && isEditingAvailability && (
                                                     <button
-                                                        onClick={() => handleAddSlot(d.date, h)}
+                                                        onClick={() => handleAddSlotLocal(d.date, h)}
                                                         className="absolute inset-1.5 rounded-xl border-2 border-dashed border-[#E5E5E5] flex flex-col items-center justify-center text-gray-300 hover:text-[#A68363] hover:border-[#A68363] hover:bg-[#A68363]/5 transition-all duration-300 gap-1 group/add"
                                                     >
                                                         <Plus className="h-5 w-5 transition-transform group-hover/add:scale-110" />

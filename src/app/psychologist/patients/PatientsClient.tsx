@@ -23,6 +23,7 @@ interface Patient {
     status: string;
     nextAppointmentId?: string; // New field
     nextAppDate?: Date;
+    isAnonymous?: boolean;
 }
 
 export function PatientsClient({ initialPatients, psychologistId }: { initialPatients: Patient[], psychologistId: string }) {
@@ -33,8 +34,8 @@ export function PatientsClient({ initialPatients, psychologistId }: { initialPat
     const router = useRouter();
 
     const filteredPatients = initialPatients.filter(patient =>
-        patient.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        patient.email.toLowerCase().includes(searchTerm.toLowerCase())
+        (patient.fullName && patient.fullName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (patient.email && patient.email.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     const handleCancel = async () => {
@@ -114,38 +115,44 @@ export function PatientsClient({ initialPatients, psychologistId }: { initialPat
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-right relative">
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setActiveMenu(activeMenu === patient.id ? null : patient.id);
-                                                }}
-                                                className="p-2 hover:bg-white rounded-xl text-gray-400 hover:text-[#A68363] shadow-sm border border-transparent hover:border-gray-100 transition-all"
-                                            >
-                                                <MoreVertical className="h-4 w-4" />
-                                            </button>
-
-                                            {/* Dropdown Menu */}
-                                            {activeMenu === patient.id && (
-                                                <div className="absolute right-12 top-8 z-50 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 animate-in fade-in zoom-in duration-200 origin-top-right">
-                                                    <div className="px-4 py-2 border-b border-gray-50 mb-1">
-                                                        <p className="text-xs font-bold text-gray-400">Acciones</p>
-                                                    </div>
-                                                    <button className="w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-[#FAF8F5] hover:text-[#4A3C31] font-medium transition-colors">
-                                                        Ver expediente
+                                            {!patient.isAnonymous ? (
+                                                <>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setActiveMenu(activeMenu === patient.id ? null : patient.id);
+                                                        }}
+                                                        className="p-2 hover:bg-white rounded-xl text-gray-400 hover:text-[#A68363] shadow-sm border border-transparent hover:border-gray-100 transition-all"
+                                                    >
+                                                        <MoreVertical className="h-4 w-4" />
                                                     </button>
-                                                    {patient.nextAppointmentId && (
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setShowCancelModal(patient.nextAppointmentId!);
-                                                                setActiveMenu(null);
-                                                            }}
-                                                            className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 font-medium transition-colors"
-                                                        >
-                                                            Cancelar próxima cita
-                                                        </button>
+
+                                                    {/* Dropdown Menu */}
+                                                    {activeMenu === patient.id && (
+                                                        <div className="absolute right-12 top-8 z-50 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 animate-in fade-in zoom-in duration-200 origin-top-right">
+                                                            <div className="px-4 py-2 border-b border-gray-50 mb-1">
+                                                                <p className="text-xs font-bold text-gray-400">Acciones</p>
+                                                            </div>
+                                                            <button className="w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-[#FAF8F5] hover:text-[#4A3C31] font-medium transition-colors">
+                                                                Ver expediente
+                                                            </button>
+                                                            {patient.nextAppointmentId && (
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setShowCancelModal(patient.nextAppointmentId!);
+                                                                        setActiveMenu(null);
+                                                                    }}
+                                                                    className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 font-medium transition-colors"
+                                                                >
+                                                                    Cancelar próxima cita
+                                                                </button>
+                                                            )}
+                                                        </div>
                                                     )}
-                                                </div>
+                                                </>
+                                            ) : (
+                                                <span className="text-gray-300 text-xs italic">Privado</span>
                                             )}
                                         </td>
                                     </tr>

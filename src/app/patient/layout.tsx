@@ -65,6 +65,7 @@ export default function PatientLayout({
                             <Link
                                 key={item.href}
                                 href={item.href}
+                                prefetch={true}
                                 className={cn(
                                     "flex items-center gap-3 px-5 py-4 rounded-2xl transition-all duration-300 font-bold tracking-wide group relative",
                                     isActive

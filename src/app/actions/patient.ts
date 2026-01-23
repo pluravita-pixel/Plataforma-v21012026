@@ -4,6 +4,8 @@ import { db, client } from "@/db"; // Use drizzle db and raw client
 import { appointments, psychologists } from "@/db/schema";
 import { eq, and, gte, asc } from "drizzle-orm";
 import { getCurrentUser } from "./auth";
+import { cookies } from "next/headers";
+import { createClient } from "@supabase/supabase-js";
 
 export async function getPatientDashboardData() {
     try {
@@ -127,6 +129,7 @@ export async function cancelAppointment(appointmentId: string) {
 
     try {
         // Get appointment details
+        // We select psychologist_id and date to match the availability slot
         const appointmentResult = await client`
             SELECT * FROM appointments 
             WHERE id = ${appointmentId} 
@@ -150,6 +153,25 @@ export async function cancelAppointment(appointmentId: string) {
             SET status = 'cancelled' 
             WHERE id = ${appointmentId}
         `;
+
+        // CRITICAL FIX: Free up the availability slot
+        // We match by psychologist_id and start_time (which corresponds to appointment.date)
+        await client`
+            UPDATE availability_slots
+            SET is_booked = false
+            WHERE psychologist_id = ${appointment.psychologist_id}
+            AND start_time = ${new Date(appointment.date).toISOString()}
+        `;
+
+        // Special logic for priority user "sanmiguelgil1@gmail.com"
+        const isPriorityUser = user.email === 'sanmiguelgil1@gmail.com';
+
+        if (isPriorityUser) {
+            return {
+                success: true,
+                message: "Cita cancelada. Sin penalización (Usuario Prioritario). Puedes reservar otra cita inmediatamente."
+            };
+        }
 
         return {
             success: true,
@@ -229,6 +251,38 @@ export async function updatePatientProfile(data: { fullName?: string; phone?: st
     }
 
     try {
+        let emailUpdateMessage = "";
+
+        // Si se proporciona un email y es diferente al actual, actualizamos en Supabase Auth
+        if (data.email && data.email.trim().toLowerCase() !== user.email.toLowerCase()) {
+            const cookieStore = await cookies();
+            const sessionId = cookieStore.get("session_id")?.value;
+
+            if (sessionId) {
+                const supabase = createClient(
+                    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+                    {
+                        global: {
+                            headers: {
+                                Authorization: `Bearer ${sessionId}`,
+                            },
+                        },
+                    }
+                );
+
+                const { error: authError } = await supabase.auth.updateUser({ email: data.email });
+
+                if (authError) {
+                    console.error("Error updating auth email:", authError);
+                    return { error: "Error al actualizar el email: " + authError.message };
+                }
+
+                emailUpdateMessage = " Se ha enviado un enlace de confirmación a tu nuevo correo.";
+            }
+        }
+
+        // Actualizamos la base de datos local
         await client`
             UPDATE users 
             SET 
@@ -238,7 +292,7 @@ export async function updatePatientProfile(data: { fullName?: string; phone?: st
             WHERE id = ${user.id}
         `;
 
-        return { success: true, message: "Perfil actualizado correctamente" };
+        return { success: true, message: "Perfil actualizado correctamente." + emailUpdateMessage };
     } catch (error) {
         console.error("Error updating profile:", error);
         return { error: "Error al actualizar el perfil" };

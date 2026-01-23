@@ -8,12 +8,12 @@ import Link from "next/link";
 import { getPsychologists } from "@/app/actions/psychologists";
 import { getCurrentUser } from "@/app/actions/auth";
 import { BookingModal } from "@/components/booking/BookingModal";
+import { PsychologistProfileModal } from "@/components/psychologist/ProfileModal";
+import { useSearchParams } from "next/navigation";
 
 export default function PatientSearchPage() {
-    const [coaches, setCoaches] = useState<any[]>([]);
-    const [currentUser, setCurrentUser] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedPsychologist, setSelectedPsychologist] = useState<any>(null);
+    const [isProfileDesktopOpen, setIsProfileDesktopOpen] = useState(false);
 
     useEffect(() => {
         async function loadData() {
@@ -25,6 +25,14 @@ export default function PatientSearchPage() {
                 ]);
                 setCoaches(psychData);
                 setCurrentUser(userData);
+
+                if (refId && psychData) {
+                    const referred = psychData.find((p: any) => p.id === refId || p.userId === refId || p.refCode === refId);
+                    if (referred) {
+                        setSelectedPsychologist(referred);
+                        setIsProfileDesktopOpen(true);
+                    }
+                }
             } catch (err) {
                 console.error(err);
             } finally {
@@ -32,7 +40,7 @@ export default function PatientSearchPage() {
             }
         }
         loadData();
-    }, []);
+    }, [refId]);
 
     const filteredCoaches = coaches.filter(c =>
         c.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -83,7 +91,14 @@ export default function PatientSearchPage() {
                         </div>
                     ))
                 ) : filteredCoaches.map((coach) => (
-                    <div key={coach.id} className="bg-white rounded-[3rem] p-8 border border-gray-100 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group relative overflow-hidden">
+                    <div
+                        key={coach.id}
+                        onClick={() => {
+                            setSelectedPsychologist(coach);
+                            setIsProfileDesktopOpen(true);
+                        }}
+                        className="bg-white rounded-[3rem] p-8 border border-gray-100 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group relative overflow-hidden cursor-pointer"
+                    >
                         <div className="absolute top-0 right-0 w-24 h-24 bg-[#A68363]/5 rounded-bl-[60px] group-hover:bg-[#A68363]/10 transition-colors"></div>
 
                         <div className="flex justify-between items-start mb-6">
@@ -97,7 +112,9 @@ export default function PatientSearchPage() {
                         </div>
 
                         <div className="space-y-1 mb-6">
-                            <h3 className="text-2xl font-black text-[#4A3C31] group-hover:text-[#A68363] transition-colors">{coach.fullName}</h3>
+                            <h3 className={`text-2xl font-black transition-colors ${refId && (coach.id === refId || coach.userId === refId) ? "text-[#A68363]" : "text-[#4A3C31] group-hover:text-[#A68363]"}`}>
+                                {coach.fullName}
+                            </h3>
                             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{coach.specialty}</p>
                         </div>
 
@@ -105,22 +122,14 @@ export default function PatientSearchPage() {
                             {coach.description}
                         </p>
 
-                        <div className="flex items-center justify-between pt-6 border-t border-gray-50">
+                        <div className="flex items-center justify-between pt-6 border-t border-gray-50 relative z-10">
                             <div>
                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Desde</p>
                                 <p className="text-xl font-black text-[#4A3C31]">${coach.price}<span className="text-xs text-gray-400 font-bold ml-1">/sesión</span></p>
                             </div>
-                            <BookingModal
-                                psychologistId={coach.id}
-                                psychologistName={coach.fullName}
-                                price={Number(coach.price) || 35}
-                                currentUser={currentUser}
-                                customTrigger={
-                                    <Button className="bg-[#4A3C31] hover:bg-black text-white font-black uppercase tracking-widest text-[10px] rounded-2xl px-6 h-12 shadow-lg shadow-[#4A3C31]/20 transition-all active:scale-95">
-                                        Reservar
-                                    </Button>
-                                }
-                            />
+                            <Button className="bg-[#4A3C31] hover:bg-black text-white font-black uppercase tracking-widest text-[10px] rounded-2xl px-6 h-12 shadow-lg shadow-[#4A3C31]/20 transition-all active:scale-95">
+                                Ver Perfil
+                            </Button>
                         </div>
                     </div>
                 ))}
@@ -135,6 +144,13 @@ export default function PatientSearchPage() {
                     </div>
                 )}
             </div>
+
+            <PsychologistProfileModal
+                psychologist={selectedPsychologist}
+                isOpen={isProfileDesktopOpen}
+                onClose={() => setIsProfileDesktopOpen(false)}
+                currentUser={currentUser}
+            />
         </div>
     );
 }

@@ -37,7 +37,7 @@ export default function AdminLayout({
             {/* Sidebar */}
             <aside
                 className={cn(
-                    "bg-gray-900 text-white flex flex-col transition-all duration-300 ease-in-out relative z-30 shadow-2xl",
+                    "bg-gray-900 text-white flex flex-col transition-all duration-300 ease-in-out relative z-50 shadow-2xl",
                     isCollapsed ? "w-20" : "w-64"
                 )}
             >
@@ -62,6 +62,7 @@ export default function AdminLayout({
                         <Link
                             key={item.href}
                             href={item.href}
+                            prefetch={true}
                             className={cn(
                                 "flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-white/5 hover:text-white rounded-xl transition-all duration-200 font-medium group relative",
                                 isCollapsed && "justify-center px-0"

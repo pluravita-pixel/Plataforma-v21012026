@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     User,
     Camera,
@@ -49,8 +49,15 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
     const [isSaving, setIsSaving] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [baseUrl, setBaseUrl] = useState("");
 
-    const publicUrl = `pluravita.com/${profile.username || 'tu-username'}`;
+    useEffect(() => {
+        setBaseUrl(window.location.origin);
+    }, []);
+
+    const publicUrl = psychologist.refCode
+        ? `${baseUrl}/api/ref/${psychologist.refCode}`
+        : `${baseUrl}/patient/search?search=${profile.username || 'tu-username'}`;
 
     const handleCopyUrl = () => {
         navigator.clipboard.writeText(publicUrl);
@@ -219,12 +226,9 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-gray-600">Nombre Completo</label>
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            className="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm text-gray-400 cursor-not-allowed"
-                                            value={profile.fullName}
-                                        />
+                                        <p className="px-4 py-3 text-sm text-gray-800 font-bold bg-gray-50/50 rounded-xl border border-gray-100">
+                                            {profile.fullName}
+                                        </p>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-gray-600">Nombre de Usuario *</label>

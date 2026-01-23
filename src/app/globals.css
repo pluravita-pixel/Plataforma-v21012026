@@ -83,65 +83,65 @@
 */
 @layer base {
   :root {
-    /* Nueva Paleta de Marca: Marrón, Crema, Beige */
+    /* Nueva Paleta: Soft Amber & Warmth */
 
-    /* Background: Crema Suave */
-    --background: #F9F5F0;
+    /* Background: Warm White with Amber Tint */
+    --background: #FFFDF9;
 
-    /* Foreground: Marrón Oscuro */
-    --foreground: #4A3C31;
+    /* Foreground: Warm Chocolate */
+    --foreground: #5D4037;
 
-    /* Card: Beige Muy Claro */
-    --card: #F2EDE7;
-    --card-foreground: #4A3C31;
+    /* Card: Soft Warm White */
+    --card: #FFFFFF;
+    --card-foreground: #5D4037;
 
-    /* Popover: Blanco Puro */
+    /* Popover: White */
     --popover: #FFFFFF;
-    --popover-foreground: #4A3C31;
+    --popover-foreground: #5D4037;
 
-    /* Primary: Marrón Arcilla */
-    --primary: #A68363;
+    /* Primary: Soft Amber (Golden) */
+    --primary: #F59E0B;
     --primary-foreground: #FFFFFF;
 
-    /* Secondary: Beige Muy Claro */
-    --secondary: #F2EDE7;
-    --secondary-foreground: #4A3C31;
+    /* Secondary: Light Peach/Amber */
+    --secondary: #FEF3C7;
+    --secondary-foreground: #92400E;
 
-    /* Muted: Gris Pizarra para texto secundario */
-    --muted: #F2EDE7;
-    --muted-foreground: #6B6B6B;
+    /* Muted: Soft Beige */
+    --muted: #FDE68A;
+    --muted-foreground: #92400E;
 
-    /* Accent: Marrón Arcilla suave */
-    --accent: #F2EDE7;
-    --accent-foreground: #A68363;
+    /* Accent: Soft Amber Hover */
+    --accent: #FFF7ED;
+    --accent-foreground: #D97706;
 
-    /* Destructive: Rojo suave (mantenido) */
-    --destructive: #E57373;
+    /* Destructive: Soft Red */
+    --destructive: #EF4444;
     --destructive-foreground: #FFFFFF;
 
     /* Borders and Inputs */
-    --border: #A68363;
-    --input: #F2EDE7;
-    --ring: #A68363;
+    --border: #FCD34D;
+    --input: #FFFBEB;
+    --ring: #F59E0B;
 
-    /* Charts */
-    --chart-1: #A68363;
-    --chart-2: #4A3C31;
-    --chart-3: #6B6B6B;
-    --chart-4: #D2B48C;
-    --chart-5: #BC8F8F;
+    /* Charts (Amber/Earth Tones) */
+    --chart-1: #F59E0B;
+    --chart-2: #D97706;
+    --chart-3: #B45309;
+    --chart-4: #92400E;
+    --chart-5: #78350F;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    /* Sidebar Variables */
-    --sidebar-background: #FFFFFF;
-    --sidebar-foreground: #4A3C31;
-    --sidebar-primary: #A68363;
+    /* Sidebar Variables - keeping warm */
+    --sidebar-background: #FFF9F0;
+    --sidebar-foreground: #5D4037;
+    --sidebar-primary: #F59E0B;
     --sidebar-primary-foreground: #FFFFFF;
-    --sidebar-accent: #F2EDE7;
-    --sidebar-accent-foreground: #A68363;
-    --sidebar-border: #F2EDE7;
-    --sidebar-ring: #A68363;
+    --sidebar-accent: #FEF3C7;
+    --sidebar-accent-foreground: #92400E;
+    --sidebar-border: #FCD34D;
+    --sidebar-ring: #F59E0B;
   }
 
   .dark {
@@ -189,6 +189,13 @@
     --sidebar-border: hsl(240 3.7% 15.9%);
     --sidebar-ring: hsl(217.2 91.2% 59.8%);
   }
+}
+
+body {
+  @apply bg-background text-foreground antialiased;
+  /* Soft Amber Lighting Effect */
+  background-image: radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.08), transparent 70%);
+}
 }
 
 /* Custom Animations */
@@ -264,44 +271,49 @@
 
 /* Almedia-style Utilities */
 .glass-card {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.02),
+    0 10px 40px -10px rgba(245, 158, 11, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.02),
     inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius);
 }
 
 .input-premium {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(166, 131, 99, 0.15);
-  /* Primary color low opacity */
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  /* Amber border low opacity */
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+  border-radius: var(--radius);
 }
 
 .input-premium:focus {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 1);
   border-color: var(--primary);
   box-shadow:
-    0 0 0 4px rgba(166, 131, 99, 0.1),
+    0 0 0 4px rgba(245, 158, 11, 0.15),
     inset 0 1px 2px rgba(0, 0, 0, 0.02);
   transform: translateY(-1px);
 }
 
-/* Premium Button Style - Almedia Inspired */
+/* Premium Button Style - Amber Glow */
 .btn-premium {
   position: relative;
-  background: linear-gradient(to bottom, #A68363, #8B6B4E);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(to bottom, #F59E0B, #D97706);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.2) inset,
-    0 10px 20px -10px rgba(166, 131, 99, 0.4);
+    0 1px 0 rgba(255, 255, 255, 0.3) inset,
+    0 10px 20px -10px rgba(245, 158, 11, 0.5);
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
+  border-radius: var(--radius);
+  color: white;
+  font-weight: 600;
 }
 
 .btn-premium::before {
@@ -313,7 +325,7 @@
   height: 100%;
   background: linear-gradient(90deg,
       transparent,
-      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.3),
       transparent);
   transform: skewX(-20deg);
   transition: 0.5s;
@@ -323,8 +335,9 @@
 .btn-premium:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.2) inset,
-    0 20px 40px -10px rgba(166, 131, 99, 0.5);
+    0 1px 0 rgba(255, 255, 255, 0.3) inset,
+    0 20px 40px -10px rgba(245, 158, 11, 0.6);
+  filter: brightness(1.1);
 }
 
 .btn-premium:hover::before {

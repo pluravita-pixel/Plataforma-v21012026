@@ -59,12 +59,59 @@ export async function resolveTicket(ticketId: string) {
 
     try {
         await db.update(supportTickets)
-            .set({ status: "resolved" })
+            .set({
+                status: "resolved",
+                isRead: true
+            })
             .where(eq(supportTickets.id, ticketId));
 
         revalidatePath("/admin/support");
         return { success: true };
     } catch (error) {
         return { error: "No se pudo actualizar el ticket" };
+    }
+}
+
+export async function replyToTicket(ticketId: string, response: string) {
+    const user = await getCurrentUser();
+    if (!user || user.role !== 'admin') {
+        throw new Error("No autorizado");
+    }
+
+    try {
+        await db.update(supportTickets)
+            .set({
+                adminResponse: response,
+                isRead: true
+                // Keep status open so user can see reply, or maybe resolved?
+                // Usually reply means admin acted. Let's keep it open or have a 'replied' status?
+                // Schema limits to 'open'/'resolved'. Let's keep 'open' or move to 'resolved' if checking.
+                // For now, just adding response. Admin can resolve separately or I'll add auto-resolve?
+                // Let's leave status as is, just add response.
+            })
+            .where(eq(supportTickets.id, ticketId));
+
+        revalidatePath("/admin/support");
+        return { success: true };
+    } catch (error) {
+        return { error: "No se pudo enviar la respuesta" };
+    }
+}
+
+export async function markAsRead(ticketId: string) {
+    const user = await getCurrentUser();
+    if (!user || user.role !== 'admin') {
+        throw new Error("No autorizado");
+    }
+
+    try {
+        await db.update(supportTickets)
+            .set({ isRead: true })
+            .where(eq(supportTickets.id, ticketId));
+
+        revalidatePath("/admin/support");
+        return { success: true };
+    } catch (error) {
+        return { error: "Error al marcar como leído" };
     }
 }

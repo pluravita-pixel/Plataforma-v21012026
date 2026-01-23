@@ -152,14 +152,13 @@ export default function LandingPage() {
                         <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-[#4A3C31]/5 rounded-3xl blur-xl" />
 
                         <div className="relative bg-white p-4 rounded-2xl shadow-xl rotate-1 max-w-[550px] mx-auto z-10">
-                            <div className="aspect-[16/9] relative bg-gray-100 rounded-lg overflow-hidden group cursor-pointer">
-                                <div className="absolute inset-0 bg-neutral-800/10"></div>
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="h-16 w-16 bg-white rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                                        <Play className="h-6 w-6 text-[#A68363] ml-1 fill-current" />
-                                    </div>
-                                </div>
-                                <div className="h-full w-full bg-[url('https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center opacity-90" />
+                            <div className="aspect-[16/9] relative bg-black rounded-lg overflow-hidden group shadow-inner">
+                                <iframe
+                                    src="https://www.youtube.com/embed/a6AtqACERTo?autoplay=0&mute=0&controls=1&loop=1&playlist=a6AtqACERTo&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1"
+                                    className="w-full h-full absolute inset-0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                ></iframe>
                             </div>
                         </div>
                     </div>

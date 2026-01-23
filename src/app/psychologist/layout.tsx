@@ -65,6 +65,7 @@ export default function PsychologistLayout({
                         <Link
                             key={item.href}
                             href={item.href}
+                            prefetch={true}
                             className={cn(
                                 "flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-blue-50 hover:text-[#0077FF] rounded-xl transition-all duration-200 font-medium group relative",
                                 isCollapsed && "justify-center px-0"

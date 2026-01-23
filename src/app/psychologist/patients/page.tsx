@@ -34,7 +34,8 @@ export default async function PatientsPage() {
                 reason: p.reason,
                 status: p.status,
                 nextAppointmentId: p.nextAppointmentId,
-                nextAppDate: p.nextAppDate
+                nextAppDate: p.nextAppDate,
+                isAnonymous: p.isAnonymous // NEW FIELD
             }))}
         />
     );

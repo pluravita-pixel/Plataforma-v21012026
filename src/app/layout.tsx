@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
 
 import { Providers } from "./providers";
 import { PageTransition } from "@/components/page-transition";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "pluravita | Plataforma de bienestar emocional",
@@ -35,6 +36,7 @@ export default function RootLayout({
             {children}
           </PageTransition>
         </Providers>
+        <SpeedInsights />
       </body>
     </html>
   );

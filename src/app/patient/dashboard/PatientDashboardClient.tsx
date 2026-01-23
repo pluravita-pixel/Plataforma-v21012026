@@ -73,15 +73,21 @@ export default function PatientDashboardClient({ initialData }: PatientDashboard
                                     <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Acompañamiento Psicoterapéutico Online</p>
                                 </div>
 
-                                <Button
-                                    onClick={() => router.push(`/session/${nextAppointment.id}`)}
-                                    className="w-full md:w-auto bg-[#4A3C31] hover:bg-black text-white font-black uppercase tracking-widest text-xs rounded-2xl px-10 h-16 shadow-xl shadow-[#4A3C31]/20 transition-all hover:-translate-y-1 active:scale-95"
-                                >
-                                    <span className="flex items-center gap-2">
-                                        <Video className="h-5 w-5" />
-                                        Entrar a Sesión
-                                    </span>
-                                </Button>
+                                {new Date() < new Date(new Date(nextAppointment.date).getTime() + 60 * 60 * 1000) ? (
+                                    <Button
+                                        onClick={() => router.push(`/session/${nextAppointment.id}`)}
+                                        className="w-full md:w-auto bg-[#4A3C31] hover:bg-black text-white font-black uppercase tracking-widest text-xs rounded-2xl px-10 h-16 shadow-xl shadow-[#4A3C31]/20 transition-all hover:-translate-y-1 active:scale-95"
+                                    >
+                                        <span className="flex items-center gap-2">
+                                            <Video className="h-5 w-5" />
+                                            Entrar a Sesión
+                                        </span>
+                                    </Button>
+                                ) : (
+                                    <div className="w-full md:w-auto bg-gray-100 text-gray-400 font-black uppercase tracking-widest text-xs rounded-2xl px-10 h-16 flex items-center justify-center border border-gray-200 cursor-not-allowed">
+                                        Sesión Finalizada
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ) : (

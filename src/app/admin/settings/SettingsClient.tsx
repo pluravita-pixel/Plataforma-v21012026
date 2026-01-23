@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Shield, Mail, User, PlusCircle, CheckCircle2 } from "lucide-react";
-import { preApproveAdmin } from "@/app/actions/admin";
+import { Shield, Mail, User, PlusCircle, CheckCircle2, Edit2, Save, X } from "lucide-react";
+import { preApproveAdmin, updateAdminSelf } from "@/app/actions/admin";
 
 interface SettingsClientProps {
     currentUser: any;
@@ -16,6 +16,14 @@ interface SettingsClientProps {
 export function SettingsClient({ currentUser }: SettingsClientProps) {
     const [adminEmail, setAdminEmail] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Profile Edit State
+    const [isEditing, setIsEditing] = useState(false);
+    const [profileData, setProfileData] = useState({
+        fullName: currentUser.fullName || "",
+        email: currentUser.email || ""
+    });
+    const [isSavingProfile, setIsSavingProfile] = useState(false);
 
     const handleAddAdmin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -33,6 +41,26 @@ export function SettingsClient({ currentUser }: SettingsClientProps) {
         }
     };
 
+    const handleUpdateProfile = async () => {
+        if (!profileData.fullName.trim() || !profileData.email.trim()) {
+            toast.error("Todos los campos son obligatorios");
+            return;
+        }
+
+        setIsSavingProfile(true);
+        const result = await updateAdminSelf(currentUser.id, profileData);
+        setIsSavingProfile(false);
+
+        if (result.success) {
+            toast.success("Perfil actualizado correctamente");
+            setIsEditing(false);
+            // Optionally update local state or router refresh manually if needed, 
+            // but revalidatePath usually handles it on next navigation/action.
+        } else {
+            toast.error(result.error || "Error al actualizar perfil");
+        }
+    };
+
     return (
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div>
@@ -46,23 +74,70 @@ export function SettingsClient({ currentUser }: SettingsClientProps) {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Account Details */}
                 <Card className="rounded-[2.5rem] border-gray-100 shadow-xl overflow-hidden">
-                    <CardHeader className="bg-gray-50 border-b border-gray-100 p-8">
-                        <CardTitle className="text-xl font-black uppercase tracking-tight">Tu Cuenta</CardTitle>
-                        <CardDescription className="text-xs font-bold uppercase tracking-widest text-gray-400">Detalles del administrador actual</CardDescription>
+                    <CardHeader className="bg-gray-50 border-b border-gray-100 p-8 flex flex-row items-center justify-between">
+                        <div>
+                            <CardTitle className="text-xl font-black uppercase tracking-tight">Tu Cuenta</CardTitle>
+                            <CardDescription className="text-xs font-bold uppercase tracking-widest text-gray-400">Detalles del administrador actual</CardDescription>
+                        </div>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                                if (isEditing) {
+                                    setProfileData({
+                                        fullName: currentUser.fullName || "",
+                                        email: currentUser.email || ""
+                                    });
+                                }
+                                setIsEditing(!isEditing);
+                            }}
+                            className="bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-gray-50"
+                        >
+                            {isEditing ? <X className="h-4 w-4 text-gray-500" /> : <Edit2 className="h-4 w-4 text-blue-600" />}
+                        </Button>
                     </CardHeader>
                     <CardContent className="p-8 space-y-6">
                         <div className="flex items-center gap-6 p-6 rounded-3xl bg-gray-50/50 border border-gray-100 shadow-inner">
                             <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center text-white text-2xl font-black shadow-lg">
-                                {currentUser.fullName?.[0] || currentUser.email[0].toUpperCase()}
+                                {profileData.fullName?.[0] || profileData.email[0]?.toUpperCase()}
                             </div>
-                            <div>
-                                <p className="text-sm font-black text-gray-900 uppercase">{currentUser.fullName || "Administrador"}</p>
-                                <p className="text-xs text-gray-500 font-bold">{currentUser.email}</p>
+                            <div className="flex-1">
+                                {isEditing ? (
+                                    <div className="space-y-3">
+                                        <Input
+                                            value={profileData.fullName}
+                                            onChange={(e) => setProfileData({ ...profileData, fullName: e.target.value })}
+                                            placeholder="Nombre Completo"
+                                            className="h-9 bg-white text-sm font-bold"
+                                        />
+                                        <Input
+                                            value={profileData.email}
+                                            onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                                            placeholder="Email"
+                                            className="h-9 bg-white text-xs font-medium"
+                                        />
+                                    </div>
+                                ) : (
+                                    <>
+                                        <p className="text-sm font-black text-gray-900 uppercase">{profileData.fullName || "Administrador"}</p>
+                                        <p className="text-xs text-gray-500 font-bold">{profileData.email}</p>
+                                    </>
+                                )}
                                 <div className="mt-2 inline-flex items-center px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase">
                                     Status: Root Admin
                                 </div>
                             </div>
                         </div>
+
+                        {isEditing && (
+                            <Button
+                                onClick={handleUpdateProfile}
+                                disabled={isSavingProfile}
+                                className="w-full h-10 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs"
+                            >
+                                {isSavingProfile ? "Guardando..." : "Guardar Cambios"}
+                            </Button>
+                        )}
 
                         <div className="space-y-4 pt-4">
                             <div className="grid grid-cols-2 gap-4 text-sm font-medium">
