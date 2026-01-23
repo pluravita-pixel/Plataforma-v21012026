@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { cancelAppointmentByPsychologist } from "@/app/actions/psychologists";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface Patient {
     id: string;
@@ -84,7 +85,7 @@ export function PatientsClient({ initialPatients, psychologistId }: { initialPat
                                 <th className="px-6 py-5 text-xs font-black text-[#A68363] uppercase tracking-wider">Motivo</th>
                                 <th className="px-6 py-5 text-xs font-black text-[#A68363] uppercase tracking-wider">Última Sesión</th>
                                 <th className="px-6 py-5 text-xs font-black text-[#A68363] uppercase tracking-wider">Estado</th>
-                                <th className="px-6 py-5 text-xs font-black text-[#A68363] uppercase tracking-wider text-right">Acciones</th>
+                                <th className="px-6 py-5 text-xs font-black text-[#A68363] uppercase tracking-wider text-right"></th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
@@ -133,9 +134,9 @@ export function PatientsClient({ initialPatients, psychologistId }: { initialPat
                                                             <div className="px-4 py-2 border-b border-gray-50 mb-1">
                                                                 <p className="text-xs font-bold text-gray-400">Acciones</p>
                                                             </div>
-                                                            <button className="w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-[#FAF8F5] hover:text-[#4A3C31] font-medium transition-colors">
+                                                            <Link href={`/psychologist/patients/${patient.id}`} className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-[#FAF8F5] hover:text-[#4A3C31] font-medium transition-colors">
                                                                 Ver expediente
-                                                            </button>
+                                                            </Link>
                                                             {patient.nextAppointmentId && (
                                                                 <button
                                                                     onClick={(e) => {
@@ -151,9 +152,7 @@ export function PatientsClient({ initialPatients, psychologistId }: { initialPat
                                                         </div>
                                                     )}
                                                 </>
-                                            ) : (
-                                                <span className="text-gray-300 text-xs italic">Privado</span>
-                                            )}
+                                            ) : null}
                                         </td>
                                     </tr>
                                 ))

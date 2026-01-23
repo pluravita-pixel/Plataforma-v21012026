@@ -20,60 +20,60 @@ export default async function AdminDashboard() {
     ]);
 
     const stats = [
-        { label: "Pacientes Totales", value: statsData.patients, icon: Users, color: "text-emerald-600", bg: "bg-emerald-50" },
-        { label: "Dinero Facturado", value: `€${statsData.revenue.toFixed(2)}`, icon: Euro, color: "text-blue-600", bg: "bg-blue-50" },
-        { label: "Coaches Registrados", value: statsData.psychologists, icon: UserCheck, color: "text-purple-600", bg: "bg-purple-50" },
-        { label: "Citas Hoy", value: statsData.appointmentsToday, icon: Activity, color: "text-orange-600", bg: "bg-orange-50" },
+        { label: "Pacientes Totales", value: statsData.patients, icon: Users, color: "text-black", bg: "bg-white" },
+        { label: "Dinero Facturado", value: `€${statsData.revenue.toFixed(2)}`, icon: Euro, color: "text-black", bg: "bg-gray-50" },
+        { label: "Coaches Registrados", value: statsData.psychologists, icon: UserCheck, color: "text-black", bg: "bg-gray-100" },
+        { label: "Citas Hoy", value: statsData.appointmentsToday, icon: Activity, color: "text-black", bg: "bg-white" },
     ];
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-12 animate-fade-in-up">
             <div className="flex justify-between items-end">
                 <div>
-                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">RESUMEN DEL SISTEMA</h1>
-                    <p className="text-gray-500 mt-1 uppercase text-xs font-bold tracking-widest">Datos en tiempo real de la plataforma</p>
+                    <h1 className="text-6xl font-black text-black tracking-tighter uppercase mb-2">Resumen</h1>
+                    <p className="text-black font-bold uppercase tracking-widest text-sm bg-white border-2 border-black inline-block px-3">Datos del Sistema</p>
                 </div>
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 {stats.map((stat, i) => (
-                    <div key={i} className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className={`p-4 rounded-2xl ${stat.bg} ${stat.color}`}>
-                                <stat.icon className="h-6 w-6" />
+                    <div key={i} className={`${stat.bg} p-8 neo-border neo-shadow transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none`}>
+                        <div className="flex items-center justify-between mb-6">
+                            <div className={`p-4 neo-border bg-white text-black`}>
+                                <stat.icon className="h-8 w-8" />
                             </div>
                         </div>
                         <div>
-                            <p className="text-gray-500 text-xs font-black uppercase tracking-widest">{stat.label}</p>
-                            <p className="text-4xl font-black text-gray-900 mt-2 tracking-tighter">{stat.value}</p>
+                            <p className="text-black text-xs font-black uppercase tracking-tighter">{stat.label}</p>
+                            <p className="text-5xl font-black text-black mt-2 tracking-tighter">{stat.value}</p>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 gap-8">
+            <div className="grid grid-cols-1 gap-12">
                 {/* Psychologists List */}
-                <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
-                    <h2 className="text-xl font-black text-gray-900 mb-6 uppercase tracking-tight">Coaches en la Web</h2>
-                    <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                <div className="bg-white p-10 neo-border neo-shadow">
+                    <h2 className="text-3xl font-black text-black mb-10 uppercase tracking-tighter">Coaches en la Web</h2>
+                    <div className="space-y-6 max-h-[700px] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-black">
                         {allPsychologists.length > 0 ? allPsychologists.map((p, i) => (
-                            <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-gray-50/50 hover:bg-gray-50 transition-colors">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center font-bold text-emerald-600 text-xs">
-                                        C
+                            <div key={i} className="flex items-center justify-between p-6 bg-white neo-border hover:bg-gray-50 transition-colors neo-shadow-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none">
+                                <div className="flex items-center gap-6">
+                                    <div className="w-14 h-14 neo-border bg-gray-200 flex items-center justify-center font-black text-black text-xl">
+                                        {p.fullName[0]}
                                     </div>
                                     <div>
-                                        <p className="font-bold text-gray-900 text-sm">{p.fullName}</p>
-                                        <p className="text-[10px] text-gray-500 uppercase font-black">{p.specialty || "General"}</p>
+                                        <p className="font-black text-black text-xl uppercase tracking-tight">{p.fullName}</p>
+                                        <p className="text-xs text-black/60 uppercase font-black bg-gray-100 px-2 inline-block">{p.specialty || "General"}</p>
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-sm font-black text-gray-900">{p.rating} ⭐</p>
-                                    <p className="text-[10px] text-gray-400 font-bold uppercase">{p.email}</p>
+                                    <p className="text-xl font-black text-black">{p.rating} ⭐</p>
+                                    <p className="text-xs text-black/40 font-bold uppercase tracking-widest leading-none mt-1">{p.email}</p>
                                 </div>
                             </div>
-                        )) : <p className="text-gray-400 text-sm italic">No hay coaches registrados</p>}
+                        )) : <p className="text-black font-bold uppercase opacity-20 text-center py-20">No hay coaches registrados</p>}
                     </div>
                 </div>
             </div>

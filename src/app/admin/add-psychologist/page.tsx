@@ -37,8 +37,8 @@ export default function AddPsychologistPage() {
         <div className="max-w-4xl">
             <div className="mb-12">
                 <h1 className="text-4xl font-black text-gray-900 tracking-tight flex items-center gap-4">
-                    <div className="p-3 bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-100">
-                        <UserPlus className="h-8 w-8 text-white" />
+                    <div className="p-3 bg-gray-100 text-black neo-border shadow-sm">
+                        <UserPlus className="h-8 w-8" />
                     </div>
                     AÑADIR COACH
                 </h1>
@@ -48,7 +48,7 @@ export default function AddPsychologistPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <div className="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-xl shadow-gray-100/50">
+                <div className="bg-white p-10 neo-border neo-shadow">
                     <form onSubmit={handleSubmit} className="space-y-8">
                         <div className="space-y-3">
                             <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
@@ -58,7 +58,7 @@ export default function AddPsychologistPage() {
                             <input
                                 type="text"
                                 required
-                                className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-600 focus:bg-white rounded-[1.5rem] px-6 py-4 text-base font-medium transition-all outline-none"
+                                className="w-full bg-gray-50 border-2 border-black focus:bg-white px-6 py-4 text-base font-bold transition-all outline-none"
                                 placeholder="P. ej. Dr. Alberto Mendoza"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
@@ -73,7 +73,7 @@ export default function AddPsychologistPage() {
                             <input
                                 type="email"
                                 required
-                                className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-600 focus:bg-white rounded-[1.5rem] px-6 py-4 text-base font-medium transition-all outline-none"
+                                className="w-full bg-gray-50 border-2 border-black focus:bg-white px-6 py-4 text-base font-bold transition-all outline-none"
                                 placeholder="correo@coach.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -97,7 +97,7 @@ export default function AddPsychologistPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-gray-900 text-white font-black py-5 rounded-[1.5rem] hover:bg-gray-800 transition-all flex items-center justify-center gap-3 shadow-xl shadow-gray-200 uppercase tracking-widest text-sm disabled:opacity-50"
+                            className="w-full bg-black text-white font-black py-5 hover:bg-gray-800 transition-all flex items-center justify-center gap-3 neo-border-4 neo-shadow uppercase tracking-widest text-sm disabled:opacity-50"
                         >
                             {loading ? (
                                 <Loader2 className="h-5 w-5 animate-spin" />
@@ -112,24 +112,24 @@ export default function AddPsychologistPage() {
                 </div>
 
                 <div className="space-y-6">
-                    <div className="bg-[#0077FF] p-10 rounded-[3rem] text-white shadow-2xl shadow-blue-200">
+                    <div className="bg-gray-100 p-10 neo-border neo-shadow text-black">
                         <h3 className="text-xl font-black mb-6 uppercase tracking-tight">Información de Seguridad</h3>
-                        <div className="text-white/80 leading-relaxed mb-8 flex items-start gap-4">
-                            <div className="mt-1 p-2 bg-white/20 rounded-lg">
+                        <div className="text-black/80 leading-relaxed mb-8 flex items-start gap-4 font-bold">
+                            <div className="mt-1 p-2 bg-white neo-border">
                                 <CheckCircle2 className="h-4 w-4" />
                             </div>
                             Al añadir un coach, este se marcará con acceso especial en el sistema.
                         </div>
-                        <div className="text-white/80 leading-relaxed flex items-start gap-4">
-                            <div className="mt-1 p-2 bg-white/20 rounded-lg">
+                        <div className="text-black/80 leading-relaxed flex items-start gap-4 font-bold">
+                            <div className="mt-1 p-2 bg-white neo-border">
                                 <CheckCircle2 className="h-4 w-4" />
                             </div>
                             Si el usuario ya estaba registrado como paciente, su cuenta se convertirá automáticamente.
                         </div>
                     </div>
 
-                    <div className="bg-gray-50 border-2 border-dashed border-gray-200 p-8 rounded-[3rem] text-center">
-                        <p className="text-gray-400 font-bold text-sm">Próximamente: Envío de invitación automática por email</p>
+                    <div className="bg-white neo-border neo-border-dashed p-8 text-center">
+                        <p className="text-gray-400 font-bold text-sm uppercase">Próximamente: Invitación automática</p>
                     </div>
                 </div>
             </div>

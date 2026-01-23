@@ -6,18 +6,28 @@ import { resetPassword } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, MessageCircle } from "lucide-react";
+import { ArrowLeft, MessageCircle, KeyRound, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 
 function SubmitButton() {
     const { pending } = useFormStatus();
     return (
         <Button
             type="submit"
-            className="w-full bg-[#0077FF] hover:bg-[#0066CC] font-bold py-6 rounded-xl text-md"
+            className="w-full btn-premium text-white font-bold py-7 rounded-2xl text-lg relative overflow-hidden group shadow-none"
             disabled={pending}
         >
-            {pending ? "Enviando..." : "Restablecer contraseña"}
+            <span className="relative z-10 flex items-center justify-center gap-2">
+                {pending ? (
+                    <>
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Enviando...
+                    </>
+                ) : (
+                    "Restablecer contraseña"
+                )}
+            </span>
         </Button>
     );
 }
@@ -26,65 +36,110 @@ export default function ForgotPasswordPage() {
     const [state, formAction] = useActionState(resetPassword, null);
 
     return (
-        <div className="min-h-screen bg-[#0077FF] flex flex-col items-center justify-center p-4">
+        <div className="min-h-dvh bg-[#FDFCFB] flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden bg-noise">
+            {/* Background Decorative Elements */}
+            <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[#A68363]/10 rounded-full blur-[120px] animate-pulse" />
+            <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-[#4A3C31]/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
+
             {/* Top Logo */}
-            <div className="absolute top-8 left-8 text-white font-black text-2xl tracking-tighter flex items-center gap-2">
-                <MessageCircle className="h-8 w-8 fill-current" />
-                pluravita
-            </div>
-
-            <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden p-12 relative">
-                {/* Back Button */}
-                <Link href="/login" className="absolute top-6 left-6 text-gray-400 hover:text-gray-600 z-10 font-medium flex items-center gap-1 text-sm">
-                    <ArrowLeft className="h-4 w-4" />
-                    Volver
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="absolute top-6 left-6 lg:top-10 lg:left-10 z-20"
+            >
+                <Link href="/" className="flex items-center gap-3 no-underline group">
+                    <div className="bg-[#A68363] p-2 rounded-xl shadow-lg shadow-[#A68363]/20 text-white group-hover:scale-105 transition-transform duration-300">
+                        <LayoutDashboard className="h-6 w-6" />
+                    </div>
+                    <span className="text-[#4A3C31] font-black text-xl lg:text-2xl tracking-tight">pluravita</span>
                 </Link>
+            </motion.div>
 
-                <div className="text-center space-y-4 mt-4">
-                    <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto">
-                        <span className="text-2xl">🔑</span>
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900">¿Olvidaste tu contraseña?</h3>
-                    <p className="text-gray-500">Introduce tu correo electrónico y te enviaremos un enlace para restablecerla.</p>
-                </div>
-
-                <form action={formAction} className="space-y-6 mt-8">
-                    <div className="space-y-2">
-                        <Label htmlFor="email" className="text-gray-500 font-normal">Correo electrónico</Label>
-                        <Input
-                            id="email"
-                            name="email"
-                            type="email"
-                            placeholder="ejemplo@correo.com"
-                            required
-                            className="h-12 rounded-xl bg-gray-50 border-gray-200"
-                        />
-                    </div>
-
-                    {state?.error && (
-                        <div className="text-sm text-destructive font-bold text-center bg-red-50 p-3 rounded-lg border border-red-100">
-                            {state.error}
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="w-full max-w-md relative z-10"
+            >
+                <div className="glass-card w-full rounded-[2rem] p-8 sm:p-12 bg-white/60 backdrop-blur-md shadow-xl border border-white/40">
+                    {/* Back Button */}
+                    <Link
+                        href="/login"
+                        className="absolute top-6 left-6 text-gray-400 hover:text-[#A68363] transition-colors z-20 group flex items-center gap-2"
+                    >
+                        <div className="p-2 rounded-full hover:bg-[#A68363]/5 transition-colors">
+                            <ArrowLeft className="h-5 w-5" />
                         </div>
-                    )}
+                    </Link>
 
-                    {state?.success && (
-                        <div className="text-sm text-green-600 font-bold text-center bg-green-50 p-3 rounded-lg border border-green-100">
-                            {state.success}
+                    <div className="text-center space-y-4 mt-8">
+                        <div className="w-16 h-16 bg-[#A68363]/10 rounded-2xl flex items-center justify-center mx-auto ring-1 ring-[#A68363]/20">
+                            <KeyRound className="h-8 w-8 text-[#A68363]" />
                         </div>
-                    )}
+                        <h3 className="text-2xl font-black text-[#4A3C31] tracking-tight">¿Recuperar contraseña?</h3>
+                        <p className="text-[#8B6B4E] font-medium text-sm leading-relaxed">
+                            Introduce tu correo y te enviaremos las instrucciones de recuperación.
+                        </p>
+                    </div>
 
-                    <SubmitButton />
-                </form>
+                    <form action={formAction} className="space-y-6 mt-10">
+                        <div className="space-y-1.5 group focus-within:transform focus-within:translate-x-1 transition-transform duration-300">
+                            <Label htmlFor="email" className="text-[13px] uppercase tracking-wider font-bold text-[#A68363] ml-1 opacity-80 group-focus-within:opacity-100 transition-opacity">Correo electrónico</Label>
+                            <Input
+                                id="email"
+                                name="email"
+                                type="email"
+                                placeholder="ejemplo@pluravita.com"
+                                required
+                                className="input-premium h-14 rounded-xl text-lg px-6"
+                            />
+                        </div>
 
-                <div className="mt-8 text-center text-sm">
-                    <p className="text-gray-500">
-                        ¿Recordaste tu contraseña?{" "}
-                        <Link href="/login" className="text-[#0077FF] font-bold hover:underline">
-                            Inicia sesión
-                        </Link>
-                    </p>
+                        <AnimatePresence mode="wait">
+                            {state?.error && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: "auto" }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    className="text-sm text-red-600 font-bold bg-red-50 p-4 rounded-2xl border border-red-100 flex items-center gap-3 shadow-sm"
+                                >
+                                    <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                                    {state.error}
+                                </motion.div>
+                            )}
+                            {state?.success && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: "auto" }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    className="text-sm text-green-600 font-bold bg-green-50 p-4 rounded-2xl border border-green-100 flex items-center gap-3 shadow-sm"
+                                >
+                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                    {state.success}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        <div className="pt-2">
+                            <SubmitButton />
+                        </div>
+                    </form>
+
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.6 }}
+                        className="text-center pt-8 border-t border-gray-100/50 mt-10"
+                    >
+                        <p className="text-gray-400 font-medium text-sm">
+                            ¿Recordaste tu contraseña?{" "}
+                            <Link href="/login" className="text-[#A68363] font-black hover:text-[#8B6B4E] transition-colors ml-1 inline-block hover:-translate-y-0.5 transform duration-200">
+                                Inicia sesión
+                            </Link>
+                        </p>
+                    </motion.div>
                 </div>
-            </div>
+            </motion.div>
         </div>
     );
 }

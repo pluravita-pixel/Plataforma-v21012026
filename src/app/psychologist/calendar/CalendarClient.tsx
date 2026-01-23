@@ -308,29 +308,20 @@ export function CalendarClient({
                                                 className="h-20 border-b border-gray-100 relative p-1.5"
                                             >
                                                 {/* 1. APPOINTMENT CARD */}
-                                                {appointment && (
+                                                {appointment && appointment.status !== 'cancelled' && (
                                                     <Link
                                                         href={`/psychologist/appointments/${appointment.id}`}
-                                                        className={`w-full h-full bg-white border-l-[3px] rounded-r-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all p-3 flex flex-col justify-center relative z-20 group/card ${appointment.status === 'cancelled'
-                                                            ? "border-red-500 bg-red-50"
-                                                            : "border-[#A68363]"
-                                                            }`}
+                                                        className="w-full h-full bg-white border-l-[3px] border-[#A68363] rounded-r-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all p-3 flex flex-col justify-center relative z-20 group/card"
                                                     >
                                                         <div className="flex items-center gap-2 mb-1">
-                                                            <div className={`p-1 rounded-md ${appointment.status === 'cancelled'
-                                                                ? "bg-red-100"
-                                                                : "bg-[#A68363]/10"
-                                                                }`}>
-                                                                <Clock className={`h-3 w-3 ${appointment.status === 'cancelled' ? "text-red-500" : "text-[#A68363]"
-                                                                    }`} />
+                                                            <div className="bg-[#A68363]/10 p-1 rounded-md">
+                                                                <Clock className="h-3 w-3 text-[#A68363]" />
                                                             </div>
-                                                            <span className={`text-[10px] font-black uppercase tracking-wider ${appointment.status === 'cancelled' ? "text-red-500" : "text-[#A68363]"
-                                                                }`}>
-                                                                {appointment.status === 'cancelled' ? "Cancelada" : "Confirmada"}
+                                                            <span className="text-[10px] font-black uppercase tracking-wider text-[#A68363]">
+                                                                Confirmada
                                                             </span>
                                                         </div>
-                                                        <p className={`text-xs font-bold truncate ml-1 ${appointment.status === 'cancelled' ? "text-red-700" : "text-[#4A3C31]"
-                                                            }`}>{appointment.patientName}</p>
+                                                        <p className="text-xs font-bold truncate ml-1 text-[#4A3C31]">{appointment.patientName}</p>
                                                     </Link>
                                                 )}
 

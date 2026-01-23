@@ -126,7 +126,7 @@ export function UserNav() {
                             <p className="text-sm font-bold text-gray-900 truncate">{user.email}</p>
                         </div>
 
-                        {user.role === 'admin' && pathname !== '/admin/dashboard' && (
+                        {user.role === 'admin' ? (
                             <Link
                                 href="/admin/dashboard"
                                 className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-[#F2EDE7] hover:text-[#A68363] transition-colors"
@@ -135,9 +135,7 @@ export function UserNav() {
                                 <LayoutDashboard className="h-4 w-4" />
                                 Panel de Admin
                             </Link>
-                        )}
-
-                        {user.role === 'psychologist' && pathname !== '/psychologist/dashboard' && (
+                        ) : user.role === 'psychologist' ? (
                             <Link
                                 href="/psychologist/dashboard"
                                 className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-[#F2EDE7] hover:text-[#A68363] transition-colors"
@@ -146,9 +144,7 @@ export function UserNav() {
                                 <LayoutDashboard className="h-4 w-4" />
                                 Panel de Coach
                             </Link>
-                        )}
-
-                        {user.role === 'patient' && pathname !== '/patient/dashboard' && (
+                        ) : (
                             <Link
                                 href="/patient/dashboard"
                                 className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-[#F2EDE7] hover:text-[#A68363] transition-colors"
@@ -158,18 +154,6 @@ export function UserNav() {
                                 Mi Dashboard
                             </Link>
                         )}
-
-
-                        <button
-                            onClick={() => {
-                                setIsEditModalOpen(true);
-                                setIsOpen(false);
-                            }}
-                            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                        >
-                            <UserCircle className="h-4 w-4" />
-                            Cambiar nombre
-                        </button>
 
                         <div className="h-px bg-gray-50 my-1" />
 

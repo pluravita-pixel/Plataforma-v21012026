@@ -133,7 +133,7 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
             <div className="space-y-8 pb-12">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Editar Perfil Público</h1>
+                        <h1 className="text-3xl font-bold text-gray-900">Perfil Público</h1>
                         <p className="text-gray-500 mt-1">Esta información será visible para tus pacientes potenciales.</p>
                     </div>
                     <div className="flex gap-3">

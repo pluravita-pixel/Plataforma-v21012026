@@ -57,46 +57,47 @@ function PatientSearchContent() {
     );
 
     return (
-        <div className="space-y-10 animate-in fade-in duration-700">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-12 animate-fade-in-up">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                 <div className="flex-1">
-                    <h1 className="text-4xl font-black text-[#4A3C31] tracking-tight flex items-center gap-3 lowercase first-letter:uppercase">
-                        <Search className="h-10 w-10 text-[#A68363]" />
-                        Buscar tu Coach
+                    <h1 className="text-5xl md:text-7xl font-black text-black tracking-tighter uppercase mb-4">
+                        Buscar Coach
                     </h1>
-                    <p className="text-[#8C8C8C] mt-2 font-medium text-lg uppercase tracking-widest text-[10px]">Encuentra al profesional ideal para tu proceso de crecimiento</p>
+                    <p className="text-black font-bold text-lg uppercase tracking-tight bg-accent inline-block px-4 py-1 neo-border">
+                        Encuentra al profesional ideal para tu proceso
+                    </p>
 
-                    <div className="mt-8 relative max-w-2xl group">
-                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-6 w-6 text-gray-400 group-focus-within:text-[#A68363] transition-colors" />
-                        <Input
+                    <div className="mt-10 relative max-w-2xl group">
+                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-black z-10" />
+                        <input
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Buscar por nombre, especialidad o síntoma..."
-                            className="h-16 pl-14 pr-6 rounded-[2rem] bg-white border-gray-100 shadow-xl focus:ring-8 focus:ring-[#A68363]/5 focus:border-[#A68363] transition-all text-lg font-medium"
+                            placeholder="BUSCAR POR NOMBRE O ESPECIALIDAD..."
+                            className="neo-input h-20 pl-16 pr-8 text-xl neo-shadow-sm uppercase"
                         />
                     </div>
                 </div>
 
-                <div className="flex gap-3">
-                    <Button variant="outline" className="h-14 rounded-2xl border-gray-100 bg-white text-gray-400 font-bold px-6 border-none shadow-md hover:bg-[#A68363]/5 hover:text-[#A68363]">
-                        <Filter className="h-5 w-5 mr-2" />
+                <div className="flex gap-4">
+                    <button className="neo-btn bg-white hover:bg-gray-100 flex items-center gap-2">
+                        <Filter className="h-5 w-5" />
                         Filtros
-                    </Button>
-                    <Button variant="outline" className="h-14 rounded-2xl border-gray-100 bg-white text-gray-400 font-bold px-6 border-none shadow-md hover:bg-[#A68363]/5 hover:text-[#A68363]">
-                        <SlidersHorizontal className="h-5 w-5 mr-2" />
+                    </button>
+                    <button className="neo-btn bg-white hover:bg-gray-100 flex items-center gap-2">
+                        <SlidersHorizontal className="h-5 w-5" />
                         Ordenar
-                    </Button>
+                    </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 pb-20">
                 {loading ? (
                     [1, 2, 3].map(i => (
-                        <div key={i} className="bg-white rounded-[3rem] p-8 border border-gray-100 h-80 animate-pulse transition-all">
-                            <div className="w-16 h-16 bg-gray-50 rounded-2xl mb-6"></div>
-                            <div className="h-6 bg-gray-50 rounded-full w-3/4 mb-4"></div>
-                            <div className="h-4 bg-gray-50 rounded-full w-1/2 mb-8"></div>
-                            <div className="h-12 bg-gray-50 rounded-2xl w-full"></div>
+                        <div key={i} className="neo-card bg-white h-96 animate-pulse">
+                            <div className="w-20 h-20 bg-gray-200 neo-border mb-6"></div>
+                            <div className="h-8 bg-gray-200 neo-border w-3/4 mb-4"></div>
+                            <div className="h-4 bg-gray-100 neo-border w-1/2 mb-8"></div>
+                            <div className="h-16 bg-gray-200 neo-border w-full"></div>
                         </div>
                     ))
                 ) : filteredCoaches.map((coach) => (
@@ -106,50 +107,48 @@ function PatientSearchContent() {
                             setSelectedPsychologist(coach);
                             setIsProfileDesktopOpen(true);
                         }}
-                        className="bg-white rounded-[3rem] p-8 border border-gray-100 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group relative overflow-hidden cursor-pointer"
+                        className="neo-card hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all cursor-pointer group bg-white"
                     >
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-[#A68363]/5 rounded-bl-[60px] group-hover:bg-[#A68363]/10 transition-colors"></div>
-
-                        <div className="flex justify-between items-start mb-6">
-                            <div className="w-20 h-20 bg-[#A68363]/10 rounded-[2rem] flex items-center justify-center text-[#A68363] font-black text-3xl shadow-inner group-hover:scale-110 transition-transform">
+                        <div className="flex justify-between items-start mb-8">
+                            <div className="w-24 h-24 bg-primary neo-border flex items-center justify-center text-black font-black text-4xl neo-shadow-sm group-hover:bg-accent transition-colors">
                                 {coach.fullName[0]}
                             </div>
-                            <div className="flex items-center gap-1 bg-amber-50 px-4 py-2 rounded-full text-amber-600 font-black text-xs shadow-sm">
-                                <Star className="h-3.5 w-3.5 fill-current" />
+                            <div className="flex items-center gap-1 bg-secondary px-4 py-2 neo-border text-black font-black text-sm neo-shadow-sm">
+                                <Star className="h-4 w-4 fill-black" />
                                 {coach.rating}
                             </div>
                         </div>
 
-                        <div className="space-y-1 mb-6">
-                            <h3 className={`text-2xl font-black transition-colors ${refId && (coach.id === refId || coach.userId === refId) ? "text-[#A68363]" : "text-[#4A3C31] group-hover:text-[#A68363]"}`}>
+                        <div className="space-y-2 mb-6">
+                            <h3 className={`text-3xl font-black uppercase leading-tight ${refId && (coach.id === refId || coach.userId === refId) ? "text-accent" : "text-black"}`}>
                                 {coach.fullName}
                             </h3>
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{coach.specialty}</p>
+                            <p className="text-sm font-black text-black/60 uppercase tracking-widest bg-gray-100 inline-block px-2">{coach.specialty}</p>
                         </div>
 
-                        <p className="text-gray-500 text-sm leading-relaxed line-clamp-2 mb-8 font-medium">
+                        <p className="text-black text-base leading-snug line-clamp-3 mb-10 font-bold uppercase tracking-tight">
                             {coach.description}
                         </p>
 
-                        <div className="flex items-center justify-between pt-6 border-t border-gray-50 relative z-10">
+                        <div className="flex items-center justify-between pt-6 neo-border-t border-t-4 border-black relative z-10">
                             <div>
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Desde</p>
-                                <p className="text-xl font-black text-[#4A3C31]">${coach.price}<span className="text-xs text-gray-400 font-bold ml-1">/sesión</span></p>
+                                <p className="text-[10px] font-black text-black/40 uppercase tracking-widest">Desde</p>
+                                <p className="text-2xl font-black text-black">€{coach.price}<span className="text-xs font-bold ml-1">/SESIÓN</span></p>
                             </div>
-                            <Button className="bg-[#4A3C31] hover:bg-black text-white font-black uppercase tracking-widest text-[10px] rounded-2xl px-6 h-12 shadow-lg shadow-[#4A3C31]/20 transition-all active:scale-95">
+                            <button className="neo-btn-black">
                                 Ver Perfil
-                            </Button>
+                            </button>
                         </div>
                     </div>
                 ))}
 
                 {!loading && filteredCoaches.length === 0 && (
-                    <div className="col-span-full py-20 text-center">
-                        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Sparkles className="h-10 w-10 text-gray-200" />
+                    <div className="col-span-full py-20 text-center neo-card bg-secondary/20">
+                        <div className="w-24 h-24 bg-white neo-border flex items-center justify-center mx-auto mb-6 neo-shadow">
+                            <Sparkles className="h-12 w-12 text-black" />
                         </div>
-                        <h3 className="text-2xl font-black text-[#4A3C31] mb-2">No encontramos coincidencias</h3>
-                        <p className="text-gray-400 font-medium max-w-xs mx-auto">Prueba buscando con otros términos o especialidades.</p>
+                        <h3 className="text-4xl font-black text-black uppercase mb-4">Sin coincidencias</h3>
+                        <p className="text-black font-bold uppercase max-w-xs mx-auto">Prueba buscando con otros términos o especialidades.</p>
                     </div>
                 )}
             </div>
@@ -168,7 +167,7 @@ export default function PatientSearchPage() {
     return (
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-[400px]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#A68363]"></div>
+                <div className="animate-spin h-16 w-16 neo-border border-b-transparent"></div>
             </div>
         }>
             <PatientSearchContent />

@@ -91,7 +91,7 @@ export default async function PsychologistDashboard() {
                         </Link>
                     </div>
                     <div className="space-y-4">
-                        {data.weeklyAppointments && data.weeklyAppointments.length > 0 ? data.weeklyAppointments.map((app, i) => (
+                        {data.weeklyAppointments && data.weeklyAppointments.filter(app => app.status !== 'cancelled').length > 0 ? data.weeklyAppointments.filter(app => app.status !== 'cancelled').map((app, i) => (
                             <div key={i} className="flex items-center justify-between p-4 rounded-3xl bg-[#FAFAFA] border border-gray-50 hover:border-[#A68363]/20 transition-all cursor-pointer group">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-full bg-[#A68363]/10 flex items-center justify-center font-black text-[#A68363]">

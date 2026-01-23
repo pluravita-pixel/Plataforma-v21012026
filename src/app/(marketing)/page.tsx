@@ -102,57 +102,40 @@ export default function LandingPage() {
         <div className="flex flex-col">
             {/* Hero Section */}
             <section className="container mx-auto px-4 py-12 lg:py-20">
-                <div className="grid lg:grid-cols-2 gap-12 items-center">
+                <div className="grid lg:grid-cols-12 gap-12 items-center">
 
                     {/* Left Content */}
-                    <div className="space-y-8">
-                        <h1 className="text-4xl lg:text-5xl font-bold text-[#4A3C31] leading-tight">
-                            Coaches en línea listos
-                            <br />
-                            para ayudarte a enfrentar los
-                            <br />
-                            retos de la vida diaria ✨
+                    <div className="lg:col-span-5 space-y-8">
+                        <h1 className="text-5xl lg:text-7xl font-bold text-[#4A3C31] leading-tight tracking-tight">
+                            Coaches en línea <br />
+                            <span className="text-[#A68363]">listos para ayudarte ahora</span>
                         </h1>
 
                         <p className="text-lg text-[#6B6B6B] leading-relaxed max-w-xl">
                             En pluravita puedes tomar coaching en línea por videollamada de forma fácil, segura y privada. Encuentra a tu coach online y comienza tu proceso hoy mismo.
                         </p>
 
-                        <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex flex-col sm:flex-row gap-5 pt-4">
                             <Button
                                 asChild
                                 onClick={handleBrowsingClick}
-                                className="bg-[#A68363] hover:opacity-90 text-white font-bold text-lg px-8 py-6 rounded-lg shadow-lg shadow-gray-200"
+                                className="neo-btn-primary h-16 text-lg"
                             >
                                 <Link href="/affinity-test">Ver coaches en línea</Link>
                             </Button>
                         </div>
 
-                        <div className="flex items-center gap-3 pt-4">
-                            <div className="flex -space-x-3">
-                                {[1, 2, 3].map((i) => (
-                                    <div key={i} className="h-10 w-10 rounded-full border-2 border-white bg-gray-200 overflow-hidden relative">
-                                        <div className="absolute inset-0 bg-gradient-to-br from-[#A68363]/20 to-[#4A3C31]/20" />
-                                    </div>
-                                ))}
-                            </div>
-                            <p className="text-sm text-[#6B6B6B] font-medium">
-                                {stats.realUsers > 0
-                                    ? `Ya somos ${stats.realUsers} personas creciendo juntas.`
-                                    : "Personas reales encontrando a su coach online."
-                                }
-                            </p>
-                        </div>
+
                     </div>
 
                     {/* Right Content - Video/Image */}
-                    <div className="relative">
+                    <div className="lg:col-span-7 relative">
                         {/* Decorative Elements */}
                         <div className="absolute -top-6 -left-6 w-24 h-24 bg-[#A68363]/10 rounded-full blur-xl" />
                         <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-[#4A3C31]/5 rounded-3xl blur-xl" />
 
-                        <div className="relative bg-white p-4 rounded-2xl shadow-xl rotate-1 max-w-[550px] mx-auto z-10">
-                            <div className="aspect-[16/9] relative bg-black rounded-lg overflow-hidden group shadow-inner">
+                        <div className="relative bg-white p-4 rounded-3xl shadow-2xl w-full max-w-3xl mx-auto z-10">
+                            <div className="aspect-[16/9] relative bg-black rounded-2xl overflow-hidden group shadow-inner">
                                 <iframe
                                     src="https://www.youtube.com/embed/a6AtqACERTo?autoplay=0&mute=0&controls=1&loop=1&playlist=a6AtqACERTo&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1"
                                     className="w-full h-full absolute inset-0"
@@ -166,14 +149,13 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* Stats Section */}
-            <section className="container mx-auto px-4 py-8">
-                <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+            <section className="container mx-auto px-4 py-16">
+                <div className="grid md:grid-cols-3 gap-8">
                     {landingStats.map((stat, i) => (
-                        <Card key={i} className="p-8 text-center bg-white border-none shadow-md hover:shadow-lg transition-shadow rounded-2xl">
-                            <div className="text-3xl font-black text-[#A68363] mb-2">{stat.number}</div>
-                            <div className="text-[#4A3C31] font-medium text-lg mb-3">{stat.label}</div>
-                            <p className="text-[#6B6B6B] italic text-sm">{stat.quote}</p>
+                        <Card key={i} className="p-10 text-center bg-white border-transparent neo-shadow hover:shadow-2xl transition-all duration-500 rounded-[2rem] border border-gray-50 flex flex-col justify-center items-center">
+                            <div className="text-2xl font-bold text-[#A68363] mb-3 tracking-tight">{stat.number}</div>
+                            <div className="text-[#4A3C31] font-bold text-lg mb-4">{stat.label}</div>
+                            <p className="text-[#8C8C8C] italic text-sm leading-relaxed">&ldquo;{stat.quote.replace(/"/g, '')}&rdquo;</p>
                         </Card>
                     ))}
                 </div>
@@ -217,13 +199,13 @@ export default function LandingPage() {
                     </div>
                 </div>
 
-                <div className="mt-12">
+                <div className="mt-16 text-center">
                     <Button
                         asChild
                         onClick={handleBrowsingClick}
-                        className="bg-[#A68363] hover:opacity-90 text-white font-bold py-6 px-8 rounded-lg text-lg shadow-lg shadow-gray-200"
+                        className="neo-btn-primary h-16 scale-110"
                     >
-                        <Link href="/affinity-test">Ver coaches disponibles</Link>
+                        <Link href="/affinity-test">Ver coaches en línea</Link>
                     </Button>
                 </div>
             </section>
@@ -254,7 +236,7 @@ export default function LandingPage() {
                             <Button
                                 asChild
                                 onClick={handleBrowsingClick}
-                                className="btn-premium text-white font-bold py-6 px-10 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300"
+                                className="neo-btn-primary h-14"
                             >
                                 <Link href="/affinity-test">Elegir coach</Link>
                             </Button>
@@ -285,7 +267,7 @@ export default function LandingPage() {
                             <p className="text-[#4A3C31] font-medium mb-6">Haz de tu paz mental una prioridad. ¿Comenzamos juntos?</p>
                             <Button
                                 onClick={handleAnsweringClick}
-                                className="bg-[#A68363] hover:opacity-90 text-white font-bold py-6 px-8 rounded-lg shadow-lg w-full md:w-auto"
+                                className="neo-btn-primary h-16 w-full md:w-auto"
                             >
                                 Sí, quiero comenzar
                             </Button>
@@ -322,7 +304,7 @@ export default function LandingPage() {
                             </p>
                             <Button
                                 onClick={handleAnsweringClick}
-                                className="bg-[#A68363] hover:opacity-90 text-white font-bold py-6 px-8 rounded-lg shadow-lg w-full"
+                                className="neo-btn-primary h-16 w-full"
                             >
                                 Responder test
                             </Button>
