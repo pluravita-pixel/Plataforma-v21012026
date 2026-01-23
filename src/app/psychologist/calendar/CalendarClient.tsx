@@ -14,7 +14,7 @@ import {
     Lock
 } from "lucide-react";
 import Link from "next/link";
-import { createAvailabilitySlot, deleteAvailabilitySlot } from "@/app/actions/booking";
+import { createAvailabilitySlot, deleteAvailabilitySlot, saveSchedule } from "@/app/actions/booking";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -61,7 +61,7 @@ export function CalendarClient({
             // Save Changes
             if (JSON.stringify(tempSlots) !== JSON.stringify(originalSlots)) {
                 // Call bulk update
-                const result = await bulkUpdateSlots(psychologistId, tempSlots);
+                const result = await saveSchedule(psychologistId, tempSlots);
                 if (result.success) {
                     toast.success("Horario guardado correctamente");
                     setOriginalSlots(tempSlots);

@@ -11,7 +11,16 @@ import { BookingModal } from "@/components/booking/BookingModal";
 import { PsychologistProfileModal } from "@/components/psychologist/ProfileModal";
 import { useSearchParams } from "next/navigation";
 
-export default function PatientSearchPage() {
+import { Suspense } from "react";
+
+function PatientSearchContent() {
+    const [coaches, setCoaches] = useState<any[]>([]);
+    const [currentUser, setCurrentUser] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
+    const searchParams = useSearchParams();
+    const refId = searchParams.get("ref");
+
     const [selectedPsychologist, setSelectedPsychologist] = useState<any>(null);
     const [isProfileDesktopOpen, setIsProfileDesktopOpen] = useState(false);
 
@@ -83,11 +92,11 @@ export default function PatientSearchPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20">
                 {loading ? (
                     [1, 2, 3].map(i => (
-                        <div key={i} className="bg-white rounded-[3rem] p-8 border border-gray-50 h-80 animate-pulse">
-                            <div className="w-16 h-16 bg-gray-100 rounded-2xl mb-6"></div>
-                            <div className="h-6 bg-gray-100 rounded-full w-3/4 mb-4"></div>
+                        <div key={i} className="bg-white rounded-[3rem] p-8 border border-gray-100 h-80 animate-pulse transition-all">
+                            <div className="w-16 h-16 bg-gray-50 rounded-2xl mb-6"></div>
+                            <div className="h-6 bg-gray-50 rounded-full w-3/4 mb-4"></div>
                             <div className="h-4 bg-gray-50 rounded-full w-1/2 mb-8"></div>
-                            <div className="h-12 bg-gray-100 rounded-2xl w-full"></div>
+                            <div className="h-12 bg-gray-50 rounded-2xl w-full"></div>
                         </div>
                     ))
                 ) : filteredCoaches.map((coach) => (
@@ -152,5 +161,17 @@ export default function PatientSearchPage() {
                 currentUser={currentUser}
             />
         </div>
+    );
+}
+
+export default function PatientSearchPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#A68363]"></div>
+            </div>
+        }>
+            <PatientSearchContent />
+        </Suspense>
     );
 }

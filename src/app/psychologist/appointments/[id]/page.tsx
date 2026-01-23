@@ -6,7 +6,7 @@ import { client } from "@/db";
 
 import { getSessionFiles } from "@/app/actions/files";
 
-export default async function AppointmentPage({ params }: { params: { id: string } }) {
+export default async function AppointmentPage({ params }: { params: Promise<{ id: string }> }) {
     const user = await getCurrentUser();
     if (!user || user.role !== 'psychologist') {
         redirect("/login");

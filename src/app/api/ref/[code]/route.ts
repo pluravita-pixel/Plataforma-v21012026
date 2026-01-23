@@ -2,8 +2,8 @@
 import { client } from "@/db";
 import { redirect } from "next/navigation";
 
-export async function GET(request: Request, { params }: { params: { code: string } }) {
-    const { code } = params;
+export async function GET(request: Request, { params }: { params: Promise<{ code: string }> }) {
+    const { code } = await params;
 
     if (!code) {
         redirect("/patient/search");

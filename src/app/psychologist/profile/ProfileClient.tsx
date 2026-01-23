@@ -29,6 +29,7 @@ interface ProfileClientProps {
         price: string | null;
         languages: string[] | null;
         tags: string[] | null;
+        refCode?: string | null;
     };
 }
 

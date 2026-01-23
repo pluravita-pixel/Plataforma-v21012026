@@ -174,38 +174,28 @@ export async function updatePsychologistSettings(userId: string, data: {
     }
 
     // Dynamic update query construction
-    const updates = [];
+    const updateObj: Record<string, any> = {};
 
-    if (data.image !== undefined) updates.push(client`image = ${data.image}`);
-    if (data.tags !== undefined) updates.push(client`tags = ${data.tags}`);
-    if (data.description !== undefined) updates.push(client`description = ${data.description}`);
-    if (data.iban !== undefined) updates.push(client`iban = ${data.iban}`);
-    if (data.payoutName !== undefined) updates.push(client`payout_name = ${data.payoutName}`);
-
-    // Missing fields added:
-    if (data.username !== undefined) updates.push(client`username = ${data.username}`);
-    if (data.specialty !== undefined) updates.push(client`specialty = ${data.specialty}`);
-    if (data.price !== undefined) updates.push(client`price = ${data.price}`);
-    if (data.languages !== undefined) updates.push(client`languages = ${data.languages}`);
+    if (data.image !== undefined) updateObj.image = data.image;
+    if (data.tags !== undefined) updateObj.tags = data.tags;
+    if (data.description !== undefined) updateObj.description = data.description;
+    if (data.iban !== undefined) updateObj.iban = data.iban;
+    if (data.payoutName !== undefined) updateObj.payout_name = data.payoutName;
+    if (data.username !== undefined) updateObj.username = data.username;
+    if (data.specialty !== undefined) updateObj.specialty = data.specialty;
+    if (data.price !== undefined) updateObj.price = data.price;
+    if (data.languages !== undefined) updateObj.languages = data.languages;
 
     // Ensure referral code
     const current = await client`SELECT ref_code FROM psychologists WHERE user_id = ${userId}`;
     if (!current[0]?.ref_code) {
-        updates.push(client`ref_code = ${crypto.randomUUID()}`);
+        updateObj.ref_code = crypto.randomUUID();
     }
 
-    if (updates.length > 0) {
-        // Join the updates with commas manually since we are using raw client template literals
-        // We can't just .join(',') on template literals directly usually, but with this client it might work if we spread.
-        // A safer pattern with postgres.js / similar libs is often to reduce or loop.
-        // However, referencing the existing pattern suggests we should use the array.
-        // Let's trust the client builds the query if we pass parts.
-        // Actually, looking at the previous code, it was creating an array but ignoring it.
-        // We'll construct a single query.
-
+    if (Object.keys(updateObj).length > 0) {
         await client`
             UPDATE psychologists 
-            SET ${client(updates, ', ')}
+            SET ${client(updateObj)}
             WHERE user_id = ${userId}
         `;
     }
