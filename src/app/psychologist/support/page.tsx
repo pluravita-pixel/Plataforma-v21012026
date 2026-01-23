@@ -73,21 +73,46 @@ export default async function SupportPage() {
                                 </div>
                             ) : (
                                 tickets.map((ticket) => (
-                                    <div key={ticket.id} className="p-6 hover:bg-gray-50 transition-all cursor-pointer group">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                                #{ticket.id.slice(0, 8)}
-                                            </span>
-                                            <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${ticket.status === 'open' ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-500'
-                                                }`}>
-                                                {ticket.status === 'open' ? 'Abierto' : 'Resuelto'}
-                                            </span>
+                                    <div key={ticket.id} className="p-8 hover:bg-gray-50/50 transition-all group border-b border-gray-50 last:border-none">
+                                        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">
+                                                        #{ticket.id.slice(0, 8)}
+                                                    </span>
+                                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${ticket.status === 'open' ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                                                        }`}>
+                                                        {ticket.status === 'open' ? 'Abierto' : 'Resuelto'}
+                                                    </span>
+                                                </div>
+                                                <h4 className="text-xl font-black text-gray-900 group-hover:text-[#0077FF] transition-colors mb-2">{ticket.subject}</h4>
+                                                <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap line-clamp-3">
+                                                    {ticket.message}
+                                                </p>
+                                            </div>
+                                            <div className="text-right shrink-0">
+                                                <p className="text-[10px] font-bold text-gray-400 uppercase flex items-center justify-end gap-1">
+                                                    <Clock className="h-3 w-3" />
+                                                    {format(new Date(ticket.createdAt), "d 'de' MMM, HH:mm", { locale: es })}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <h4 className="font-bold text-gray-900 group-hover:text-[#0077FF] transition-colors">{ticket.subject}</h4>
-                                        <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
-                                            <Clock className="h-3 w-3" />
-                                            Enviado el {format(new Date(ticket.createdAt), "d 'de' MMM, HH:mm", { locale: es })}
-                                        </p>
+
+                                        {/* Admin Response Section */}
+                                        {ticket.adminResponse && (
+                                            <div className="mt-6 ml-4 md:ml-10 p-6 bg-blue-50/50 rounded-[2rem] border border-blue-100 relative group-hover:bg-blue-50 transition-colors">
+                                                <div className="absolute -left-4 top-8 w-4 h-px bg-blue-200" />
+                                                <div className="flex items-center gap-2 mb-3">
+                                                    <div className="w-6 h-6 rounded-lg bg-blue-600 flex items-center justify-center">
+                                                        <MessageCircle className="h-3 w-3 text-white" />
+                                                    </div>
+                                                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Respuesta de Pluravita</span>
+                                                </div>
+                                                <p className="text-sm text-blue-900/80 leading-relaxed font-medium italic">
+                                                    "{ticket.adminResponse}"
+                                                </p>
+                                            </div>
+                                        )}
                                     </div>
                                 ))
                             )}

@@ -20,17 +20,10 @@ export default async function AdminDashboard() {
     ]);
 
     const stats = [
-        { label: "Coaches Registrados", value: statsData.psychologists, icon: UserCheck, color: "text-emerald-600", bg: "bg-emerald-50" },
-        { label: "Citas Totales", value: statsData.sessions, icon: Activity, color: "text-purple-600", bg: "bg-purple-50" },
-        {
-            label: "Ingresos Totales",
-            // @ts-ignore
-            value: `€${statsData.revenue.toFixed(2)}`,
-            icon: Euro,
-            color: "text-blue-600",
-            bg: "bg-blue-50"
-        },
-        { label: "Usuarios Totales", value: statsData.users, icon: Users, color: "text-orange-600", bg: "bg-orange-50" },
+        { label: "Pacientes Totales", value: statsData.patients, icon: Users, color: "text-emerald-600", bg: "bg-emerald-50" },
+        { label: "Dinero Facturado", value: `€${statsData.revenue.toFixed(2)}`, icon: Euro, color: "text-blue-600", bg: "bg-blue-50" },
+        { label: "Coaches Registrados", value: statsData.psychologists, icon: UserCheck, color: "text-purple-600", bg: "bg-purple-50" },
+        { label: "Citas Hoy", value: statsData.appointmentsToday, icon: Activity, color: "text-orange-600", bg: "bg-orange-50" },
     ];
 
     return (
