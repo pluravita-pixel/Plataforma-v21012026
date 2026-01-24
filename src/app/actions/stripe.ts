@@ -41,7 +41,7 @@ export async function createCheckoutSession(appointmentId: string, returnUrl?: s
                             name: `Sesión con ${appointment.coach_name}`,
                             description: `Cita reservada para el ${new Date(appointment.date).toLocaleString('es-ES')}`,
                         },
-                        unit_amount: Math.round(Number(appointment.price || 35) * 100),
+                        unit_amount: Math.round(Number(appointment.price || 0) * 100),
                     },
                     quantity: 1,
                 },

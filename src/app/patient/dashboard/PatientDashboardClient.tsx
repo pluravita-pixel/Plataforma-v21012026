@@ -130,7 +130,7 @@ export default function PatientDashboardClient({ initialData }: PatientDashboard
                                 <BookingModal
                                     psychologistId={coach.id}
                                     psychologistName={coach.fullName}
-                                    price={Number(coach.price) || 35}
+                                    price={Number(coach.price) || 0}
                                     currentUser={user}
                                     customTrigger={
                                         <Button variant="ghost" className="h-10 w-10 rounded-xl p-0 hover:bg-[#A68363]/10 text-[#A68363]">

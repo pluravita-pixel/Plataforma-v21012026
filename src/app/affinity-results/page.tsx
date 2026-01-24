@@ -237,7 +237,7 @@ export default function AffinityResultsPage() {
                                             <BookingModal
                                                 psychologistId={psych.id}
                                                 psychologistName={psych.fullName}
-                                                price={Number(psych.price) || 35}
+                                                price={Number(psych.price) || 0}
                                                 currentUser={currentUser}
                                             />
                                         </div>

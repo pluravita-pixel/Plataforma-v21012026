@@ -65,6 +65,7 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
 
     // Payment/Loading States
     const [isLoading, setIsLoading] = useState(false);
+    const [showCardForm, setShowCardForm] = useState(false);
 
     // --- Init Data on Open & Handle Canceled Return ---
     useEffect(() => {
@@ -204,6 +205,19 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
         setStep(3);
     };
 
+    const handleFreeBooking = async (appointmentId: string) => {
+        setIsLoading(true);
+        try {
+            await confirmAppointmentPayment(appointmentId);
+            setStep(4);
+            toast.success("¡Reserva confirmada!");
+        } catch (error) {
+            toast.error("Error al confirmar la reserva");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const handleStripePayment = async () => {
         if (!selectedSlot) return;
         setIsLoading(true);
@@ -235,6 +249,12 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
                 return;
             }
 
+            // If price is 0, confirm immediately
+            if (finalPriceCalc === 0) {
+                await handleFreeBooking(result.appointmentId);
+                return;
+            }
+
             // 2. Create Stripe Checkout Session
             const returnUrl = typeof window !== 'undefined' ? window.location.origin + window.location.pathname : undefined;
 
@@ -257,6 +277,50 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
         } catch (error) {
             console.error("Stripe redirect error:", error);
             toast.error("Error al iniciar el pago");
+            setIsLoading(false);
+        }
+    };
+
+    const handleMockPaymentSuccess = async () => {
+        if (!selectedSlot) return;
+        setIsLoading(true);
+
+        try {
+            const finalPriceCalc = appliedDiscount
+                ? price * (1 - appliedDiscount.percent / 100)
+                : price;
+
+            const anonymousId = Math.random().toString(36).substring(2, 8).toUpperCase();
+            const patientName = isAnonymous ? `Usuario-${anonymousId}` : formData.name;
+
+            // 1. Create Pending Appointment
+            const result = await createPendingAppointment({
+                patientName: patientName,
+                patientEmail: formData.email,
+                psychologistId,
+                slotId: selectedSlot.id,
+                startTime: selectedSlot.startTime,
+                discountCodeId: appliedDiscount?.id,
+                finalPrice: finalPriceCalc.toFixed(2),
+                isAnonymous: isAnonymous
+            });
+
+            if (result.error || !result.appointmentId) {
+                toast.error(result.error || "Error al crear la reserva");
+                setIsLoading(false);
+                return;
+            }
+
+            // 2. Confirm immediately (Mock Success)
+            await confirmAppointmentPayment(result.appointmentId);
+            setStep(4);
+            setShowCardForm(false);
+            toast.success("¡Pago con tarjeta simulado correctamente!");
+
+        } catch (error) {
+            console.error("Mock payment error:", error);
+            toast.error("Error al procesar el pago");
+        } finally {
             setIsLoading(false);
         }
     };
@@ -536,25 +600,68 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
                                     </div>
                                 </div>
 
-                                <div className="space-y-4">
-                                    <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-start gap-3">
-                                        <Lock className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                                        <p className="text-xs text-blue-700">
-                                            Serás redirigido a la pasarela segura de <span className="font-bold">Stripe</span> para completar tu pago.
-                                        </p>
-                                    </div>
+                                {showCardForm ? (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="space-y-4"
+                                    >
+                                        <PaymentForm
+                                            amount={finalPrice}
+                                            onSuccess={handleMockPaymentSuccess}
+                                            onCancel={() => setShowCardForm(false)}
+                                        />
+                                    </motion.div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-start gap-3">
+                                            <Lock className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                                            <p className="text-xs text-blue-700">
+                                                {finalPrice === 0
+                                                    ? "Esta sesión es gratuita. Pulsa el botón para confirmar tu reserva."
+                                                    : "Elige tu método de pago para completar la reserva."}
+                                            </p>
+                                        </div>
 
-                                    <div className="flex gap-3">
-                                        <Button variant="outline" onClick={() => setStep(2)} className="flex-1 rounded-xl h-12 font-bold border-gray-200">Atrás</Button>
-                                        <Button
-                                            onClick={handleStripePayment}
-                                            disabled={isLoading}
-                                            className="flex-1 bg-[#A68363] hover:bg-[#8C6B4D] text-white rounded-xl h-12 font-bold shadow-lg"
-                                        >
-                                            {isLoading ? "Cargando..." : `Pagar con Stripe →`}
-                                        </Button>
+                                        <div className="space-y-3">
+                                            <Button
+                                                onClick={handleStripePayment}
+                                                disabled={isLoading}
+                                                className="w-full bg-[#A68363] hover:bg-[#8C6B4D] text-white rounded-xl h-14 font-extrabold shadow-lg flex items-center justify-center gap-2 group transition-all"
+                                            >
+                                                {isLoading ? (
+                                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                                ) : finalPrice === 0 ? (
+                                                    "Confirmar Reserva Gratuita"
+                                                ) : (
+                                                    <>
+                                                        <CreditCard className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                                                        Pagar con Stripe →
+                                                    </>
+                                                )}
+                                            </Button>
+
+                                            {finalPrice > 0 && (
+                                                <Button
+                                                    variant="outline"
+                                                    onClick={() => setShowCardForm(true)}
+                                                    disabled={isLoading}
+                                                    className="w-full border-2 border-gray-200 hover:border-[#A68363] hover:bg-[#A68363]/5 text-gray-700 font-bold rounded-xl h-14 transition-all"
+                                                >
+                                                    Pagar con Tarjeta (Directo)
+                                                </Button>
+                                            )}
+
+                                            <Button
+                                                variant="ghost"
+                                                onClick={() => setStep(2)}
+                                                className="w-full text-gray-400 hover:text-gray-600 font-bold"
+                                            >
+                                                Volver a Horarios
+                                            </Button>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </motion.div>
                         )}
 
