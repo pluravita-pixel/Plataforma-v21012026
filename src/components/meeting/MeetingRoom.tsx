@@ -42,24 +42,25 @@ export default function MeetingRoom({
             const secondsUntilStart = differenceInSeconds(start, now);
             const secondsUntilEnd = differenceInSeconds(end, now);
 
-            if (secondsUntilEnd <= 0) {
+            const isSpecialUser = userEmail === 'sanmiguelgil1@gmail.com' || userEmail === 'psicologo_test@ejemplo.com';
+
+            if (secondsUntilEnd <= 0 && !isSpecialUser) {
                 setStatus('ended');
                 setTimeLeft(0);
                 return;
             }
 
-            const isSpecialUser = userEmail === 'sanmiguelgil1@gmail.com';
-
             if (isSpecialUser) {
-                // Special user bypasses timing checks unless session passed 50 min mark
+                // Special users (tests/admins) bypass timing checks
                 setStatus('active');
+                // If special user enters an "ended" session, give them a placeholder timer if they want to browse
+                setTimeLeft(secondsUntilEnd > 0 ? secondsUntilEnd : 3600);
             } else if (secondsUntilStart > 300) {
                 setStatus('waiting');
             } else {
                 setStatus('active');
+                setTimeLeft(secondsUntilEnd);
             }
-
-            setTimeLeft(secondsUntilEnd);
         };
 
         calculateTime();
