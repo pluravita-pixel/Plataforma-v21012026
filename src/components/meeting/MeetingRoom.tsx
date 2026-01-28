@@ -170,7 +170,7 @@ export default function MeetingRoom({
                     startWithAudioMuted: true,
                     disableDeepLinking: true,
                     remoteVideoMenu: {
-                        disableKick: userRole !== 'psychologist', // Psychologists can kick if needed
+                        disableKick: userRole !== 'psychologist',
                     },
                     prejoinPageEnabled: false,
                     toolbarButtons: [
@@ -178,8 +178,7 @@ export default function MeetingRoom({
                         'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
                         'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
                         'videoquality', 'filmstrip', 'tileview', 'videobackgroundblur', 'download', 'help',
-                        userRole === 'psychologist' ? 'mute-everyone' : '',
-                        userRole === 'psychologist' ? 'security' : '',
+                        ...(userRole === 'psychologist' ? ['mute-everyone', 'security'] : [])
                     ],
                 }}
                 userInfo={{
@@ -189,10 +188,15 @@ export default function MeetingRoom({
                 onApiReady={(externalApi) => {
                     setIsJitsiLoaded(true);
 
-                    // Add listeners if needed
+                    // Optional: only redirect if specifically requested or on conference end
+                    // But for now, let's keep it minimal to avoid accidental kicks
                     externalApi.addEventListener('videoConferenceLeft', () => {
-                        handleReadyToClose();
+                        console.log("Conference left");
+                        // We rely on the "Salir" button or "hangup" button via Jitsi's native onReadyToClose
                     });
+                }}
+                onReadyToClose={() => {
+                    handleReadyToClose();
                 }}
                 getIFrameRef={(iframeRef) => {
                     iframeRef.style.height = '100%';
