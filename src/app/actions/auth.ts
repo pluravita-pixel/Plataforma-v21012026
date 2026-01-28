@@ -4,23 +4,27 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import { client } from "@/db"; // Importamos el cliente directo, NO Drizzle
+import { cache } from "react";
 
 // Helper para cliente Supabase
+// Singleton pattern for Supabase client
+let supabaseInstance: ReturnType<typeof createClient> | null = null;
+
 const getSupabase = () => {
+    if (supabaseInstance) return supabaseInstance;
+
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-    // During build time on Vercel, these might be missing.
-    // We shouldn't throw here or the build will fail.
     if (!url || !key) {
         if (process.env.NODE_ENV === "production" && !process.env.NEXT_PHASE?.includes("build")) {
             console.error("Supabase keys missing at runtime!");
         }
-        // Return a dummy client that will fail gracefully if used, or handle carefully
         return createClient(url || "https://placeholder.supabase.co", key || "placeholder");
     }
 
-    return createClient(url, key);
+    supabaseInstance = createClient(url, key);
+    return supabaseInstance;
 };
 
 export async function login(prevState: any, formData: FormData) {
@@ -47,7 +51,7 @@ export async function login(prevState: any, formData: FormData) {
         }
 
         if (data.session && data.user) {
-            // 2. Establecer Cookie de Sesión
+            // 2. Establecer Cookie de Sesión - Non-blocking if possible (but we need it for next steps potentially)
             const cookieStore = await cookies();
             cookieStore.set("session_id", data.session.access_token, {
                 httpOnly: true,
@@ -56,29 +60,27 @@ export async function login(prevState: any, formData: FormData) {
                 path: "/",
             });
 
-            // 3. Obtener Rol del Usuario (SQL DIRECTO)
+            // 3. Obtener Rol y Actualizar last_login en UNA SOLA consulta
             try {
-                // Actualizamos last_login
-                await client`
-                    UPDATE users SET last_login = NOW() WHERE id = ${data.user.id}
+                const usersResult = await client`
+                    UPDATE users 
+                    SET last_login = NOW() 
+                    WHERE id = ${data.user.id} 
+                    RETURNING role
                 `;
 
-                // Obtenemos el rol
-                const usersResult = await client`
-                    SELECT role FROM users WHERE id = ${data.user.id} LIMIT 1
-                `;
                 const user = usersResult[0];
 
                 if (!user) {
                     console.error("Usuario autenticado pero no encontrado en tabla users DB");
-                    // Fallback: intentar crearlo o enviarlo a patient
                     redirectPath = "/patient/dashboard";
                 } else {
-                    // Lógica de Redirección Simple
+                    // Lógica de Redirección
                     if (user.role === 'admin') {
                         redirectPath = "/admin/dashboard";
                     } else if (user.role === 'psychologist') {
-                        // Actualizar tabla psicólogos también
+                        // Actualizamos psicólogos de forma asíncrona (opcionalmente) o rápida
+                        // Aquí lo mantenemos para asegurar consistencia, pero es una sola query ahora.
                         await client`
                             UPDATE psychologists SET last_login = NOW() WHERE user_id = ${data.user.id}
                         `;
@@ -90,14 +92,12 @@ export async function login(prevState: any, formData: FormData) {
 
             } catch (dbError) {
                 console.error("Error crítico de base de datos al login:", dbError);
-                // Si falla la DB pero el login es correcto, mandamos al dashboard de paciente por defecto
-                // para no bloquear al usuario, aunque verá datos vacíos.
                 redirectPath = "/patient/dashboard";
             }
         }
     } catch (err) {
         console.error("Error inesperado en login:", err);
-        authError = "Error del sistema al iniciar sesión";
+        authError = "Error del systema al iniciar sesión";
     }
 
     if (authError) return { error: authError };
@@ -105,7 +105,7 @@ export async function login(prevState: any, formData: FormData) {
     return { error: "No se pudo iniciar sesión." };
 }
 
-export async function getCurrentUser() {
+export const getCurrentUser = cache(async () => {
     const cookieStore = await cookies();
     const sessionId = cookieStore.get("session_id")?.value;
     if (!sessionId) return null;
@@ -136,7 +136,7 @@ export async function getCurrentUser() {
         console.error("Error getting current user:", e);
         return null;
     }
-}
+});
 
 export async function logout() {
     try {

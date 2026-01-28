@@ -95,11 +95,7 @@ export async function getPsychologistStatus(userId: string) {
         `;
 
         if (result.length > 0) {
-            const psych = result[0];
-            // Sync stats on load to ensure accuracy
-            await refreshPsychologistStats(psych.id);
-            const updatedResult = await client`SELECT * FROM psychologists WHERE id = ${psych.id}`;
-            return mapPsychologist(updatedResult[0]);
+            return mapPsychologist(result[0]);
         }
 
         // Self-healing: If user is a psychologist but has no profile, create it.

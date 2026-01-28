@@ -12,21 +12,28 @@ export async function getPatientDashboardData() {
         const user = await getCurrentUser();
         if (!user) return null;
 
-        // 1. Fetch next appointment using raw client for stability
-        const nextApptResults = await client`
-            SELECT a.*, 
-                   p.id as p_id, p.user_id as p_user_id, p.full_name as p_full_name, p.email as p_email,
-                   p.total_sessions as p_total_sessions, p.total_patients as p_total_patients,
-                   p.active_patients as p_active_patients, p.rating as p_rating,
-                   p.specialty as p_specialty, p.image as p_image, p.price as p_price
-            FROM appointments a
-            LEFT JOIN psychologists p ON a.psychologist_id = p.id
-            WHERE a.patient_id = ${user.id}
-            AND a.status = 'scheduled'
-            AND a.date >= ${new Date().toISOString()}
-            ORDER BY a.date ASC
-            LIMIT 1
-        `;
+        // Fetch data in parallel to reduce total roundtrip time
+        const [nextApptResults, coachesResults] = await Promise.all([
+            client`
+                SELECT a.*, 
+                       p.id as p_id, p.user_id as p_user_id, p.full_name as p_full_name, p.email as p_email,
+                       p.total_sessions as p_total_sessions, p.total_patients as p_total_patients,
+                       p.active_patients as p_active_patients, p.rating as p_rating,
+                       p.specialty as p_specialty, p.image as p_image, p.price as p_price
+                FROM appointments a
+                LEFT JOIN psychologists p ON a.psychologist_id = p.id
+                WHERE a.patient_id = ${user.id}
+                AND a.status = 'scheduled'
+                AND a.date >= ${new Date().toISOString()}
+                ORDER BY a.date ASC
+                LIMIT 1
+            `,
+            client`
+                SELECT * FROM psychologists 
+                ORDER BY rating DESC 
+                LIMIT 3
+            `
+        ]);
 
         const nextAppt = nextApptResults[0] ? {
             ...nextApptResults[0],
@@ -38,13 +45,6 @@ export async function getPatientDashboardData() {
                 image: nextApptResults[0].p_image,
             }
         } : null;
-
-        // 2. Fetch recommended coaches
-        const coachesResults = await client`
-            SELECT * FROM psychologists 
-            ORDER BY rating DESC 
-            LIMIT 3
-        `;
 
         const coaches = coachesResults.map((p: any) => ({
             id: p.id,
