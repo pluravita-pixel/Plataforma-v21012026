@@ -36,7 +36,7 @@ export default function MeetingRoom({
     useEffect(() => {
         const calculateTime = () => {
             const start = new Date(startTime);
-            const end = addMinutes(start, 50); // 50 minute session
+            const end = addMinutes(start, 60); // 60 minute session
             const now = new Date();
 
             const secondsUntilStart = differenceInSeconds(start, now);
@@ -86,7 +86,7 @@ export default function MeetingRoom({
                     </div>
                     <h1 className="text-2xl font-bold text-neutral-900">Sesión Finalizada</h1>
                     <p className="text-neutral-600">
-                        El tiempo de la sesión (50 min) ha expirado o la fecha de la cita ya pasó.
+                        El tiempo de la sesión (60 min) ha expirado o la fecha de la cita ya pasó.
                     </p>
                     <Button
                         onClick={() => router.back()}
@@ -169,7 +169,7 @@ export default function MeetingRoom({
                     startWithAudioMuted: true,
                     disableDeepLinking: true,
                     remoteVideoMenu: {
-                        disableKick: true,
+                        disableKick: userRole !== 'psychologist', // Psychologists can kick if needed
                     },
                     prejoinPageEnabled: false,
                     toolbarButtons: [
@@ -177,6 +177,8 @@ export default function MeetingRoom({
                         'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
                         'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
                         'videoquality', 'filmstrip', 'tileview', 'videobackgroundblur', 'download', 'help',
+                        userRole === 'psychologist' ? 'mute-everyone' : '',
+                        userRole === 'psychologist' ? 'security' : '',
                     ],
                 }}
                 userInfo={{

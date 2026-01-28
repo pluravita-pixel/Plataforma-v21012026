@@ -5,7 +5,8 @@ import {
     TrendingUp,
     MessageSquare,
     Clock,
-    CheckCircle2
+    CheckCircle2,
+    Video
 } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
@@ -105,9 +106,21 @@ export default async function PsychologistDashboard() {
                                         </div>
                                     </div>
                                 </div>
-                                <Link href={`/psychologist/appointments/${app.id}`} className="opacity-0 group-hover:opacity-100 bg-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-sm text-[#4A3C31] transition-all">
-                                    Ver cita
-                                </Link>
+                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                    <Link
+                                        href={`/session/${app.id}`}
+                                        className="bg-[#A68363] px-5 py-2.5 rounded-xl text-xs font-bold shadow-sm text-white hover:bg-[#8C6B4D] transition-colors flex items-center gap-2"
+                                    >
+                                        <Video className="h-3 w-3" />
+                                        Entrar
+                                    </Link>
+                                    <Link
+                                        href={`/psychologist/appointments/${app.id}`}
+                                        className="bg-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-sm text-[#4A3C31] hover:bg-gray-50 transition-all border border-gray-100"
+                                    >
+                                        Detalles
+                                    </Link>
+                                </div>
                             </div>
                         )) : (
                             <div className="flex flex-col items-center justify-center py-12 text-center">
