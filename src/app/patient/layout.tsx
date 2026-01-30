@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
     LayoutDashboard,
@@ -51,11 +52,28 @@ export default function PatientLayout({
                 </button>
 
                 <div className={cn(
-                    "p-8 flex items-center gap-2 text-[#4A3C31] font-black transition-all duration-300",
-                    isCollapsed ? "justify-center px-0" : "px-8"
+                    "p-8 flex items-center transition-all duration-300",
+                    isCollapsed ? "justify-center px-2" : "px-8"
                 )}>
-                    <MessageCircle className="h-8 w-8 fill-current shrink-0" />
-                    {!isCollapsed && <span className="text-2xl tracking-tight animate-in fade-in duration-500">pluravita</span>}
+                    {isCollapsed ? (
+                        <div className="w-10 h-10 relative shrink-0">
+                            <Image
+                                src="/logo.png"
+                                alt="pluravita Logo"
+                                fill
+                                className="object-contain mix-blend-multiply"
+                            />
+                        </div>
+                    ) : (
+                        <Image
+                            src="/logo.png"
+                            alt="pluravita Logo"
+                            width={160}
+                            height={48}
+                            className="h-10 w-auto object-contain mix-blend-multiply"
+                            priority
+                        />
+                    )}
                 </div>
 
                 <nav className="flex-1 px-3 py-4 space-y-2">

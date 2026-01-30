@@ -8,6 +8,7 @@ import { UserNav } from "@/components/user-nav";
 import { useState, useEffect } from "react";
 import { getCurrentUser } from "@/app/actions/auth";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function MarketingLayout({
     children,
@@ -39,9 +40,16 @@ export default function MarketingLayout({
             <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-sm border-b border-gray-100">
                 <div className="container mx-auto px-4 h-20 flex items-center">
                     {/* Logo - Scrolls to Top */}
-                    <Link href="#" className="flex items-center gap-2">
-                        <div className="text-[#4A3C31] font-black text-2xl tracking-tighter flex items-center gap-1 uppercase">
-                            LOGO
+                    <Link href="#" className="flex items-center h-full">
+                        <div className="relative w-64 h-14 overflow-hidden flex items-center justify-center">
+                            <Image
+                                src="/logo.png"
+                                alt="pluravita Logo"
+                                width={500}
+                                height={500}
+                                className="h-40 w-auto object-contain mix-blend-multiply brightness-105"
+                                priority
+                            />
                         </div>
                     </Link>
 
@@ -75,9 +83,15 @@ export default function MarketingLayout({
                 <div className="container mx-auto px-4">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-8">
                         {/* Logo */}
-                        <div className="flex items-center gap-1">
-                            <div className="text-[#4A3C31] font-black text-2xl tracking-tighter flex items-center gap-1 uppercase">
-                                LOGO
+                        <div className="flex items-center">
+                            <div className="relative w-48 h-12 overflow-hidden flex items-center justify-center opacity-80">
+                                <Image
+                                    src="/logo.png"
+                                    alt="pluravita Logo"
+                                    width={400}
+                                    height={400}
+                                    className="h-32 w-auto object-contain mix-blend-multiply brightness-105"
+                                />
                             </div>
                         </div>
 

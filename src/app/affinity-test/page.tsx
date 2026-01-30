@@ -13,19 +13,19 @@ import { markTestAsCompleted } from "@/app/actions/auth"
 const STEPS = [
     {
         id: "therapy_type",
-        title: "¿Qué tipo de proceso estás buscando?",
+        title: "¿Cómo te gustaría que fuera este camino?",
         options: [
-            { id: "individual", label: "Sesiones individuales" },
-            { id: "couple", label: "Sesiones de pareja" }
+            { id: "individual", label: "Para mí (individual)" },
+            { id: "couple", label: "Con mi pareja" }
         ],
         type: "single"
     },
     {
         id: "first_time",
-        title: "¿Es tu primera vez en un proceso de coaching?",
+        title: "¿Ya habías probado algo parecido antes?",
         options: [
-            { id: "yes", label: "Sí, es mi primera vez" },
-            { id: "no", label: "No, ya he tenido sesiones antes" }
+            { id: "yes", label: "Es mi primera vez" },
+            { id: "no", label: "Sí, ya he tenido procesos similares" }
         ],
         type: "single"
     },
@@ -43,52 +43,40 @@ const STEPS = [
     },
     {
         id: "practical_exercises",
-        title: "¿Te gustaría continuar con ejercicios prácticos después de tus citas?",
+        title: "¿Te gustaría recibir ideas para aplicar en tu día a día?",
         options: [
-            { id: "totally", label: "Totalmente, me sirve aplicar lo aprendido" },
-            { id: "maybe", label: "Puede ser, me gustaría intentarlo" },
-            { id: "no", label: "No, no quisiera hacer tareas" },
-            { id: "not_sure", label: "No lo tengo claro por ahora" }
+            { id: "totally", label: "¡Sí! Me encanta pasar a la acción" },
+            { id: "no", label: "Prefiero solo conversar por ahora" },
+            { id: "maybe", label: "Lo vemos según avance el proceso" }
         ],
         type: "single"
     },
     {
-        id: "time_focus",
-        title: "¿Te interesa abordar temas de tu pasado, presente o ambos?",
+        id: "focus_area",
+        title: "¿En qué te gustaría enfocarte más?",
         options: [
-            { id: "past", label: "Pasado: Quiero resolver temas de mi infancia/adolescencia" },
-            { id: "present", label: "Presente: Quiero trabajar temas actuales" },
-            { id: "both", label: "Ambas opciones" },
-            { id: "not_sure", label: "No lo tengo claro por ahora" }
-        ],
-        type: "single"
-    },
-    {
-        id: "time_focus",
-        title: "¿Te interesa abordar temas de tu pasado, presente o ambos?",
-        options: [
-            { id: "past", label: "Pasado: Quiero resolver temas de mi infancia/adolescencia" },
-            { id: "present", label: "Presente: Quiero trabajar temas actuales" },
-            { id: "both", label: "Ambas opciones" },
-            { id: "not_sure", label: "No lo tengo claro por ahora" }
+            { id: "goals", label: "Mis metas y crecimiento personal" },
+            { id: "balance", label: "Mi equilibrio mental y emocional" },
+            { id: "relationships", label: "Mis relaciones con los demás" },
+            { id: "self_knowledge", label: "Simplemente conocerme mejor" }
         ],
         type: "single"
     },
     {
         id: "therapist_gender",
-        title: "¿Tienes alguna preferencia respecto al género de tu coach?",
+        title: "¿Prefieres que tu coach sea hombre o mujer?",
         options: [
-            { id: "woman", label: "Prefiero que sea mujer" },
-            { id: "man", label: "Prefiero que sea hombre" },
-            { id: "indifferent", label: "Me es indiferente" }
+            { id: "woman", label: "Mujer" },
+            { id: "man", label: "Hombre" },
+            { id: "indifferent", label: "Me es totalmente igual" }
         ],
         type: "single"
     },
     {
         id: "age",
-        title: "¿Cuántos años tienes?",
+        title: "¿Qué edad tienes?",
         type: "select",
-        placeholder: "Selecciona tu edad"
+        placeholder: "Elige tu edad"
     }
 ]
 
@@ -210,9 +198,16 @@ export default function AffinityTestPage() {
                     >
                         {/* Header */}
                         <div className="w-full text-center pt-16">
-                            <div className="flex items-center justify-center gap-2 mb-2">
-                                <div className="text-[#4A3C31] font-black text-3xl tracking-tighter flex items-center gap-1 uppercase">
-                                    LOGO
+                            <div className="flex items-center justify-center mb-6">
+                                <div className="relative w-64 h-16 overflow-hidden flex items-center justify-center">
+                                    <Image
+                                        src="/logo.png"
+                                        alt="pluravita Logo"
+                                        width={500}
+                                        height={500}
+                                        className="h-44 w-auto object-contain mix-blend-multiply brightness-105"
+                                        priority
+                                    />
                                 </div>
                             </div>
                             <h1 className="text-xl font-medium text-[#4A3C31] mb-8">
@@ -433,7 +428,7 @@ export default function AffinityTestPage() {
                                 transition={{ delay: 0.8 }}
                                 className="text-gray-500 font-medium text-md"
                             >
-                                Estamos buscando los mejores psicólogos para ti
+                                Estamos buscando a los mejores coaches para ti
                             </motion.p>
                         </div>
 

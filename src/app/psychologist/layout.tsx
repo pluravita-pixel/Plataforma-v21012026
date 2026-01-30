@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
     LayoutDashboard,
     Users,
@@ -53,11 +54,28 @@ export default function PsychologistLayout({
                 </button>
 
                 <div className={cn(
-                    "p-6 flex items-center gap-2 text-[#0077FF] font-black tracking-tighter transition-all duration-300",
-                    isCollapsed ? "justify-center px-0" : "px-6"
+                    "p-6 flex items-center transition-all duration-300",
+                    isCollapsed ? "justify-center px-2" : "px-6"
                 )}>
-                    <MessageCircle className="h-8 w-8 shrink-0 fill-current" />
-                    {!isCollapsed && <span className="text-2xl animate-in fade-in duration-500">pluravita</span>}
+                    {isCollapsed ? (
+                        <div className="w-10 h-10 relative shrink-0">
+                            <Image
+                                src="/logo.png"
+                                alt="pluravita Logo"
+                                fill
+                                className="object-contain mix-blend-multiply"
+                            />
+                        </div>
+                    ) : (
+                        <Image
+                            src="/logo.png"
+                            alt="pluravita Logo"
+                            width={160}
+                            height={48}
+                            className="h-10 w-auto object-contain mix-blend-multiply"
+                            priority
+                        />
+                    )}
                 </div>
 
                 <nav className="flex-1 px-3 py-4 space-y-1">

@@ -43,9 +43,17 @@ export default function AffinityResultsPage() {
             {/* Simple Header */}
             <header className="w-full bg-white border-b border-gray-100 py-4 px-6 z-20">
                 <div className="max-w-7xl mx-auto flex items-center">
-                    <Link href="/" className="text-[#4A3C31] font-black text-2xl tracking-tighter flex items-center gap-1">
-                        <MessageCircle className="h-6 w-6 fill-current" />
-                        pluravita
+                    <Link href="/" className="hover:opacity-80 transition-opacity">
+                        <div className="relative w-48 h-12 overflow-hidden flex items-center justify-center">
+                            <Image
+                                src="/logo.png"
+                                alt="pluravita Logo"
+                                width={500}
+                                height={500}
+                                className="h-40 w-auto object-contain mix-blend-multiply brightness-105"
+                                priority
+                            />
+                        </div>
                     </Link>
                 </div>
             </header>

@@ -52,7 +52,7 @@ export default function LandingPage() {
     const landingStats = [
         { number: "Transforma tu vida", label: "Tu proceso empieza hoy", quote: '"Cada persona tiene una historia única de cambio"' },
         { number: "Sesiones a medida", label: "Adaptadas a ti", quote: '"Cada sesión es un paso hacia tu bienestar"' },
-        { number: "Coaches titulados", label: "Calidad profesional", quote: '"Listos para escucharte cuando lo necesites"' }
+        { number: "Acompañamiento real", label: "Más que tradición", quote: '"Personas que te entienden de verdad"' }
     ];
 
     const faqs = [
@@ -86,7 +86,7 @@ export default function LandingPage() {
         },
         {
             question: "¿Qué requisitos cumplen los coaches de pluravita?",
-            answer: "Todos nuestros coaches pasan por un riguroso proceso de selección. Verificamos sus credenciales académicas, certificaciones, años de experiencia y calidad humana para asegurar que recibas el mejor acompañamiento posible."
+            answer: "Nuestros coaches son personas que te entienden de verdad. Ofrecemos una opción diferente a lo tradicional, centrada en tu bienestar y en una conexión humana real."
         },
         {
             question: "¿Qué enfoque es el mejor para mí?",
@@ -214,7 +214,7 @@ export default function LandingPage() {
             <section id="trusted-psychologists" className="bg-white py-20 scroll-mt-20">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold text-[#4A3C31] mb-2">Coaches en línea de confianza</h2>
+                        <h2 className="text-3xl font-bold text-[#4A3C31] mb-2">Coaches que te entienden de verdad</h2>
                         <p className="text-[#6B6B6B]">Conoce nuestra garantía de primera cita</p>
                     </div>
 
@@ -250,11 +250,11 @@ export default function LandingPage() {
                 <div className="grid md:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
                     <div className="space-y-6 order-2 md:order-1">
                         <h2 className="text-3xl font-bold text-[#4A3C31] leading-tight">
-                            Un equipo de coaches online comprometidos con tu bienestar
+                            Personas que te entienden de verdad
                         </h2>
                         <div className="space-y-4 text-[#6B6B6B]">
                             <p>
-                                Todos nuestros coaches en línea están altamente capacitados para acompañarte por videollamada en tu proceso. Tienen una <span className="font-bold">sólida formación académica</span> y experiencia en coaching.
+                                Somos una opción diferente a lo tradicional. Encuentra el acompañamiento que necesitas con coaches que conectan contigo y tu realidad.
                             </p>
                             <p>
                                 Con horarios disponibles de lunes a domingo, <span className="font-bold">podrás comenzar</span> tu proceso de coaching en línea <span className="font-bold">en el momento que lo necesites.</span>
