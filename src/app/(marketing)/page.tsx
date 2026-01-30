@@ -52,7 +52,7 @@ export default function LandingPage() {
     const landingStats = [
         { number: "Transforma tu vida", label: "Tu proceso empieza hoy", quote: '"Cada persona tiene una historia única de cambio"' },
         { number: "Sesiones a medida", label: "Adaptadas a ti", quote: '"Cada sesión es un paso hacia tu bienestar"' },
-        { number: "Coaches preparados", label: "Profesionales expertos", quote: '"Listos para escucharte cuando lo necesites"' }
+        { number: "Coaches titulados", label: "Calidad profesional", quote: '"Listos para escucharte cuando lo necesites"' }
     ];
 
     const faqs = [
@@ -112,7 +112,7 @@ export default function LandingPage() {
                         </h1>
 
                         <p className="text-lg text-[#6B6B6B] leading-relaxed max-w-xl">
-                            En pluravita puedes tomar coaching en línea por videollamada de forma fácil, segura y privada. Encuentra a tu coach online y comienza tu proceso hoy mismo.
+                            En pluravita puedes tomar coaching en línea por videollamada de forma fácil, segura y privada. Encuentra a tu coach online y comienza tu proceso hoy mismo. Desde <b>15€</b> por sesión.
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-5 pt-4">
@@ -221,7 +221,7 @@ export default function LandingPage() {
                     <div className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
                         <div className="relative rounded-3xl overflow-hidden shadow-2xl h-[400px]">
                             {/* Mock Image */}
-                            <div className="absolute inset-0 bg-gray-200 bg-[url('https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center" />
+                            <div className="absolute inset-0 bg-gray-200 bg-[url('https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center" />
                         </div>
                         <div className="space-y-6">
                             <p className="text-gray-700">
@@ -254,10 +254,7 @@ export default function LandingPage() {
                         </h2>
                         <div className="space-y-4 text-[#6B6B6B]">
                             <p>
-                                Todos nuestros coaches en línea están altamente capacitados para acompañarte por videollamada en tu proceso. Tienen una <span className="font-bold">sólida formación académica</span> y experiencia en coaching. Además, cuentan con el apoyo y <span className="font-bold">supervisión constante</span> de nuestra área clínica, respaldando su servicio y tu bienestar.
-                            </p>
-                            <p>
-                                También, cada uno de nuestros coaches online cuenta con la documentación necesaria para ejercer su profesión y tienen <span className="font-bold">más de 5 años de experiencia</span> profesional comprobable.
+                                Todos nuestros coaches en línea están altamente capacitados para acompañarte por videollamada en tu proceso. Tienen una <span className="font-bold">sólida formación académica</span> y experiencia en coaching.
                             </p>
                             <p>
                                 Con horarios disponibles de lunes a domingo, <span className="font-bold">podrás comenzar</span> tu proceso de coaching en línea <span className="font-bold">en el momento que lo necesites.</span>
@@ -274,7 +271,7 @@ export default function LandingPage() {
                         </div>
                     </div>
                     <div className="relative rounded-3xl overflow-hidden shadow-2xl h-[500px] order-1 md:order-2">
-                        <div className="absolute inset-0 bg-gray-200 bg-[url('https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center" />
+                        <div className="absolute inset-0 bg-gray-200 bg-[url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center" />
                     </div>
                 </div>
             </section>
@@ -290,7 +287,7 @@ export default function LandingPage() {
 
                     <div className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
                         <div className="relative rounded-3xl overflow-hidden shadow-xl h-[400px]">
-                            <div className="absolute inset-0 bg-gray-200 bg-[url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center" />
+                            <div className="absolute inset-0 bg-gray-200 bg-[url('https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center" />
                         </div>
                         <div className="space-y-6">
                             <p className="text-gray-700">

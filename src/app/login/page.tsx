@@ -41,7 +41,7 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
-        <div className="min-h-dvh bg-[#FDFCFB] flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden bg-noise">
+        <div className="min-h-dvh bg-[#F9F5F0] flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden bg-noise">
             {/* Background Decorative Elements */}
             <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[#A68363]/10 rounded-full blur-[120px] animate-pulse" />
             <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-[#4A3C31]/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
@@ -56,7 +56,7 @@ export default function LoginPage() {
                     <div className="bg-[#A68363] p-2 rounded-xl shadow-lg shadow-[#A68363]/20 text-white group-hover:scale-105 transition-transform duration-300">
                         <LayoutDashboard className="h-6 w-6" />
                     </div>
-                    <span className="text-[#4A3C31] font-black text-xl lg:text-2xl tracking-tight">pluravita</span>
+                    <span className="text-[#4A3C31] font-black text-xl lg:text-2xl tracking-tight uppercase">LOGO</span>
                 </Link>
             </motion.div>
 

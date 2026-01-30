@@ -42,41 +42,6 @@ const STEPS = [
         type: "single"
     },
     {
-        id: "topics",
-        title: "¿Qué te gustaría trabajar con tu coach?",
-        subtitle: "Selecciona máximo 3 motivos de consulta",
-        options: [
-            { id: "depression", label: "Depresión" },
-            { id: "anxiety", label: "Ansiedad" },
-            { id: "self_esteem", label: "Autoestima" },
-            { id: "sexuality", label: "Sexualidad" },
-            { id: "couple_problems", label: "Problemas de pareja" },
-            { id: "motivation", label: "Motivación" },
-            { id: "addictions", label: "Adicciones" },
-            { id: "stress", label: "Estrés" },
-            { id: "burnout", label: "Burnout/Trabajo" },
-            { id: "grief", label: "Duelo" },
-            { id: "self_knowledge", label: "Autoconocimiento" },
-            { id: "adhd", label: "TDHA" },
-            { id: "trauma", label: "Trauma" },
-            { id: "sleep", label: "Problemas de sueño" },
-            { id: "impulse", label: "Control de impulsos" },
-            { id: "social_skills", label: "Habilidades sociales" },
-            { id: "violence", label: "Violencia" },
-            { id: "abortion", label: "Aborto" },
-            { id: "sexual_abuse", label: "Abuso sexual" },
-            { id: "social_adaptation", label: "Adaptación social" },
-            { id: "adolescence", label: "Adolescencia" },
-            { id: "seniors", label: "Adultos mayores" },
-            { id: "aggressiveness", label: "Agresividad" },
-            { id: "anguish", label: "Angustia" },
-            { id: "anorexia", label: "Anorexia" },
-            { id: "assertiveness", label: "Asertividad" }
-        ],
-        type: "multiple",
-        max: 3
-    },
-    {
         id: "practical_exercises",
         title: "¿Te gustaría continuar con ejercicios prácticos después de tus citas?",
         options: [
@@ -88,12 +53,12 @@ const STEPS = [
         type: "single"
     },
     {
-        id: "dialogue_style",
-        title: "¿Cómo te gustaría que sea el diálogo con tu coach?",
+        id: "time_focus",
+        title: "¿Te interesa abordar temas de tu pasado, presente o ambos?",
         options: [
-            { id: "deep", label: "Quiero profundizar en mis pensamientos y que mi coach me escuche" },
-            { id: "concrete", label: "Quiero acciones concretas en base al diálogo con mi coach" },
-            { id: "balanced", label: "Me gusta el equilibrio entre ambas opciones" },
+            { id: "past", label: "Pasado: Quiero resolver temas de mi infancia/adolescencia" },
+            { id: "present", label: "Presente: Quiero trabajar temas actuales" },
+            { id: "both", label: "Ambas opciones" },
             { id: "not_sure", label: "No lo tengo claro por ahora" }
         ],
         type: "single"
@@ -124,17 +89,6 @@ const STEPS = [
         title: "¿Cuántos años tienes?",
         type: "select",
         placeholder: "Selecciona tu edad"
-    },
-    {
-        id: "preferred_time",
-        title: "¿En qué momento del día prefieres tomar tus sesiones de coaching en línea?",
-        options: [
-            { id: "before_9", label: "Antes de las 9:00" },
-            { id: "9_to_14", label: "Entre las 9:00 y las 14:00" },
-            { id: "14_to_18", label: "Entre las 14:00 y las 18:00" },
-            { id: "after_18", label: "Después de las 18:00" }
-        ],
-        type: "single"
     }
 ]
 
@@ -240,15 +194,9 @@ export default function AffinityTestPage() {
             <title>Test de Afinidad | pluravita</title>
             <meta name="description" content="Encuentra a tu coach ideal con nuestro test de afinidad." />
 
-            {/* Background Image */}
-            <div className="absolute inset-0 z-0">
-                <Image
-                    src="/affinity-bg.png"
-                    alt="Background"
-                    fill
-                    className="object-cover opacity-60"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-white via-white/40 to-transparent" />
+            {/* Background */}
+            <div className="absolute inset-0 z-0 bg-[#F9F5F0]">
+                <div className="absolute inset-0 bg-gradient-to-b from-white via-white/40 to-[#F9F5F0]" />
             </div>
 
             <AnimatePresence mode="wait">
@@ -263,9 +211,8 @@ export default function AffinityTestPage() {
                         {/* Header */}
                         <div className="w-full text-center pt-16">
                             <div className="flex items-center justify-center gap-2 mb-2">
-                                <div className="text-[#4A3C31] font-black text-3xl tracking-tighter flex items-center gap-1">
-                                    <MessageCircle className="h-8 w-8 fill-current" />
-                                    pluravita
+                                <div className="text-[#4A3C31] font-black text-3xl tracking-tighter flex items-center gap-1 uppercase">
+                                    LOGO
                                 </div>
                             </div>
                             <h1 className="text-xl font-medium text-[#4A3C31] mb-8">

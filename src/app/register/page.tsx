@@ -39,9 +39,16 @@ function SubmitButton() {
 export default function RegisterPage() {
     const [state, formAction] = useActionState(register, null);
     const [showPassword, setShowPassword] = useState(false);
+    const [role] = useState(() => {
+        if (typeof window !== "undefined") {
+            return new URLSearchParams(window.location.search).get("role") || "";
+        }
+        return "";
+    });
+    const isCoach = role === "coach";
 
     return (
-        <div className="min-h-dvh bg-[#FDFCFB] flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden bg-noise">
+        <div className="min-h-dvh bg-[#F9F5F0] flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden bg-noise">
             {/* Background Decorative Elements */}
             <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[#A68363]/10 rounded-full blur-[120px] animate-pulse" />
             <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-[#4A3C31]/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
@@ -56,7 +63,7 @@ export default function RegisterPage() {
                     <div className="bg-[#A68363] p-2 rounded-xl shadow-lg shadow-[#A68363]/20 text-white group-hover:scale-105 transition-transform duration-300">
                         <LayoutDashboard className="h-6 w-6" />
                     </div>
-                    <span className="text-[#4A3C31] font-black text-xl lg:text-2xl tracking-tight">pluravita</span>
+                    <span className="text-[#4A3C31] font-black text-xl lg:text-2xl tracking-tight uppercase">LOGO</span>
                 </Link>
             </motion.div>
 
@@ -127,12 +134,18 @@ export default function RegisterPage() {
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: 0.3, duration: 0.6 }}
                                 >
-                                    <h1 className="text-3xl lg:text-4xl font-black text-[#4A3C31] tracking-tight">Crea tu cuenta</h1>
-                                    <p className="text-[#8B6B4E] font-medium text-sm lg:text-base">Regístrate para empezar tu progreso.</p>
+                                    <h1 className="text-3xl lg:text-4xl font-black text-[#4A3C31] tracking-tight">
+                                        {isCoach ? "Únete como Coach" : "Crea tu cuenta"}
+                                    </h1>
+                                    <p className="text-[#8B6B4E] font-medium text-sm lg:text-base">
+                                        {isCoach ? "Registra tus datos para unirte a nuestro equipo." : "Regístrate para empezar tu progreso."}
+                                    </p>
                                 </motion.div>
                             </div>
 
                             <form action={formAction} className="space-y-5">
+                                <input type="hidden" name="role" value={role} />
+
                                 <div className="space-y-1.5 group focus-within:transform focus-within:translate-x-1 transition-transform duration-300">
                                     <Label htmlFor="fullName" className="text-[13px] uppercase tracking-wider font-bold text-[#A68363] ml-1 opacity-80 group-focus-within:opacity-100 transition-opacity">Nombre completo</Label>
                                     <Input

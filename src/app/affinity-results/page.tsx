@@ -188,9 +188,12 @@ export default function AffinityResultsPage() {
                                                 className="object-cover group-hover:scale-105 transition-transform duration-500"
                                             />
                                         ) : (
-                                            <div className="absolute inset-0 flex items-center justify-center">
-                                                <UserCircle className="h-20 w-20 text-gray-300" />
-                                            </div>
+                                            <Image
+                                                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${psych.email || psych.fullName}`}
+                                                alt={psych.fullName}
+                                                fill
+                                                className="object-cover group-hover:scale-105 transition-transform duration-500 p-4"
+                                            />
                                         )}
                                         <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
                                             <div className="h-2 w-2 rounded-full bg-emerald-500" />

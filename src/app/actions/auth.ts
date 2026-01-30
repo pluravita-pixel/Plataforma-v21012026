@@ -163,6 +163,7 @@ export async function register(prevState: any, formData: FormData) {
     const email = (formData.get("email") as string).toLowerCase().trim();
     const password = formData.get("password") as string;
     const fullName = formData.get("fullName") as string;
+    const isCoachApplication = formData.get("role") === "coach";
     const supabase = getSupabase();
 
     try {
@@ -183,42 +184,47 @@ export async function register(prevState: any, formData: FormData) {
             if (existing.length > 0) {
                 // User was pre-registered by admin
                 const oldUser = existing[0];
-                role = oldUser.role; // Preserve the pre-assigned role (psychologist/admin)
+                role = oldUser.role;
 
-                // Sync the pre-seeded user ID with the new Supabase Auth ID
-                // This preserves relationships handling ON UPDATE CASCADE automatically
                 if (oldUser.id !== data.user.id) {
-                    try {
-                        await client`
-                            UPDATE users 
-                            SET id = ${data.user.id},
-                                full_name = ${fullName || oldUser.full_name}
-                            WHERE id = ${oldUser.id}
-                        `;
+                    await client`
+                        UPDATE users 
+                        SET id = ${data.user.id},
+                            full_name = ${fullName || oldUser.full_name}
+                        WHERE id = ${oldUser.id}
+                    `;
 
-                        // If this is a psychologist, also update the psychologist profile
-                        if (role === 'psychologist') {
-                            await client`
-                                UPDATE psychologists 
-                                SET user_id = ${data.user.id},
-                                    full_name = ${fullName || oldUser.full_name}
-                                WHERE user_id = ${oldUser.id}
-                            `;
-                        }
-                    } catch (migrationError) {
-                        console.error("Error migrating user ID:", migrationError);
-                        // Fallback mostly for safety, though update is preferred
+                    if (role === 'psychologist') {
+                        await client`
+                            UPDATE psychologists 
+                            SET user_id = ${data.user.id},
+                                full_name = ${fullName || oldUser.full_name}
+                            WHERE user_id = ${oldUser.id}
+                        `;
                     }
                 }
             } else {
-                // New User Registration (not pre-registered)
+                // New User Registration
                 await client`
                     INSERT INTO users (id, email, full_name, role)
                     VALUES (${data.user.id}, ${email}, ${fullName}, 'patient')
                 `;
+
+                // If it's a coach application, create a support ticket for admin
+                if (isCoachApplication) {
+                    await client`
+                        INSERT INTO support_tickets (user_id, subject, message, status)
+                        VALUES (${data.user.id}, 'Nueva solicitud de Coach', 'El usuario ${fullName} (${email}) se ha registrado y desea ser Coach. Aquí les aceptará este psicólogo. Una vez verificado, cambie su rol a "psychologist" en la sección de usuarios.', 'open')
+                    `;
+                }
             }
 
-            // Auto-login
+            // Determine Success Message / Redirect
+            if (isCoachApplication) {
+                return { success: "¡Registro de coach recibido! Un administrador revisará tu solicitud. En un plazo de 24 a 72 horas recibirás una respuesta." };
+            }
+
+            // Auto-login if session exists
             if (data.session) {
                 const cookieStore = await cookies();
                 cookieStore.set("session_id", data.session.access_token, {
@@ -228,25 +234,17 @@ export async function register(prevState: any, formData: FormData) {
                     path: "/",
                 });
 
-                // Determine redirect based on role
-                if (role === 'psychologist') {
-                    redirect("/psychologist/dashboard");
-                } else if (role === 'admin') {
-                    redirect("/admin/dashboard");
-                } else {
-                    redirect("/patient/dashboard");
-                }
+                if (role === 'psychologist') redirect("/psychologist/dashboard");
+                if (role === 'admin') redirect("/admin/dashboard");
+                redirect("/patient/dashboard");
             } else {
-                return { success: "Registro exitoso. Revisa tu email." };
+                return { success: "Registro exitoso. Revisa tu email para confirmar tu cuenta." };
             }
         }
     } catch (err: any) {
         if (err.message?.includes("NEXT_REDIRECT")) throw err;
         console.error("Error crítico en proceso de registro:", err);
-
-        // Return a more descriptive error if possible
-        const errorMessage = err instanceof Error ? err.message : "Error desconocido";
-        return { error: `Error del sistema: ${errorMessage}` };
+        return { error: `Error del sistema: ${err instanceof Error ? err.message : "Error desconocido"}` };
     }
 }
 

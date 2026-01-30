@@ -103,6 +103,7 @@ export function UserNav() {
                 className="flex items-center gap-3 p-1 pr-3 rounded-full hover:bg-gray-100 transition-colors"
             >
                 <Avatar className="h-8 w-8 border border-gray-200">
+                    <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`} />
                     <AvatarFallback className="bg-[#F2EDE7] text-[#A68363] text-xs font-bold">
                         {initials}
                     </AvatarFallback>

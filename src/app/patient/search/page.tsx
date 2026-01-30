@@ -110,8 +110,14 @@ function PatientSearchContent() {
                         className="neo-card hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all cursor-pointer group bg-white"
                     >
                         <div className="flex justify-between items-start mb-8">
-                            <div className="w-24 h-24 bg-primary neo-border flex items-center justify-center text-black font-black text-4xl neo-shadow-sm group-hover:bg-accent transition-colors">
-                                {coach.fullName[0]}
+                            <div className="w-24 h-24 bg-primary neo-border overflow-hidden neo-shadow-sm group-hover:bg-accent transition-colors">
+                                <Image
+                                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${coach.email || coach.fullName}`}
+                                    alt={coach.fullName}
+                                    width={96}
+                                    height={96}
+                                    className="object-cover"
+                                />
                             </div>
                             <div className="flex items-center gap-1 bg-secondary px-4 py-2 neo-border text-black font-black text-sm neo-shadow-sm">
                                 <Star className="h-4 w-4 fill-black" />
