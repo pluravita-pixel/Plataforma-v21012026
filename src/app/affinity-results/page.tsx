@@ -41,16 +41,7 @@ export default function AffinityResultsPage() {
         <div className="min-h-screen bg-[#F9F5F0] flex flex-col">
             <title>Resultados de Afinidad | pluravita</title>
 
-            {/* Simple Header */}
-            <header className="w-full bg-white border-b border-gray-100 py-4 px-6 z-20">
-                <div className="max-w-7xl mx-auto flex items-center">
-                    <Link href="/" className="hover:opacity-80 transition-opacity">
-                        <div className="flex items-center justify-center">
-                            <Logo className="w-48 h-12" />
-                        </div>
-                    </Link>
-                </div>
-            </header>
+
 
             <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-12 md:py-16">
                 {/* Hero Section */}
