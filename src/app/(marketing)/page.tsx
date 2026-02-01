@@ -136,12 +136,13 @@ export default function LandingPage() {
 
                         <div className="relative bg-white p-4 rounded-3xl shadow-2xl w-full max-w-3xl mx-auto z-10">
                             <div className="aspect-[16/9] relative bg-black rounded-2xl overflow-hidden group shadow-inner">
-                                <iframe
-                                    src="https://www.youtube.com/embed/a6AtqACERTo?autoplay=0&mute=0&controls=1&loop=1&playlist=a6AtqACERTo&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1"
-                                    className="w-full h-full absolute inset-0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                ></iframe>
+                                <Image
+                                    src="/images/hero-illustration.jpg"
+                                    alt="Sesión de coaching en grupo"
+                                    fill
+                                    className="object-cover group-hover:scale-105 transition-transform duration-700"
+                                    priority
+                                />
                             </div>
                         </div>
                     </div>
