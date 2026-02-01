@@ -10,6 +10,7 @@ import { getPsychologists } from "@/app/actions/psychologists"
 import { getCurrentUser } from "@/app/actions/auth" // Added
 import type { Psychologist, User } from "@/db/schema"
 import { BookingModal } from "@/components/booking/BookingModal"
+import { Logo } from "@/components/logo";
 
 export default function AffinityResultsPage() {
     const [copied, setCopied] = useState(false)
@@ -44,15 +45,8 @@ export default function AffinityResultsPage() {
             <header className="w-full bg-white border-b border-gray-100 py-4 px-6 z-20">
                 <div className="max-w-7xl mx-auto flex items-center">
                     <Link href="/" className="hover:opacity-80 transition-opacity">
-                        <div className="relative w-48 h-12 overflow-hidden flex items-center justify-center">
-                            <Image
-                                src="/logo.png"
-                                alt="pluravita Logo"
-                                width={500}
-                                height={500}
-                                className="h-40 w-auto object-contain mix-blend-multiply brightness-105"
-                                priority
-                            />
+                        <div className="flex items-center justify-center">
+                            <Logo className="w-48 h-12" />
                         </div>
                     </Link>
                 </div>
@@ -68,7 +62,7 @@ export default function AffinityResultsPage() {
                     >
                         <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl">
                             <Image
-                                src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop"
+                                src="/images/affinity-results.jpg"
                                 alt="Resultados listos"
                                 fill
                                 className="object-cover"
