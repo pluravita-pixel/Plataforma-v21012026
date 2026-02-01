@@ -136,13 +136,12 @@ export default function LandingPage() {
 
                         <div className="relative bg-white p-4 rounded-3xl shadow-2xl w-full max-w-3xl mx-auto z-10">
                             <div className="aspect-[16/9] relative bg-black rounded-2xl overflow-hidden group shadow-inner">
-                                <Image
-                                    src="/images/hero-illustration.jpg"
-                                    alt="Sesión de coaching en grupo"
-                                    fill
-                                    className="object-cover group-hover:scale-105 transition-transform duration-700"
-                                    priority
-                                />
+                                <iframe
+                                    src="https://www.youtube.com/embed/a6AtqACERTo?autoplay=0&mute=0&controls=1&loop=1&playlist=a6AtqACERTo&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1"
+                                    className="w-full h-full absolute inset-0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                ></iframe>
                             </div>
                         </div>
                     </div>
@@ -223,8 +222,8 @@ export default function LandingPage() {
                         <div className="relative rounded-3xl overflow-hidden shadow-2xl h-[400px]">
                             {/* Mock Image */}
                             <Image
-                                src="/images/guarantee.jpg"
-                                alt="Garantía de confianza"
+                                src="/images/hero-illustration.jpg"
+                                alt="Sesión de coaching en grupo"
                                 fill
                                 className="object-cover"
                             />
@@ -278,8 +277,8 @@ export default function LandingPage() {
                     </div>
                     <div className="relative rounded-3xl overflow-hidden shadow-2xl h-[500px] order-1 md:order-2">
                         <Image
-                            src="/images/team.png"
-                            alt="Personas que te entienden"
+                            src="/images/guarantee.jpg"
+                            alt="Sesión por videollamada"
                             fill
                             className="object-cover"
                         />
@@ -298,7 +297,12 @@ export default function LandingPage() {
 
                     <div className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
                         <div className="relative rounded-3xl overflow-hidden shadow-xl h-[400px]">
-                            <div className="absolute inset-0 bg-gray-200 bg-[url('https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center" />
+                            <Image
+                                src="/images/team.png"
+                                alt="Crecimiento personal"
+                                fill
+                                className="object-cover"
+                            />
                         </div>
                         <div className="space-y-6">
                             <p className="text-gray-700">
