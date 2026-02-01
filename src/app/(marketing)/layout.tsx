@@ -41,7 +41,7 @@ export default function MarketingLayout({
             <header className="sticky top-0 z-50 w-full bg-[#F9F5F0]/80 backdrop-blur-md border-b border-[#A68363]/10">
                 <div className="container mx-auto px-4 h-20 flex items-center">
                     <Link href="#" className="flex items-center h-full group">
-                        <Logo className="w-52 h-14" />
+                        <Logo className="w-80 h-24" />
                     </Link>
 
                     {/* Desktop Nav */}

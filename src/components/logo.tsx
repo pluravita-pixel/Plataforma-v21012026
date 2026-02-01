@@ -14,12 +14,15 @@ export function Logo({ className, variant = "dark" }: LogoProps) {
             <Image
                 src="/logo.png"
                 alt="pluravita"
-                width={400}
-                height={400}
+                width={800}
+                height={800}
                 className={cn(
                     "object-contain w-full h-full transition-all duration-700 ease-in-out group-hover:scale-110",
                     variant === "light" ? "brightness-0 invert" : "brightness-[1.05] contrast-[1.05] saturate-[1.1] mix-blend-multiply"
                 )}
+                style={{
+                    transform: "scale(1.4)"
+                }}
                 priority
             />
         </div>
