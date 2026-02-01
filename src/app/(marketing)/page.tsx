@@ -222,7 +222,12 @@ export default function LandingPage() {
                     <div className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
                         <div className="relative rounded-3xl overflow-hidden shadow-2xl h-[400px]">
                             {/* Mock Image */}
-                            <div className="absolute inset-0 bg-gray-200 bg-[url('https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center" />
+                            <Image
+                                src="/images/guarantee.jpg"
+                                alt="Garantía de confianza"
+                                fill
+                                className="object-cover"
+                            />
                         </div>
                         <div className="space-y-6">
                             <p className="text-gray-700">
@@ -272,7 +277,12 @@ export default function LandingPage() {
                         </div>
                     </div>
                     <div className="relative rounded-3xl overflow-hidden shadow-2xl h-[500px] order-1 md:order-2">
-                        <div className="absolute inset-0 bg-gray-200 bg-[url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center" />
+                        <Image
+                            src="/images/team.png"
+                            alt="Personas que te entienden"
+                            fill
+                            className="object-cover"
+                        />
                     </div>
                 </div>
             </section>
