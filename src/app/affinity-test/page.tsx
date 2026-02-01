@@ -9,29 +9,35 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { supabase } from "@/lib/supabase"
 import { markTestAsCompleted } from "@/app/actions/auth"
+import { Logo } from "@/components/logo";
 
 const STEPS = [
     {
         id: "therapy_type",
         title: "¿Cómo te gustaría que fuera este camino?",
+        subtitle: "",
         options: [
             { id: "individual", label: "Para mí (individual)" },
             { id: "couple", label: "Con mi pareja" }
         ],
-        type: "single"
+        type: "single",
+        max: 1
     },
     {
         id: "first_time",
         title: "¿Ya habías probado algo parecido antes?",
+        subtitle: "",
         options: [
             { id: "yes", label: "Es mi primera vez" },
             { id: "no", label: "Sí, ya he tenido procesos similares" }
         ],
-        type: "single"
+        type: "single",
+        max: 1
     },
     {
         id: "gender",
         title: "¿Con qué género te identificas?",
+        subtitle: "",
         options: [
             { id: "woman", label: "Mujer" },
             { id: "man", label: "Hombre" },
@@ -39,44 +45,53 @@ const STEPS = [
             { id: "other", label: "Otro" },
             { id: "prefer_not_to_say", label: "Prefiero no decir" }
         ],
-        type: "single"
+        type: "single",
+        max: 1
     },
     {
         id: "practical_exercises",
         title: "¿Te gustaría recibir ideas para aplicar en tu día a día?",
+        subtitle: "",
         options: [
             { id: "totally", label: "¡Sí! Me encanta pasar a la acción" },
             { id: "no", label: "Prefiero solo conversar por ahora" },
             { id: "maybe", label: "Lo vemos según avance el proceso" }
         ],
-        type: "single"
+        type: "single",
+        max: 1
     },
     {
         id: "focus_area",
         title: "¿En qué te gustaría enfocarte más?",
+        subtitle: "",
         options: [
             { id: "goals", label: "Mis metas y crecimiento personal" },
             { id: "balance", label: "Mi equilibrio mental y emocional" },
             { id: "relationships", label: "Mis relaciones con los demás" },
             { id: "self_knowledge", label: "Simplemente conocerme mejor" }
         ],
-        type: "single"
+        type: "single",
+        max: 1
     },
     {
         id: "therapist_gender",
         title: "¿Prefieres que tu coach sea hombre o mujer?",
+        subtitle: "",
         options: [
             { id: "woman", label: "Mujer" },
             { id: "man", label: "Hombre" },
             { id: "indifferent", label: "Me es totalmente igual" }
         ],
-        type: "single"
+        type: "single",
+        max: 1
     },
     {
         id: "age",
         title: "¿Qué edad tienes?",
+        subtitle: "",
         type: "select",
-        placeholder: "Elige tu edad"
+        placeholder: "Elige tu edad",
+        max: 1
     }
 ]
 
@@ -196,21 +211,9 @@ export default function AffinityTestPage() {
                         exit={{ opacity: 0, scale: 0.95 }}
                         className="w-full max-w-2xl z-10 flex flex-col items-center"
                     >
-                        {/* Header */}
-                        <div className="w-full text-center pt-16">
-                            <div className="flex items-center justify-center mb-6">
-                                <div className="relative w-64 h-16 overflow-hidden flex items-center justify-center">
-                                    <Image
-                                        src="/logo.png"
-                                        alt="pluravita Logo"
-                                        width={500}
-                                        height={500}
-                                        className="h-44 w-auto object-contain mix-blend-multiply brightness-105"
-                                        priority
-                                    />
-                                </div>
-                            </div>
-                            <h1 className="text-xl font-medium text-[#4A3C31] mb-8">
+                        {/* Test Content starts with spacing */}
+                        <div className="w-full pt-16">
+                            <h1 className="text-xl font-medium text-[#4A3C31] mb-8 text-center">
                                 Encuentra a tu coach ideal
                             </h1>
 
