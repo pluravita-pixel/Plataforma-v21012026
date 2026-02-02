@@ -48,12 +48,12 @@ export function NewPatientModal() {
             <DialogTrigger asChild>
                 <Button className="gap-2">
                     <Plus className="h-4 w-4" />
-                    Nuevo Paciente
+                    Nuevo Usuario
                 </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Añadir Nuevo Paciente</DialogTitle>
+                    <DialogTitle>Añadir Nuevo Usuario</DialogTitle>
                     <DialogDescription>
                         Completa los datos para registrar un nuevo usuario en la plataforma.
                     </DialogDescription>

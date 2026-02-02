@@ -51,11 +51,11 @@ export default async function PsychologistDashboard() {
     if (!data) return <div className="p-8">Cargando dashboard...</div>;
 
     const stats = [
-        { label: "Pacientes Activos", value: data.psych.activePatients?.toString() || "0", icon: Users, color: "bg-[#4A3C31]/10 text-[#4A3C31]" },
+        { label: "Usuarios Activos", value: data.psych.activePatients?.toString() || "0", icon: Users, color: "bg-[#4A3C31]/10 text-[#4A3C31]" },
         { label: "Sesiones Cogidas", value: data.psych.totalSessions?.toString() || "0", icon: Calendar, color: "bg-[#A68363]/10 text-[#A68363]" },
         { label: "Sesiones Completadas", value: data.psych.completedSessions?.toString() || "0", icon: CheckCircle2, color: "bg-blue-50 text-blue-700" },
         { label: "Saldo acumulado", value: `€${data.psych.balance || "0.00"}`, icon: TrendingUp, color: "bg-emerald-50 text-emerald-700" },
-        { label: "Total Pacientes", value: data.psych.totalPatients?.toString() || "0", icon: MessageSquare, color: "bg-orange-50 text-orange-700" },
+        { label: "Total Usuarios", value: data.psych.totalPatients?.toString() || "0", icon: MessageSquare, color: "bg-orange-50 text-orange-700" },
     ];
 
     return (
@@ -138,7 +138,7 @@ export default async function PsychologistDashboard() {
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-xl font-black text-[#4A3C31]">Historial Reciente</h2>
                         <Link href="/psychologist/patients" className="text-sm font-bold text-[#A68363] hover:text-[#8C6B4D] transition-colors">
-                            Mis pacientes
+                            Mis usuarios
                         </Link>
                     </div>
                     <div className="space-y-4">
@@ -149,7 +149,7 @@ export default async function PsychologistDashboard() {
                                         {app.patient?.fullName ? app.patient.fullName[0] : 'P'}
                                     </div>
                                     <div>
-                                        <p className="font-bold text-[#4A3C31] text-sm">{app.patient?.fullName || 'Paciente'}</p>
+                                        <p className="font-bold text-[#4A3C31] text-sm">{app.patient?.fullName || 'Usuario'}</p>
                                         <p className="text-xs text-gray-500 mt-0.5 line-clamp-1 italic">"{app.reason || 'Seguimiento general'}"</p>
                                     </div>
                                 </div>

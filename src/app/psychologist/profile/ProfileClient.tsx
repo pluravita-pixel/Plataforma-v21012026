@@ -134,7 +134,7 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900">Perfil Público</h1>
-                        <p className="text-gray-500 mt-1">Esta información será visible para tus pacientes potenciales.</p>
+                        <p className="text-gray-500 mt-1">Esta información será visible para tus usuarios potenciales.</p>
                     </div>
                     <div className="flex gap-3">
                         <button
@@ -362,7 +362,7 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                         </div>
 
                         <div className="p-8">
-                            {/* Preview Card - Como lo vería un paciente */}
+                            {/* Preview Card - Como lo vería un usuario */}
                             <div className="bg-gradient-to-br from-[#F2EDE7] to-white p-8 rounded-2xl border border-gray-100 shadow-lg">
                                 <div className="flex flex-col md:flex-row gap-6">
                                     <div className="flex-shrink-0">
@@ -412,7 +412,7 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
 
                             <div className="mt-6 p-4 bg-blue-50 rounded-xl">
                                 <p className="text-sm text-blue-900">
-                                    <strong>💡 Nota:</strong> Así es como los pacientes verán tu perfil cuando visiten tu página pública.
+                                    <strong>💡 Nota:</strong> Así es como los usuarios verán tu perfil cuando visiten tu página pública.
                                 </p>
                             </div>
                         </div>

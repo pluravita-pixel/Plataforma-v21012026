@@ -57,7 +57,7 @@ export function PatientsClient({ initialPatients, psychologistId }: { initialPat
         <div className="space-y-8 font-sans" onClick={() => setActiveMenu(null)}>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-[#4A3C31]">Mis Pacientes</h1>
+                    <h1 className="text-3xl font-black text-[#4A3C31]">Mis Usuarios</h1>
                     <p className="text-gray-500 mt-1 font-medium">Gestiona tus consultas y notas de sesión.</p>
                 </div>
 
@@ -66,7 +66,7 @@ export function PatientsClient({ initialPatients, psychologistId }: { initialPat
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <input
                             type="text"
-                            placeholder="Buscar paciente..."
+                            placeholder="Buscar usuario..."
                             className="bg-white border border-gray-200 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#A68363]/20 transition-all w-64"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -81,7 +81,7 @@ export function PatientsClient({ initialPatients, psychologistId }: { initialPat
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-[#FAF8F5] border-b border-gray-100 first:rounded-t-[2rem]">
-                                <th className="px-6 py-5 text-xs font-black text-[#A68363] uppercase tracking-wider">Paciente</th>
+                                <th className="px-6 py-5 text-xs font-black text-[#A68363] uppercase tracking-wider">Usuario</th>
                                 <th className="px-6 py-5 text-xs font-black text-[#A68363] uppercase tracking-wider">Motivo</th>
                                 <th className="px-6 py-5 text-xs font-black text-[#A68363] uppercase tracking-wider">Última Sesión</th>
                                 <th className="px-6 py-5 text-xs font-black text-[#A68363] uppercase tracking-wider">Estado</th>
@@ -159,7 +159,7 @@ export function PatientsClient({ initialPatients, psychologistId }: { initialPat
                             ) : (
                                 <tr>
                                     <td colSpan={5} className="px-6 py-12 text-center text-gray-400 italic font-medium">
-                                        No hay pacientes registrados actualmente.
+                                        No hay usuarios registrados actualmente.
                                     </td>
                                 </tr>
                             )}
@@ -183,7 +183,7 @@ export function PatientsClient({ initialPatients, psychologistId }: { initialPat
                         <p className="text-gray-600 text-sm leading-relaxed font-medium">
                             ¿Seguro que quieres cancelar la sesión? <br />
                             <span className="text-emerald-600 font-bold block mt-2">
-                                Se devolverá la cantidad entera al paciente automáticamente.
+                                Se devolverá la cantidad entera al usuario automáticamente.
                             </span>
                             <span className="text-xs text-gray-400 mt-2 block">
                                 Esta acción quedará registrada en tu historial y podría conllevar penalizaciones si es recurrente.
@@ -216,9 +216,9 @@ export function PatientsClient({ initialPatients, psychologistId }: { initialPat
                     <div className="w-16 h-16 bg-[#F9F5F1] rounded-full flex items-center justify-center text-[#A68363] mb-4 group-hover:scale-110 transition-transform">
                         <History className="h-8 w-8" />
                     </div>
-                    <h3 className="font-bold text-[#4A3C31] text-lg">Historial de Pacientes</h3>
+                    <h3 className="font-bold text-[#4A3C31] text-lg">Historial de Usuarios</h3>
                     <p className="text-sm text-gray-400 mt-2 max-w-xs font-medium">
-                        Selecciona un paciente para ver su historial completo.
+                        Selecciona un usuario para ver su historial completo.
                     </p>
                 </div>
             </div>

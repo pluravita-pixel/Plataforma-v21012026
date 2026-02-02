@@ -112,7 +112,7 @@ export default function PatientLayout({
                         <span className="text-gray-300 font-medium hidden sm:inline">Panel</span>
                         <span className="text-gray-200 hidden sm:inline">/</span>
                         <span className="font-black text-[#4A3C31] uppercase tracking-[0.2em] text-[10px] bg-[#F8F6F4] px-4 py-1.5 rounded-full border border-[#A68363]/10">
-                            Paciente
+                            Usuario
                         </span>
                     </div>
                     <div className="flex items-center gap-6">

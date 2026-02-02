@@ -31,7 +31,7 @@ export default async function CalendarPage() {
             initialAppointments={appointments.map(app => ({
                 id: app.id,
                 date: app.date,
-                patientName: app.patient?.fullName || 'Paciente sin nombre',
+                patientName: app.patient?.fullName || 'Usuario sin nombre',
                 status: app.status
             }))}
             initialSlots={slots.map(s => ({

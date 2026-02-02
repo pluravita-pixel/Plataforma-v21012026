@@ -130,7 +130,7 @@ export default function AppointmentDetailsClient({ appointment, coachId }: Appoi
 
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <Label className="font-bold text-[#4A3C31]">Notas de la sesión (Visibles para el paciente)</Label>
+                            <Label className="font-bold text-[#4A3C31]">Notas de la sesión (Visibles para el usuario)</Label>
                             <Textarea
                                 placeholder="Escribe aquí el resumen de la sesión..."
                                 className="min-h-[150px] rounded-2xl bg-gray-50 border-gray-100 focus:border-[#A68363] focus:ring-[#A68363]/20"

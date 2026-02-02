@@ -124,7 +124,7 @@ export default function AddPsychologistPage() {
                             <div className="mt-1 p-2 bg-white neo-border">
                                 <CheckCircle2 className="h-4 w-4" />
                             </div>
-                            Si el usuario ya estaba registrado como paciente, su cuenta se convertirá automáticamente.
+                            Si el usuario ya estaba registrado como usuario estándar, su cuenta se convertirá automáticamente.
                         </div>
                     </div>
 

@@ -20,7 +20,7 @@ export default async function AdminDashboard() {
     ]);
 
     const stats = [
-        { label: "Pacientes Totales", value: statsData.patients, icon: Users, color: "text-black", bg: "bg-white" },
+        { label: "Usuarios Totales", value: statsData.patients, icon: Users, color: "text-black", bg: "bg-white" },
         { label: "Dinero Facturado", value: `€${statsData.revenue.toFixed(2)}`, icon: Euro, color: "text-black", bg: "bg-gray-50" },
         { label: "Coaches Registrados", value: statsData.psychologists, icon: UserCheck, color: "text-black", bg: "bg-gray-100" },
         { label: "Citas Hoy", value: statsData.appointmentsToday, icon: Activity, color: "text-black", bg: "bg-white" },

@@ -529,7 +529,7 @@ export async function cancelAppointmentByPsychologist(appointmentId: string, psy
         revalidatePath("/psychologist/calendar");
         revalidatePath("/psychologist/patients");
 
-        return { success: "Cita cancelada. Se ha emitido un reembolso completo al paciente." };
+        return { success: "Cita cancelada. Se ha emitido un reembolso completo al usuario." };
     } catch (error) {
         console.error("Error cancelling appointment:", error);
         return { error: "Error al cancelar la cita." };

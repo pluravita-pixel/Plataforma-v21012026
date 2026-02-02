@@ -30,7 +30,7 @@ export default function PsychologistLayout({
 
     const navItems = [
         { icon: LayoutDashboard, label: "Panel de Coach", href: "/psychologist/dashboard" },
-        { icon: Users, label: "Mis Pacientes", href: "/psychologist/patients" },
+        { icon: Users, label: "Mis Usuarios", href: "/psychologist/patients" },
         { icon: Calendar, label: "Calendario", href: "/psychologist/calendar" },
         { icon: Wallet, label: "Saldo y Pagos", href: "/psychologist/balance" },
         { icon: UserCircle, label: "Editar Perfil", href: "/psychologist/profile" },

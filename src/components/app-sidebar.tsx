@@ -27,7 +27,7 @@ import { Separator } from "@/components/ui/separator";
 
 const menuItems = [
     { icon: LayoutDashboard, label: "Vista General", href: "/" },
-    { icon: Users, label: "Pacientes", href: "/patients" },
+    { icon: Users, label: "Usuarios", href: "/patients" },
     { icon: Briefcase, label: "Terapeutas", href: "/therapists" },
     { icon: Calendar, label: "Agenda", href: "/schedule" },
     { icon: MessageSquare, label: "Sesiones", href: "/sessions" },
