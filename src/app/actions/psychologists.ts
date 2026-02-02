@@ -117,7 +117,10 @@ export async function getPsychologistStatus(userId: string) {
         }
 
         return null;
-    } catch (error) {
+    } catch (error: any) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+            throw error;
+        }
         console.error("Error in getPsychologistStatus:", error);
         return null;
     }
@@ -127,7 +130,10 @@ export async function getPsychologists() {
     try {
         const results = await client`SELECT * FROM psychologists`;
         return results.map(mapPsychologist).filter((p): p is NonNullable<typeof p> => p !== null);
-    } catch (error) {
+    } catch (error: any) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+            throw error;
+        }
         console.error("Error in getPsychologists:", error);
         return [];
     }
@@ -235,7 +241,10 @@ export async function getUpcomingAppointments(psychologistId: string) {
                 role: r.u_role
             } : null
         }));
-    } catch (error) {
+    } catch (error: any) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+            throw error;
+        }
         console.error("Error getUpcomingAppointments optimized:", error);
         return [];
     }
@@ -306,7 +315,10 @@ export async function getPsychologistPatients(psychologistId: string) {
         }
 
         return Array.from(uniquePatientsMap.values());
-    } catch (e) {
+    } catch (e: any) {
+        if (e.digest === 'DYNAMIC_SERVER_USAGE' || e.message?.includes('cookies')) {
+            throw e;
+        }
         console.error("Error in getPsychologistPatients:", e);
         return [];
     }
@@ -390,7 +402,10 @@ export async function getRecentConsultations(psychologistId: string) {
                 email: r.is_anonymous ? "Privado" : r.u_email
             }
         }));
-    } catch (error) {
+    } catch (error: any) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+            throw error;
+        }
         console.error("Error getting recent consultations optimized:", error);
         return [];
     }
@@ -435,7 +450,10 @@ export async function getWeeklyAppointments(psychologistId: string) {
                 fullName: r.patient_name || r.u_full_name,
             } : null
         }));
-    } catch (error) {
+    } catch (error: any) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+            throw error;
+        }
         console.error("Error getting weekly appointments:", error);
         return [];
     }
@@ -462,7 +480,10 @@ export async function getWeeklyAppointmentsCount(psychologistId: string) {
         `;
 
         return Number(result[0]?.count || 0);
-    } catch (error) {
+    } catch (error: any) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+            throw error;
+        }
         console.error("Error getting weekly stats:", error);
         return 0;
     }

@@ -60,7 +60,10 @@ export async function createAvailabilitySlot(psychologistId: string, startTime: 
         });
         revalidatePath("/psychologist/calendar");
         return { success: true };
-    } catch (error) {
+    } catch (error: any) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+            throw error;
+        }
         console.error("Error creating availability slot:", error);
         return { error: "Could not create slot" };
     }
@@ -79,7 +82,10 @@ export async function deleteAvailabilitySlot(slotId: string) {
         await db.delete(availabilitySlots).where(eq(availabilitySlots.id, slotId));
         revalidatePath("/psychologist/calendar");
         return { success: true };
-    } catch (error) {
+    } catch (error: any) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+            throw error;
+        }
         return { error: "Failed to delete slot" };
     }
 }
@@ -157,7 +163,10 @@ export async function saveSchedule(psychologistId: string, slots: { id: string, 
 
         revalidatePath("/psychologist/calendar");
         return { success: true };
-    } catch (error) {
+    } catch (error: any) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+            throw error;
+        }
         console.error("Save schedule error:", error);
         return { error: "Error al guardar el horario." };
     }
@@ -223,6 +232,9 @@ export async function createPendingAppointment(data: {
         return { success: true, appointmentId: apptResults[0].id };
 
     } catch (error: any) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+            throw error;
+        }
         console.error("Booking error details:", error);
         return { error: `No se pudo crear la reserva: ${error.message || 'Error desconocido'}. Por favor intenta de nuevo.` };
     }
@@ -246,7 +258,10 @@ export async function confirmAppointmentPayment(appointmentId: string) {
         revalidatePath("/patient/dashboard");
         revalidatePath("/psychologist/dashboard");
         revalidatePath("/psychologist/patients");
-    } catch (error) {
+    } catch (error: any) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+            throw error;
+        }
         console.error("Error confirming payment:", error);
     }
 }

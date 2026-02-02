@@ -132,7 +132,10 @@ export const getCurrentUser = cache(async () => {
         `;
 
         return result[0] || null;
-    } catch (e) {
+    } catch (e: any) {
+        if (e.digest === 'DYNAMIC_SERVER_USAGE' || e.message?.includes('cookies')) {
+            throw e;
+        }
         console.error("Error getting current user:", e);
         return null;
     }
