@@ -23,7 +23,12 @@ const getSupabase = () => {
         return createClient(url || "https://placeholder.supabase.co", key || "placeholder");
     }
 
-    supabaseInstance = createClient(url, key);
+    supabaseInstance = createClient(url, key, {
+        auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+        }
+    });
     return supabaseInstance;
 };
 
@@ -51,17 +56,19 @@ export async function login(prevState: any, formData: FormData) {
         }
 
         if (data.session && data.user) {
-            // 2. Establecer Cookie de Sesión - Non-blocking if possible (but we need it for next steps potentially)
+            // 2. Establecer Cookie de Sesión - Fast path
             const cookieStore = await cookies();
             cookieStore.set("session_id", data.session.access_token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 maxAge: data.session.expires_in,
                 path: "/",
+                sameSite: "lax",
             });
 
             // 3. Obtener Rol y Actualizar last_login en UNA SOLA consulta
             try {
+                // Actualizamos users y obtenemos info básica
                 const usersResult = await client`
                     UPDATE users 
                     SET last_login = NOW() 
@@ -75,14 +82,14 @@ export async function login(prevState: any, formData: FormData) {
                     console.error("Usuario autenticado pero no encontrado en tabla users DB");
                     redirectPath = "/patient/dashboard";
                 } else {
-                    // Lógica de Redirección
-                    if (user.role === 'admin') {
-                        redirectPath = "/admin/dashboard";
-                    } else if (user.role === 'psychologist') {
-                        await client`
-                            UPDATE psychologists SET last_login = NOW() WHERE user_id = ${data.user.id}::uuid
-                        `;
+                    // Si es psicólogo, actualizamos de forma "fire and forget" si es posible, 
+                    // o combinamos si es crítico, pero para no retrasar mucho:
+                    if (user.role === 'psychologist') {
+                        // Lo hacemos lo más rápido posible
+                        await client`UPDATE psychologists SET last_login = NOW() WHERE user_id = ${data.user.id}::uuid`;
                         redirectPath = "/psychologist/dashboard";
+                    } else if (user.role === 'admin') {
+                        redirectPath = "/admin/dashboard";
                     } else if (user.hasPendingApplication) {
                         redirectPath = "/coach-onboarding";
                     } else {
@@ -105,7 +112,7 @@ export async function login(prevState: any, formData: FormData) {
     return { error: "No se pudo iniciar sesión." };
 }
 
-export async function getCurrentUser() {
+export const getCurrentUser = cache(async function getCurrentUser() {
     try {
         const cookieStore = await cookies();
         const sessionId = cookieStore.get("session_id")?.value;
@@ -139,7 +146,7 @@ export async function getCurrentUser() {
         console.error("Error getting current user:", e);
         return null;
     }
-}
+});
 
 export async function logout() {
     try {
