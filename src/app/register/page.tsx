@@ -100,7 +100,7 @@ function RegisterForm() {
                                 className="space-y-4"
                             >
                                 <h2 className="text-4xl font-black text-[#4A3C31] tracking-tight leading-tight drop-shadow-sm">
-                                    Comienza tu viaje hoy.
+                                    NO ESPERES MÁS
                                 </h2>
                                 <p className="text-lg text-[#6B6B6B] max-w-sm mx-auto leading-relaxed font-medium">
                                     Únete a miles de personas que ya están transformando su vida con pluravita.
