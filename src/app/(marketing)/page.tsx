@@ -101,7 +101,7 @@ export default function LandingPage() {
     return (
         <div className="flex flex-col">
             {/* Hero Section */}
-            <section className="container mx-auto px-4 py-12 lg:py-20">
+            <section className="container mx-auto px-6 md:px-12 lg:px-20 py-12 lg:py-24">
                 <div className="grid lg:grid-cols-12 gap-12 items-center">
 
                     {/* Left Content */}
@@ -149,7 +149,7 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            <section className="container mx-auto px-4 py-16">
+            <section className="container mx-auto px-6 md:px-12 lg:px-20 py-16">
                 <div className="grid md:grid-cols-3 gap-8">
                     {landingStats.map((stat, i) => (
                         <Card key={i} className="p-10 text-center bg-white border-transparent neo-shadow hover:shadow-2xl transition-all duration-500 rounded-[2rem] border border-gray-50 flex flex-col justify-center items-center">
@@ -162,7 +162,7 @@ export default function LandingPage() {
             </section>
 
             {/* How it Works Section */}
-            <section className="container mx-auto px-4 py-20 text-center">
+            <section className="container mx-auto px-6 md:px-12 lg:px-20 py-20 text-center">
                 <h2 className="text-3xl font-bold text-[#4A3C31] mb-4">¿Cómo funciona el coaching online?</h2>
                 <p className="text-[#6B6B6B] mb-16">Iniciar tu proceso con un coach en línea es muy fácil</p>
 
@@ -212,7 +212,7 @@ export default function LandingPage() {
 
             {/* Guarantee Section */}
             <section id="trusted-psychologists" className="bg-white py-20 scroll-mt-20">
-                <div className="container mx-auto px-4">
+                <div className="container mx-auto px-6 md:px-12 lg:px-20">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl font-bold text-[#4A3C31] mb-2">Coaches que te entienden de verdad</h2>
                         <p className="text-[#6B6B6B]">Conoce nuestra garantía de primera cita</p>

@@ -41,7 +41,7 @@ export default function MarketingLayout({
         <div className="min-h-screen flex flex-col font-sans">
             {/* Navbar */}
             <header className="sticky top-0 z-50 w-full bg-white/70 backdrop-blur-md border-b border-gray-100">
-                <div className="container mx-auto px-4 h-20 flex items-center">
+                <div className="container mx-auto px-6 md:px-12 lg:px-20 h-20 flex items-center">
                     <Link href="#" className="flex items-center h-full group">
                         <Logo className="w-64 h-20" />
                     </Link>
@@ -79,7 +79,7 @@ export default function MarketingLayout({
 
             {/* Footer */}
             <footer className="bg-white border-t border-gray-100 py-12">
-                <div className="container mx-auto px-4">
+                <div className="container mx-auto px-6 md:px-12 lg:px-20">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-8">
                         <div className="flex items-center">
                             <Logo className="w-40 h-12 opacity-80" />
