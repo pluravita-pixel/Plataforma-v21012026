@@ -1,3 +1,4 @@
+export const revalidate = 0;
 export const dynamic = 'force-dynamic';
 import { getAdminStats, getAllPsychologists } from "@/app/actions/admin";
 import {
@@ -23,7 +24,6 @@ export default async function AdminDashboard() {
         { label: "Usuarios Registrados", value: statsData.users, icon: Users, color: "text-black", bg: "bg-white" },
         { label: "Coaches Registrados", value: statsData.psychologists, icon: UserCheck, color: "text-black", bg: "bg-gray-100" },
         { label: "Total Sesiones", value: statsData.sessions, icon: Calendar, color: "text-black", bg: "bg-gray-50" },
-        { label: "Dinero Facturado", value: `€${statsData.revenue.toFixed(2)}`, icon: Euro, color: "text-black", bg: "bg-white" },
     ];
 
     return (

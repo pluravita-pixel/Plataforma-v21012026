@@ -42,45 +42,35 @@ export default function OverviewPage() {
             </div>
 
             {/* KPI Cards */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
                 <Card className="hover:shadow-md transition-shadow">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Usuarios Totales</CardTitle>
+                        <CardTitle className="text-sm font-medium">Usuarios Registrados</CardTitle>
                         <Users className="h-4 w-4 text-primary" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{stats.realUsers}</div>
-                        <p className="text-xs text-muted-foreground">Sistema activo</p>
+                        <p className="text-xs text-muted-foreground">Sistema operativo</p>
                     </CardContent>
                 </Card>
                 <Card className="hover:shadow-md transition-shadow">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Próximas Sesiones</CardTitle>
+                        <CardTitle className="text-sm font-medium">Sesiones Totales</CardTitle>
                         <Calendar className="h-4 w-4 text-primary" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{stats.realSessions}</div>
-                        <p className="text-xs text-muted-foreground">Total en la plataforma</p>
+                        <p className="text-xs text-muted-foreground">Historial completo</p>
                     </CardContent>
                 </Card>
                 <Card className="hover:shadow-md transition-shadow">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Tasa de Mejora</CardTitle>
-                        <TrendingUp className="h-4 w-4 text-emerald-500" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">0%</div>
-                        <p className="text-xs text-muted-foreground">Esperando feedback</p>
-                    </CardContent>
-                </Card>
-                <Card className="hover:shadow-md transition-shadow">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Coaches Registrados</CardTitle>
+                        <CardTitle className="text-sm font-medium">Coaches Activos</CardTitle>
                         <Activity className="h-4 w-4 text-primary" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{stats.realCoaches}</div>
-                        <p className="text-xs text-muted-foreground">Disponibles ahora</p>
+                        <p className="text-xs text-muted-foreground">Listos para empezar</p>
                     </CardContent>
                 </Card>
             </div>
