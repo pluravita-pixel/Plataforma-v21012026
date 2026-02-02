@@ -61,7 +61,7 @@ export async function createAvailabilitySlot(psychologistId: string, startTime: 
         revalidatePath("/psychologist/calendar");
         return { success: true };
     } catch (error: any) {
-        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || (error.message && error.message.includes('Dynamic server usage'))) {
             throw error;
         }
         console.error("Error creating availability slot:", error);
@@ -83,7 +83,7 @@ export async function deleteAvailabilitySlot(slotId: string) {
         revalidatePath("/psychologist/calendar");
         return { success: true };
     } catch (error: any) {
-        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || (error.message && error.message.includes('Dynamic server usage'))) {
             throw error;
         }
         return { error: "Failed to delete slot" };
@@ -164,7 +164,7 @@ export async function saveSchedule(psychologistId: string, slots: { id: string, 
         revalidatePath("/psychologist/calendar");
         return { success: true };
     } catch (error: any) {
-        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || (error.message && error.message.includes('Dynamic server usage'))) {
             throw error;
         }
         console.error("Save schedule error:", error);
@@ -232,7 +232,7 @@ export async function createPendingAppointment(data: {
         return { success: true, appointmentId: apptResults[0].id };
 
     } catch (error: any) {
-        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || (error.message && error.message.includes('Dynamic server usage'))) {
             throw error;
         }
         console.error("Booking error details:", error);
@@ -259,7 +259,7 @@ export async function confirmAppointmentPayment(appointmentId: string) {
         revalidatePath("/psychologist/dashboard");
         revalidatePath("/psychologist/patients");
     } catch (error: any) {
-        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || (error.message && error.message.includes('Dynamic server usage'))) {
             throw error;
         }
         console.error("Error confirming payment:", error);

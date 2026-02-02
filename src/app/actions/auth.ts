@@ -105,17 +105,17 @@ export async function login(prevState: any, formData: FormData) {
     return { error: "No se pudo iniciar sesión." };
 }
 
-export const getCurrentUser = cache(async () => {
-    const cookieStore = await cookies();
-    const sessionId = cookieStore.get("session_id")?.value;
-    if (!sessionId) return null;
-
-    const supabase = getSupabase();
-    const { data: { user }, error } = await supabase.auth.getUser(sessionId);
-
-    if (error || !user) return null;
-
+export async function getCurrentUser() {
     try {
+        const cookieStore = await cookies();
+        const sessionId = cookieStore.get("session_id")?.value;
+        if (!sessionId) return null;
+
+        const supabase = getSupabase();
+        const { data: { user }, error } = await supabase.auth.getUser(sessionId);
+
+        if (error || !user) return null;
+
         // Fetch raw user data
         const result = await client`
             SELECT 
@@ -133,13 +133,13 @@ export const getCurrentUser = cache(async () => {
 
         return result[0] || null;
     } catch (e: any) {
-        if (e.digest === 'DYNAMIC_SERVER_USAGE' || e.message?.includes('cookies')) {
+        if (e.digest === 'DYNAMIC_SERVER_USAGE' || (e.message && e.message.includes('Dynamic server usage'))) {
             throw e;
         }
         console.error("Error getting current user:", e);
         return null;
     }
-});
+}
 
 export async function logout() {
     try {

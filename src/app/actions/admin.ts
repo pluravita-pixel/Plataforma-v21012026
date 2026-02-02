@@ -129,7 +129,7 @@ export async function createPsychologistProfile(name: string, email: string) {
         revalidatePath("/admin/dashboard");
         return { success: true, message: existing.length > 0 ? "Psicólogo actualizado correctamente" : "Psicólogo pre-registrado. Recibirá acceso al registrarse." };
     } catch (error: any) {
-        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || (error.message && error.message.includes('Dynamic server usage'))) {
             throw error;
         }
         console.error("Error:", error);
@@ -168,7 +168,7 @@ export async function preApproveAdmin(email: string) {
         revalidatePath("/admin/settings");
         return { success: true };
     } catch (error: any) {
-        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || (error.message && error.message.includes('Dynamic server usage'))) {
             throw error;
         }
         console.error("Error pre-approving admin:", error);
@@ -202,7 +202,7 @@ export async function updateAdminSelf(userId: string, data: { fullName: string; 
         revalidatePath("/admin/settings");
         return { success: true };
     } catch (error: any) {
-        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || (error.message && error.message.includes('Dynamic server usage'))) {
             throw error;
         }
         console.error("Error updating admin profile:", error);

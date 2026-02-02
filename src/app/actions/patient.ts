@@ -61,8 +61,7 @@ export async function getPatientDashboardData() {
             recommendedCoaches: coaches
         };
     } catch (error: any) {
-        // Re-throw dynamic server usage errors so Next.js handles them properly
-        if (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('cookies')) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || (error.message && error.message.includes('Dynamic server usage'))) {
             throw error;
         }
         console.error("Error in getPatientDashboardData:", error);
