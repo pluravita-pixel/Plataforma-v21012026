@@ -18,11 +18,17 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { NewPatientModal } from "@/components/new-patient-modal";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { getGlobalStats } from "@/app/actions/stats";
+import { useState, useEffect } from "react";
 
 const chartData: any[] = [];
 
 export default function OverviewPage() {
+    const [stats, setStats] = useState({ realUsers: 0, realSessions: 0, realCoaches: 0 });
+
+    useEffect(() => {
+        getGlobalStats().then(setStats);
+    }, []);
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
@@ -43,18 +49,18 @@ export default function OverviewPage() {
                         <Users className="h-4 w-4 text-primary" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">0</div>
-                        <p className="text-xs text-muted-foreground">0% desde el mes pasado</p>
+                        <div className="text-2xl font-bold">{stats.realUsers}</div>
+                        <p className="text-xs text-muted-foreground">Sistema activo</p>
                     </CardContent>
                 </Card>
                 <Card className="hover:shadow-md transition-shadow">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Sesiones Hoy</CardTitle>
+                        <CardTitle className="text-sm font-medium">Próximas Sesiones</CardTitle>
                         <Calendar className="h-4 w-4 text-primary" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">0</div>
-                        <p className="text-xs text-muted-foreground">0 pendientes para hoy</p>
+                        <div className="text-2xl font-bold">{stats.realSessions}</div>
+                        <p className="text-xs text-muted-foreground">Total en la plataforma</p>
                     </CardContent>
                 </Card>
                 <Card className="hover:shadow-md transition-shadow">
@@ -69,12 +75,12 @@ export default function OverviewPage() {
                 </Card>
                 <Card className="hover:shadow-md transition-shadow">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Actividad Real</CardTitle>
+                        <CardTitle className="text-sm font-medium">Coaches Registrados</CardTitle>
                         <Activity className="h-4 w-4 text-primary" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">0</div>
-                        <p className="text-xs text-muted-foreground">0 sesiones en curso</p>
+                        <div className="text-2xl font-bold">{stats.realCoaches}</div>
+                        <p className="text-xs text-muted-foreground">Disponibles ahora</p>
                     </CardContent>
                 </Card>
             </div>

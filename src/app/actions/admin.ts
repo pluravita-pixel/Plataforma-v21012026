@@ -16,40 +16,52 @@ async function ensureAdmin() {
 
 // Note: Make sure to import sql from drizzle-orm at the top
 export async function getAdminStats() {
-    await ensureAdmin();
+    try {
+        await ensureAdmin();
 
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
 
-    const endOfToday = new Date();
-    endOfToday.setHours(23, 59, 59, 999);
+        const endOfToday = new Date();
+        endOfToday.setHours(23, 59, 59, 999);
 
-    const [
-        totalUsersRes,
-        totalPsychologistsRes,
-        totalPatientsRes,
-        totalSessionsRes,
-        totalRevenueRes,
-        appointmentsTodayRes
-    ] = await Promise.all([
-        db.select({ value: count() }).from(users),
-        db.select({ value: count() }).from(users).where(eq(users.role, 'psychologist')),
-        db.select({ value: count() }).from(users).where(eq(users.role, 'patient')),
-        db.select({ value: count() }).from(appointments),
-        db.select({ value: sql<number>`sum(${appointments.price})` }).from(appointments),
-        db.select({ value: count() }).from(appointments).where(
-            sql`${appointments.date} >= ${startOfToday.toISOString()} AND ${appointments.date} <= ${endOfToday.toISOString()}`
-        )
-    ]);
+        const [
+            totalUsersRes,
+            totalPsychologistsRes,
+            totalPatientsRes,
+            totalSessionsRes,
+            totalRevenueRes,
+            appointmentsTodayRes
+        ] = await Promise.all([
+            db.select({ value: count() }).from(users),
+            db.select({ value: count() }).from(users).where(eq(users.role, 'psychologist')),
+            db.select({ value: count() }).from(users).where(eq(users.role, 'patient')),
+            db.select({ value: count() }).from(appointments),
+            db.select({ value: sql`sum(${appointments.price})` }).from(appointments),
+            db.select({ value: count() }).from(appointments).where(
+                sql`${appointments.date} >= ${startOfToday.toISOString()} AND ${appointments.date} <= ${endOfToday.toISOString()}`
+            )
+        ]);
 
-    return {
-        users: totalUsersRes[0].value,
-        psychologists: totalPsychologistsRes[0].value,
-        patients: totalPatientsRes[0].value,
-        sessions: totalSessionsRes[0].value,
-        revenue: Number(totalRevenueRes[0]?.value || 0),
-        appointmentsToday: appointmentsTodayRes[0].value,
-    };
+        return {
+            users: totalUsersRes[0]?.value || 0,
+            psychologists: totalPsychologistsRes[0]?.value || 0,
+            patients: totalPatientsRes[0]?.value || 0,
+            sessions: totalSessionsRes[0]?.value || 0,
+            revenue: Number(totalRevenueRes[0]?.value || 0),
+            appointmentsToday: appointmentsTodayRes[0]?.value || 0,
+        };
+    } catch (error) {
+        console.error("Error fetching admin stats:", error);
+        return {
+            users: 0,
+            psychologists: 0,
+            patients: 0,
+            sessions: 0,
+            revenue: 0,
+            appointmentsToday: 0,
+        };
+    }
 }
 
 export async function getAllUsers() {
