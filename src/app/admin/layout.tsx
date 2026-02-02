@@ -60,7 +60,6 @@ export default function AdminLayout({
                     ) : (
                         <div className="flex items-center gap-3">
                             <Logo className="w-32 h-10" />
-                            <span className="text-2xl font-black uppercase tracking-tighter border-l-4 border-black pl-3">Admin</span>
                         </div>
                     )}
                 </div>

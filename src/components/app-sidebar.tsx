@@ -107,7 +107,7 @@ export function AppSidebar() {
                         <AvatarFallback>AD</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-1 flex-col overflow-hidden">
-                        <span className="text-sm font-medium leading-none truncate">Admin</span>
+                        <span className="text-sm font-medium leading-none truncate">Usuario</span>
                         <span className="text-xs text-muted-foreground truncate">pluravita@gmail.com</span>
                     </div>
                     <AdminLogout />
