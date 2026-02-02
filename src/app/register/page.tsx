@@ -123,7 +123,7 @@ function RegisterForm() {
                                         {isCoach ? "Únete como Coach" : "Crea tu cuenta"}
                                     </h1>
                                     <p className="text-[#8B6B4E] font-medium text-sm lg:text-base">
-                                        {isCoach ? "Registra tus datos para unirte a nuestro equipo." : "Regístrate para empezar tu progreso."}
+                                        {isCoach ? "Registra tus datos para unirte a nuestro equipo." : ""}
                                     </p>
                                 </motion.div>
                             </div>

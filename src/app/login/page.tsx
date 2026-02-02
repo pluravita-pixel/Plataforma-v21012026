@@ -115,7 +115,6 @@ export default function LoginPage() {
                                     transition={{ delay: 0.3, duration: 0.6 }}
                                 >
                                     <h1 className="text-3xl lg:text-4xl font-black text-[#4A3C31] tracking-tight">Inicia sesión</h1>
-                                    <p className="text-[#8B6B4E] font-medium text-sm lg:text-base">Introduce tus credenciales para acceder.</p>
                                 </motion.div>
                             </div>
 
