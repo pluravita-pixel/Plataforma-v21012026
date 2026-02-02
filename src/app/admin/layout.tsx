@@ -56,7 +56,7 @@ export default function AdminLayout({
                     isCollapsed ? "justify-center px-0" : "px-8"
                 )}>
                     {isCollapsed ? (
-                        <Logo className="w-10 h-10" />
+                        <Logo minimal className="w-10 h-10" />
                     ) : (
                         <div className="flex items-center gap-3">
                             <Logo className="w-32 h-10" />

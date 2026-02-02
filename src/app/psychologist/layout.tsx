@@ -59,7 +59,7 @@ export default function PsychologistLayout({
                     isCollapsed ? "justify-center px-0" : "px-6"
                 )}>
                     {isCollapsed ? (
-                        <Logo className="w-10 h-10" />
+                        <Logo minimal className="w-10 h-10" />
                     ) : (
                         <Logo className="w-40 h-12" />
                     )}

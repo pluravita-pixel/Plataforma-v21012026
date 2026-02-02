@@ -6,9 +6,10 @@ import { cn } from "@/lib/utils";
 interface LogoProps {
     className?: string;
     variant?: "light" | "dark";
+    minimal?: boolean;
 }
 
-export function Logo({ className, variant = "dark" }: LogoProps) {
+export function Logo({ className, variant = "dark", minimal = false }: LogoProps) {
     return (
         <div className={cn(
             "flex items-center font-black tracking-tighter leading-none select-none",
@@ -17,7 +18,7 @@ export function Logo({ className, variant = "dark" }: LogoProps) {
         )}
         >
             <span className="text-2xl md:text-3xl lg:text-4xl">
-                Pluravita<span className="text-[#FF5F5F]">.</span>
+                {minimal ? "P" : "Pluravita"}<span className="text-[#FF5F5F]">.</span>
             </span>
         </div>
     );
