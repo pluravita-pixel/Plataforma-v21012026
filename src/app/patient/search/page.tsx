@@ -5,6 +5,7 @@ import { Search, Star, MessageSquare, Filter, SlidersHorizontal, Sparkles, UserC
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import Image from "next/image";
 import { getPsychologists } from "@/app/actions/psychologists";
 import { getCurrentUser } from "@/app/actions/auth";
 import { BookingModal } from "@/components/booking/BookingModal";
