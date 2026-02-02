@@ -50,51 +50,51 @@ export default function LandingPage() {
     };
 
     const landingStats = [
-        { number: "Transforma tu vida", label: "Tu proceso empieza hoy", quote: '"Cada persona tiene una historia única de cambio"' },
-        { number: "Sesiones a medida", label: "Adaptadas a ti", quote: '"Cada sesión es un paso hacia tu bienestar"' },
-        { number: "Acompañamiento real", label: "Más que tradición", quote: '"Personas que te entienden de verdad"' }
+        { number: "No estás solx", label: "Estamos contigo en esto", quote: '"A veces solo necesitas a alguien que no te juzgue"' },
+        { number: "A tu ritmo", label: "Sin presiones, solo tú", quote: '"Tu salud mental no tiene por qué ser una carga"' },
+        { number: "Conexión real", label: "Gente que vibra contigo", quote: '"Buscamos a la persona que realmente haga clic contigo"' }
     ];
 
     const faqs = [
         {
             question: "¿Qué es pluravita?",
-            answer: "Pluravita es una plataforma de bienestar que conecta a personas con coaches certificados en línea para sesiones de acompañamiento emocional y desarrollo personal. Ofrecemos un espacio seguro, privado y accesible desde cualquier lugar para que puedas trabajar en tu mejor versión."
+            answer: "Somos ese refugio digital donde puedes ser tú mismx. Una comunidad de coaches que no solo tienen títulos, sino que saben lo que es pasarlo mal y están aquí para escucharte sin filtros. Un espacio seguro, privado y pensado para tu generación."
         },
         {
-            question: "¿Cómo puedo pagar mis citas en pluravita?",
-            answer: "Aceptamos todas las tarjetas de crédito y débito (Visa, Mastercard, American Express). Todos los pagos se procesan de forma segura a través de nuestra plataforma, garantizando la protección de tus datos financieros."
+            question: "¿Cómo puedo pagar mis sesiones?",
+            answer: "Súper fácil y transparente. Aceptamos tus tarjetas de siempre (Visa, Mastercard, Amex). Todo el proceso es seguro para que lo único en lo que pienses sea en sentirte mejor."
         },
         {
-            question: "¿Qué puedo esperar de un proceso de coaching?",
-            answer: "El coaching es un proceso de acompañamiento donde trabajarás junto a un profesional para alcanzar tus objetivos, superar obstáculos y mejorar tu bienestar. Es un espacio libre de juicios, confidencial y enfocado en tu crecimiento personal y profesional."
+            question: "¿Qué puedo esperar de este proceso?",
+            answer: "Espera sentirte validado. No es una clase magistral ni alguien dándote lecciones, es una conversación real donde tú eres el protagonista y nosotros el apoyo que necesitas para ordenar el caos."
         },
         {
-            question: "¿Cuánto dura un proceso de coaching?",
-            answer: "La duración varía según cada persona y sus objetivos particulares. Algunos procesos pueden requerir pocas sesiones para temas puntuales, mientras que otros pueden extenderse para un trabajo más profundo. Tú y tu coach definirán juntos el ritmo y la duración adecuada."
+            question: "¿Cuánto tiempo dura esto?",
+            answer: "Lo que tú quieras. Aquí no hay cronómetros obligatorios ni contratos permanentes. Tú decides cuándo parar y cuándo seguir, respetando siempre tu propio ritmo y tus necesidades."
         },
         {
-            question: "¿Qué sucede en una sesión?",
-            answer: "En una sesión típica, conversarás con tu coach sobre tus retos y metas. El coach utilizará diversas técnicas y herramientas para ayudarte a ganar claridad, explorar nuevas perspectivas y definir planes de acción concretos para tu vida diaria."
+            question: "¿Qué pasa exactamente en una sesión?",
+            answer: "Es tu espacio. Hablarás de lo que te preocupa, de tus metas o simplemente de cómo te sientes hoy. Tu coach te escuchará y te dará herramientas prácticas para que puedas gestionar tu día a día con más calma."
         },
         {
-            question: "¿Cómo puedo saber si estoy progresando?",
-            answer: "Notarás cambios en tu forma de abordar situaciones cotidianas, mayor claridad mental, mejor gestión emocional y el cumplimiento de las metas que te trazaste al inicio. Además, revisarás periódicamente tus avances junto con tu coach."
+            question: "¿Cómo sé si estoy avanzando?",
+            answer: "Lo notarás cuando empieces a ver las cosas con más claridad, cuando esas situaciones que antes te agobiaban ya no pesen tanto y cuando sientas que tienes el control sobre tus emociones. Estaremos celebrando cada pequeño paso contigo."
         },
         {
-            question: "¿Cómo puedo elegir al coach adecuado?",
-            answer: "Contamos con un Test de Afinidad inteligente que te sugiere los coaches más compatibles contigo basándose en tus necesidades. También puedes explorar los perfiles detallados, ver sus videos de presentación y leer reseñas de otros usuarios."
+            question: "¿Cómo elijo a la persona adecuada?",
+            answer: "Tenemos un Test de Afinidad que hace el trabajo sucio por ti. Te sugerimos a los coaches que más encajan con tu personalidad para que no pierdas tiempo buscando. Queremos que el 'clic' sea inmediato."
         },
         {
-            question: "¿Qué requisitos cumplen los coaches de pluravita?",
-            answer: "Nuestros coaches son personas que te entienden de verdad. Ofrecemos una opción diferente a lo tradicional, centrada en tu bienestar y en una conexión humana real."
+            question: "¿Quiénes son los coaches?",
+            answer: "Son personas como tú, que entienden tu realidad. No usamos un lenguaje frío; buscamos una conexión humana real que te haga sentir que, al otro lado de la pantalla, hay alguien que de verdad te pilla."
         },
         {
-            question: "¿Qué enfoque es el mejor para mí?",
-            answer: "No existe un enfoque único para todos. Cada coach tiene especialidades diferentes (vida, carrera, relaciones, etc.). Nuestro sistema de recomendación te ayudará a encontrar el enfoque que mejor se alinee con lo que buscas trabajar."
+            question: "¿Qué enfoque me va mejor?",
+            answer: "Cada persona es un mundo, por eso tenemos especialistas en todo: ansiedad, carrera, relaciones... Nuestro sistema te ayudará a encontrar exactamente lo que tu mente está pidiendo ahora mismo."
         },
         {
-            question: "¿Es normal sentir nervios antes de empezar?",
-            answer: "¡Totalmente! Dar el primer paso hacia el autocuidado puede generar incertidumbre. Es una señal de que estás saliendo de tu zona de confort para crecer. Nuestros coaches están entrenados para crear un ambiente cálido y seguro desde el primer minuto."
+            question: "¿Es normal sentir nervios antes de la primera vez?",
+            answer: "¡Totalmente! A nosotros también nos pasaría. Es ese saltito al vacío que da vértigo, pero te prometemos que aquí abajo hay una red esperándote. El primer paso es el más valiente."
         }
     ];
 
@@ -107,12 +107,12 @@ export default function LandingPage() {
                     {/* Left Content */}
                     <div className="lg:col-span-5 space-y-8">
                         <h1 className="text-5xl lg:text-7xl font-bold text-[#4A3C31] leading-tight tracking-tight">
-                            Coaches en línea <br />
-                            <span className="text-[#A68363]">listos para ayudarte ahora</span>
+                            Encuentra a alguien que <br />
+                            <span className="text-[#A68363]">te escuche de verdad</span>
                         </h1>
 
                         <p className="text-lg text-[#6B6B6B] leading-relaxed max-w-xl">
-                            En pluravita puedes tomar coaching en línea por videollamada de forma fácil, segura y privada. Encuentra a tu coach online y comienza tu proceso hoy mismo. Desde <b>15€</b> por sesión.
+                            Sabemos que a veces el mundo pesa. En pluravita, conectas con coaches que entienden tu realidad, sin juicios y desde tu sofá. Un espacio seguro, privado y tan real como tú. Desde <b>15€</b>.
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-5 pt-4">
@@ -163,38 +163,35 @@ export default function LandingPage() {
 
             {/* How it Works Section */}
             <section className="container mx-auto px-6 md:px-12 lg:px-20 py-20 text-center">
-                <h2 className="text-3xl font-bold text-[#4A3C31] mb-4">¿Cómo funciona el coaching online?</h2>
-                <p className="text-[#6B6B6B] mb-16">Iniciar tu proceso con un coach en línea es muy fácil</p>
+                <h2 className="text-3xl font-bold text-[#4A3C31] mb-4">¿Cómo empezamos este viaje juntos?</h2>
+                <p className="text-[#6B6B6B] mb-16">Cero complicaciones, solo tres pasos para empezar a soltar lastre.</p>
 
                 <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
                     <div className="flex flex-col items-center space-y-4">
                         <div className="bg-[#F2EDE7] p-6 rounded-full h-40 w-40 flex items-center justify-center mb-4">
-                            {/* Search Icon Placeholder */}
                             <SearchIcon className="h-20 w-20 text-[#4A3C31]" />
                         </div>
-                        <h3 className="text-xl font-bold text-[#4A3C31]">Elige a tu coach en línea</h3>
+                        <h3 className="text-xl font-bold text-[#4A3C31]">Busca a tu aliado</h3>
                         <p className="text-[#6B6B6B] text-sm leading-relaxed">
-                            Navega por nuestro listado de coaches o utiliza nuestra herramienta de match para encontrar a tu coach ideal.
+                            Explora perfiles de personas reales. Mira sus vídeos, siente su vibra y elige a quien te dé más confianza.
                         </p>
                     </div>
                     <div className="flex flex-col items-center space-y-4">
                         <div className="bg-[#FFF5EB] p-6 rounded-full h-40 w-40 flex items-center justify-center mb-4">
-                            {/* Calendar Icon Placeholder */}
                             <CalendarIcon className="h-20 w-20 text-gray-700" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-800">Agenda una cita</h3>
+                        <h3 className="text-xl font-bold text-gray-800">Haz hueco en tu agenda</h3>
                         <p className="text-gray-600 text-sm leading-relaxed">
-                            Olvida el tráfico y las salas de espera. Elige el día y la hora que mejor se adapte a tu rutina, sin complicaciones.
+                            Sin llamadas incómodas. Elige el momento que prefieras y reserva en un clic. Así de simple, a tu manera.
                         </p>
                     </div>
                     <div className="flex flex-col items-center space-y-4">
                         <div className="bg-[#FFF5EB] p-6 rounded-full h-40 w-40 flex items-center justify-center mb-4">
-                            {/* Video Icon Placeholder */}
                             <VideoIcon className="h-20 w-20 text-gray-700" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-800">Inicia tu proceso de coaching</h3>
+                        <h3 className="text-xl font-bold text-gray-800">Suelta lo que llevas dentro</h3>
                         <p className="text-gray-600 text-sm leading-relaxed">
-                            Conéctate desde cualquier lugar con tu coach en un entorno seguro, cómodo y privado a través de pluravita.
+                            Conéctate desde donde quieras. Ponte cómodx, prepárate un café y simplemente deja que la conversación fluya.
                         </p>
                     </div>
                 </div>
@@ -214,8 +211,8 @@ export default function LandingPage() {
             <section id="trusted-psychologists" className="bg-white py-20 scroll-mt-20">
                 <div className="container mx-auto px-6 md:px-12 lg:px-20">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold text-[#4A3C31] mb-2">Coaches que te entienden de verdad</h2>
-                        <p className="text-[#6B6B6B]">Conoce nuestra garantía de primera cita</p>
+                        <h2 className="text-3xl font-bold text-[#4A3C31] mb-2">Queremos que hagas clic</h2>
+                        <p className="text-[#6B6B6B]">Tu primera sesión tiene red de seguridad</p>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
@@ -223,20 +220,20 @@ export default function LandingPage() {
                             {/* Mock Image */}
                             <Image
                                 src="/images/hero-illustration.jpg"
-                                alt="Sesión de coaching en grupo"
+                                alt="Sesión de coaching empática"
                                 fill
                                 className="object-cover"
                             />
                         </div>
                         <div className="space-y-6">
                             <p className="text-gray-700">
-                                Queremos que te sientas en confianza desde el primer momento.
+                                Lo más importante para nosotros es que te sientas realmente cómodocx desde el segundo uno.
                             </p>
                             <p className="text-gray-700">
-                                Si en tu primera cita no encuentras la conexión que necesitas con tu coach, no te preocupes, <span className="font-bold text-[#4A3C31]">puedes agendar otra sesión</span> con un nuevo coach <span className="font-bold text-[#4A3C31]">sin costo extra</span>, hasta que encuentres al ideal.
+                                Si en tu primera cita sientes que no hay química con tu coach, no te preocupes, lo entendemos perfectamente. <span className="font-bold text-[#4A3C31]">Te regalamos otra sesión</span> con un coach diferente <span className="font-bold text-[#4A3C31]">sin que pagues ni un euro más</span>.
                             </p>
                             <p className="text-[#6B6B6B]">
-                                Estamos aquí para acompañarte en cada paso de tu proceso terapéutico. <span className="font-bold text-[#4A3C31]">Tu tranquilidad siempre será nuestra prioridad.</span>
+                                Estamos aquí para que el camino sea fácil. <span className="font-bold text-[#4A3C31]">Tu tranquilidad y tu proceso son lo que de verdad nos importa.</span>
                             </p>
                             <Button
                                 asChild
@@ -255,18 +252,18 @@ export default function LandingPage() {
                 <div className="grid md:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
                     <div className="space-y-6 order-2 md:order-1">
                         <h2 className="text-3xl font-bold text-[#4A3C31] leading-tight">
-                            Personas que te entienden de verdad
+                            Gente real para problemas reales
                         </h2>
                         <div className="space-y-4 text-[#6B6B6B]">
                             <p>
-                                Somos una opción diferente a lo tradicional. Encuentra el acompañamiento que necesitas con coaches que conectan contigo y tu realidad.
+                                No somos la típica plataforma corporativa y fría. Somos una comunidad de personas que entienden que la vida puede ser caótica y que a veces solo necesitas a alguien que hable tu mismo idioma.
                             </p>
                             <p>
-                                Con horarios disponibles de lunes a domingo, <span className="font-bold">podrás comenzar</span> tu proceso de coaching en línea <span className="font-bold">en el momento que lo necesites.</span>
+                                Sin esperas infinitas. Con horarios flexibles de lunes a domingo, <span className="font-bold">podrás hablar con alguien</span> en el momento exacto <span className="font-bold">en que más lo necesites.</span>
                             </p>
                         </div>
                         <div className="pt-4">
-                            <p className="text-[#4A3C31] font-medium mb-6">Haz de tu paz mental una prioridad. ¿Comenzamos juntos?</p>
+                            <p className="text-[#4A3C31] font-medium mb-6">Tu paz mental no es un lujo, es tu prioridad. ¿Empezamos por aquí?</p>
                             <Button
                                 onClick={handleAnsweringClick}
                                 className="neo-btn-primary h-16 w-full md:w-auto"
@@ -291,7 +288,7 @@ export default function LandingPage() {
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl font-bold text-[#4A3C31]">
-                            Encuentra a tu coach en línea con <br /> nuestro Test de Afinidad de Coaching
+                            Deja que te ayudemos a encontrar <br /> a tu "Match" emocional
                         </h2>
                     </div>
 
@@ -299,20 +296,20 @@ export default function LandingPage() {
                         <div className="relative rounded-3xl overflow-hidden shadow-xl h-[400px]">
                             <Image
                                 src="/images/team.png"
-                                alt="Crecimiento personal"
+                                alt="Crecimiento personal real"
                                 fill
                                 className="object-cover"
                             />
                         </div>
                         <div className="space-y-6">
                             <p className="text-gray-700">
-                                Conectar con el coach adecuado es fundamental para que tu proceso sea realmente efectivo.
+                                Sabemos que elegir a alguien para contarle tus cosas puede dar un poco de parálisis por análisis.
                             </p>
                             <p className="text-gray-700">
-                                Por eso, desarrollamos un Test de Afinidad, <span className="font-bold">diseñado para ayudarte a encontrar al coach que mejor se adapte a tus necesidades y objetivos.</span>
+                                Por eso creamos nuestro Test de Afinidad. No es un examen, <span className="font-bold">es una forma de conocerte para recomendarte a alguien que realmente vibre con lo que buscas.</span>
                             </p>
                             <p className="text-gray-700">
-                                Tómate unos minutos para responder nuestro test, descubre a tu coach ideal y comienza tu proceso de forma <span className="font-bold">fácil, segura y privada</span> en pluravita.
+                                Tómate un minuto, descubre quién es tu coach ideal y quítate un peso de encima. <span className="font-bold">Fácil, seguro y diseñado para que te sientas cómodx.</span>
                             </p>
                             <Button
                                 onClick={handleAnsweringClick}
