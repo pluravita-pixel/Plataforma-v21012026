@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, Eye, EyeOff, LayoutDashboard, LogIn } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { Logo } from "@/components/logo";
 import { motion, AnimatePresence } from "framer-motion";
 
 function SubmitButton() {
@@ -45,26 +46,6 @@ export default function LoginPage() {
             {/* Background Decorative Elements */}
             <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[#A68363]/10 rounded-full blur-[120px] animate-pulse" />
             <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-[#4A3C31]/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
-
-            {/* Top Logo */}
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="absolute top-6 left-6 lg:top-10 lg:left-10 z-20"
-            >
-                <Link href="/" className="flex items-center no-underline hover:opacity-80 transition-opacity">
-                    <div className="relative w-64 h-16 overflow-hidden flex items-center justify-center">
-                        <Image
-                            src="/logo.png"
-                            alt="pluravita Logo"
-                            width={500}
-                            height={500}
-                            className="h-44 w-auto object-contain mix-blend-multiply brightness-105"
-                            priority
-                        />
-                    </div>
-                </Link>
-            </motion.div>
 
             <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}

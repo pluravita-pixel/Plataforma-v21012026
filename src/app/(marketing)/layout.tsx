@@ -18,12 +18,14 @@ export default function MarketingLayout({
 }) {
     const { openAffinityModal } = useModals();
     const router = useRouter();
+    const [user, setUser] = useState<any>(null);
     const [hasCompletedTest, setHasCompletedTest] = useState(false);
 
     useEffect(() => {
-        getCurrentUser().then(user => {
-            if (user) {
-                setHasCompletedTest(user.hasCompletedAffinity);
+        getCurrentUser().then(u => {
+            if (u) {
+                setUser(u);
+                setHasCompletedTest(u.hasCompletedAffinity);
             }
         });
     }, []);
@@ -55,7 +57,13 @@ export default function MarketingLayout({
                         </Link>
                         <Link href="#" className="text-[#6B6B6B] hover:text-[#A68363] transition-colors">Precios</Link>
                         <Link href="#faq" className="text-[#6B6B6B] hover:text-[#A68363] transition-colors">Preguntas frecuentes</Link>
-                        <Link href="/register?role=coach" className="text-[#A68363] font-bold border-l pl-8 hover:opacity-80 transition-opacity">Únete como coach</Link>
+                        {user?.role === 'psychologist' ? (
+                            <Link href="/psychologist/dashboard" className="text-[#A68363] font-bold border-l pl-8 hover:opacity-80 transition-opacity">Panel de Coach</Link>
+                        ) : user ? (
+                            <Link href="/coach-onboarding" className="text-[#A68363] font-bold border-l pl-8 hover:opacity-80 transition-opacity">Únete como coach</Link>
+                        ) : (
+                            <Link href="/register?role=coach" className="text-[#A68363] font-bold border-l pl-8 hover:opacity-80 transition-opacity">Únete como coach</Link>
+                        )}
                     </nav>
 
                     {/* Auth Buttons */}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Logo } from "@/components/logo";
 import {
     LayoutDashboard,
     UserPlus,
@@ -27,6 +28,7 @@ export default function AdminLayout({
 
     const navItems = [
         { icon: LayoutDashboard, label: "Resumen", href: "/admin/dashboard" },
+        { icon: ShieldCheck, label: "Coaches Pendientes", href: "/admin/coaches-pending" },
         { icon: UserPlus, label: "Añadir Coach", href: "/admin/add-psychologist" },
         { icon: MessageCircle, label: "Soporte", href: "/admin/support" },
         { icon: Settings, label: "Configuración", href: "/admin/settings" },
@@ -50,11 +52,17 @@ export default function AdminLayout({
                 </button>
 
                 <div className={cn(
-                    "p-8 flex items-center gap-3 text-black font-black tracking-tighter border-b-4 border-black transition-all duration-300",
+                    "p-8 flex items-center gap-3 text-black transition-all duration-300 overflow-hidden",
                     isCollapsed ? "justify-center px-0" : "px-8"
                 )}>
-                    <ShieldCheck className="h-10 w-10 shrink-0 fill-current" />
-                    {!isCollapsed && <span className="text-3xl uppercase">Admin</span>}
+                    {isCollapsed ? (
+                        <Logo className="w-10 h-10" />
+                    ) : (
+                        <div className="flex items-center gap-3">
+                            <Logo className="w-32 h-10" />
+                            <span className="text-2xl font-black uppercase tracking-tighter border-l-4 border-black pl-3">Admin</span>
+                        </div>
+                    )}
                 </div>
 
                 <nav className="flex-1 px-4 py-10 space-y-4">

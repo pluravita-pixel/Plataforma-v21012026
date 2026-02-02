@@ -1,15 +1,17 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, Suspense } from "react";
 import { useFormStatus } from "react-dom";
 import { register } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Eye, EyeOff, LayoutDashboard, UserPlus } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, UserPlus } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { Logo } from "@/components/logo";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSearchParams } from "next/navigation";
 
 function SubmitButton() {
     const { pending } = useFormStatus();
@@ -36,42 +38,19 @@ function SubmitButton() {
     );
 }
 
-export default function RegisterPage() {
+function RegisterForm() {
+    const searchParams = useSearchParams();
+    const role = searchParams.get("role") || "";
+    const isCoach = role === "coach";
+
     const [state, formAction] = useActionState(register, null);
     const [showPassword, setShowPassword] = useState(false);
-    const [role] = useState(() => {
-        if (typeof window !== "undefined") {
-            return new URLSearchParams(window.location.search).get("role") || "";
-        }
-        return "";
-    });
-    const isCoach = role === "coach";
 
     return (
         <div className="min-h-dvh bg-[#F9F5F0] flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden bg-noise">
             {/* Background Decorative Elements */}
             <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[#A68363]/10 rounded-full blur-[120px] animate-pulse" />
             <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-[#4A3C31]/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
-
-            {/* Top Logo */}
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="absolute top-6 left-6 lg:top-10 lg:left-10 z-20"
-            >
-                <Link href="/" className="flex items-center no-underline hover:opacity-80 transition-opacity">
-                    <div className="relative w-64 h-16 overflow-hidden flex items-center justify-center">
-                        <Image
-                            src="/logo.png"
-                            alt="pluravita Logo"
-                            width={500}
-                            height={500}
-                            className="h-44 w-auto object-contain mix-blend-multiply brightness-105"
-                            priority
-                        />
-                    </div>
-                </Link>
-            </motion.div>
 
             <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -259,5 +238,13 @@ export default function RegisterPage() {
                 <span className="cursor-pointer hover:text-gray-600 transition-colors">Privacidad</span>
             </div>
         </div>
+    );
+}
+
+export default function RegisterPage() {
+    return (
+        <Suspense fallback={<div className="min-h-dvh bg-[#F9F5F0]" />}>
+            <RegisterForm />
+        </Suspense>
     );
 }

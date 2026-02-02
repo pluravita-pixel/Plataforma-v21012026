@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Logo } from "@/components/logo";
 import {
     LayoutDashboard,
     Users,
@@ -54,27 +55,13 @@ export default function PsychologistLayout({
                 </button>
 
                 <div className={cn(
-                    "p-6 flex items-center transition-all duration-300",
-                    isCollapsed ? "justify-center px-2" : "px-6"
+                    "p-6 flex items-center transition-all duration-300 overflow-hidden",
+                    isCollapsed ? "justify-center px-0" : "px-6"
                 )}>
                     {isCollapsed ? (
-                        <div className="w-10 h-10 relative shrink-0">
-                            <Image
-                                src="/logo.png"
-                                alt="pluravita Logo"
-                                fill
-                                className="object-contain mix-blend-multiply"
-                            />
-                        </div>
+                        <Logo className="w-10 h-10" />
                     ) : (
-                        <Image
-                            src="/logo.png"
-                            alt="pluravita Logo"
-                            width={160}
-                            height={48}
-                            className="h-10 w-auto object-contain mix-blend-multiply"
-                            priority
-                        />
+                        <Logo className="w-40 h-12" />
                     )}
                 </div>
 

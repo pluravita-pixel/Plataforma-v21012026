@@ -65,8 +65,8 @@ export async function login(prevState: any, formData: FormData) {
                 const usersResult = await client`
                     UPDATE users 
                     SET last_login = NOW() 
-                    WHERE id = ${data.user.id} 
-                    RETURNING role
+                    WHERE id = ${data.user.id}::uuid 
+                    RETURNING role, has_pending_application as "hasPendingApplication"
                 `;
 
                 const user = usersResult[0];
@@ -79,12 +79,12 @@ export async function login(prevState: any, formData: FormData) {
                     if (user.role === 'admin') {
                         redirectPath = "/admin/dashboard";
                     } else if (user.role === 'psychologist') {
-                        // Actualizamos psicólogos de forma asíncrona (opcionalmente) o rápida
-                        // Aquí lo mantenemos para asegurar consistencia, pero es una sola query ahora.
                         await client`
-                            UPDATE psychologists SET last_login = NOW() WHERE user_id = ${data.user.id}
+                            UPDATE psychologists SET last_login = NOW() WHERE user_id = ${data.user.id}::uuid
                         `;
                         redirectPath = "/psychologist/dashboard";
+                    } else if (user.hasPendingApplication) {
+                        redirectPath = "/coach-onboarding";
                     } else {
                         redirectPath = "/patient/dashboard";
                     }
@@ -170,7 +170,13 @@ export async function register(prevState: any, formData: FormData) {
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
-            options: { data: { full_name: fullName } }
+            options: {
+                emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+                data: {
+                    full_name: fullName,
+                    is_coach_application: isCoachApplication
+                }
+            }
         });
 
         if (error) return { error: error.message };
@@ -207,21 +213,29 @@ export async function register(prevState: any, formData: FormData) {
                 // New User Registration
                 await client`
                     INSERT INTO users (id, email, full_name, role)
-                    VALUES (${data.user.id}, ${email}, ${fullName}, 'patient')
+                    VALUES (${data.user.id}::uuid, ${email}::text, ${fullName}::text, 'patient')
                 `;
 
                 // If it's a coach application, create a support ticket for admin
                 if (isCoachApplication) {
+                    const ticketMessage = `El usuario ${fullName} (${email}) se ha registrado y desea ser Coach. Verifique su perfil.`;
                     await client`
                         INSERT INTO support_tickets (user_id, subject, message, status)
-                        VALUES (${data.user.id}, 'Nueva solicitud de Coach', 'El usuario ${fullName} (${email}) se ha registrado y desea ser Coach. Aquí les aceptará este psicólogo. Una vez verificado, cambie su rol a "psychologist" en la sección de usuarios.', 'open')
+                        VALUES (${data.user.id}::uuid, 'Nueva solicitud de Coach', ${ticketMessage}::text, 'open')
                     `;
                 }
             }
 
             // Determine Success Message / Redirect
             if (isCoachApplication) {
-                return { success: "¡Registro de coach recibido! Un administrador revisará tu solicitud. En un plazo de 24 a 72 horas recibirás una respuesta." };
+                const cookieStore = await cookies();
+                cookieStore.set("session_id", data.session?.access_token || "", {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    maxAge: data.session?.expires_in || 3600,
+                    path: "/",
+                });
+                redirect("/coach-onboarding");
             }
 
             // Auto-login if session exists

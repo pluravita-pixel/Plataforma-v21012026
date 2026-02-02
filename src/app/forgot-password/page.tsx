@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, MessageCircle, KeyRound, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { Logo } from "@/components/logo";
 import { motion, AnimatePresence } from "framer-motion";
 
 function SubmitButton() {
@@ -49,15 +50,8 @@ export default function ForgotPasswordPage() {
                 className="absolute top-6 left-6 lg:top-10 lg:left-10 z-20"
             >
                 <Link href="/" className="flex items-center no-underline hover:opacity-80 transition-opacity">
-                    <div className="relative w-64 h-16 overflow-hidden flex items-center justify-center">
-                        <Image
-                            src="/logo.png"
-                            alt="pluravita Logo"
-                            width={500}
-                            height={500}
-                            className="h-44 w-auto object-contain mix-blend-multiply brightness-105"
-                            priority
-                        />
+                    <div className="flex items-center justify-center">
+                        <Logo className="w-64 h-16" />
                     </div>
                 </Link>
             </motion.div>

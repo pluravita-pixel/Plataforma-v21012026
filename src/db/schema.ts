@@ -10,6 +10,21 @@ export const users = pgTable("users", {
   sessionsCount: integer("sessions_count").default(0),
   lastLogin: timestamp("last_login"),
   hasCompletedAffinity: boolean("has_completed_affinity").default(false).notNull(),
+  hasPendingApplication: boolean("has_pending_application").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const coachApplications = pgTable("coach_applications", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  studies: text("studies"),
+  motivation: text("motivation"),
+  languages: text("languages"), // Comma separated or JSON text
+  interviewAvailability: text("interview_availability"), // Preferencia horaria para entrevista
+  status: text("status").default("pending").notNull(), // pending, accepted, rejected
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -139,6 +154,8 @@ export type Withdrawal = typeof withdrawals.$inferSelect;
 export type NewWithdrawal = typeof withdrawals.$inferInsert;
 export type DiscountCode = typeof discountCodes.$inferSelect;
 export type NewDiscountCode = typeof discountCodes.$inferInsert;
+export type CoachApplication = typeof coachApplications.$inferSelect;
+export type NewCoachApplication = typeof coachApplications.$inferInsert;
 
 export const availabilitySlots = pgTable("availability_slots", {
   id: uuid("id").primaryKey().defaultRandom(),
