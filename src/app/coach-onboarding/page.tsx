@@ -31,26 +31,32 @@ export default function CoachOnboardingPage() {
 
     if (!user) return null;
 
+    // Si el usuario es rechazado, mostramos el mensaje de rechazo
+    // (Esto se basa en si el usuario ya no existe en la DB o si tenemos una marca,
+    // pero como el usuario pidió borrarlo, el getCurrentUser devolverá null o error.
+    // Sin embargo, para una mejor UX, el sistema de borrado de handleCoachApplication
+    // borrará al usuario. Si el usuario intenta entrar de nuevo, no tendrá cuenta.)
+
     if (state?.success) {
         return (
-            <div className="min-h-screen bg-[#F9F5F0] flex flex-col items-center justify-center p-6">
+            <div className="min-h-screen bg-[#F9F5F0] flex flex-col items-center justify-center p-6 text-center">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="max-w-md w-full bg-white rounded-[2.5rem] p-12 text-center shadow-xl border border-[#A68363]/5"
+                    className="max-w-md w-full bg-white rounded-[2.5rem] p-12 shadow-xl border border-[#A68363]/5"
                 >
                     <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-8">
                         <CheckCircle2 className="h-10 w-10 text-green-500" />
                     </div>
-                    <h1 className="text-3xl font-black text-[#4A3C31] mb-4">Solicitud enviada</h1>
+                    <h1 className="text-3xl font-black text-[#4A3C31] mb-4 text-balance leading-tight">¡Solicitud enviada con éxito!</h1>
                     <p className="text-[#6B6B6B] leading-relaxed mb-8">
-                        Hemos recibido tu solicitud para unirte como coach. Nuestro equipo la revisará y te contactaremos por email en los próximos días.
+                        Hemos recibido tu solicitud para formar parte de nuestro equipo de coaches. Un administrador la revisará cuidadosamente y recibirás una respuesta por email muy pronto.
                     </p>
                     <Button
                         asChild
                         className="w-full bg-[#A68363] hover:bg-[#8B6B4E] h-14 rounded-xl font-bold text-lg"
                     >
-                        <a href="/">Volver al inicio</a>
+                        <a href="/">Volver a Pluravita</a>
                     </Button>
                 </motion.div>
             </div>

@@ -60,38 +60,41 @@ export async function handleCoachApplication(applicationId: string, action: 'acc
         if (action === 'accept') {
             // 1. Change user role to psychologist
             await client`
-                UPDATE users SET role = 'psychologist', has_pending_application = false WHERE id = ${application.user_id}
+                UPDATE users SET role = 'psychologist', has_pending_application = false WHERE id = ${application.user_id}::uuid
             `;
 
             // 2. Create psychologist profile
             // We use the full name and email from the application
             await client`
                 INSERT INTO psychologists (user_id, full_name, email)
-                VALUES (${application.user_id}, ${application.full_name}, ${application.email})
+                VALUES (${application.user_id}::uuid, ${application.full_name}, ${application.email})
             `;
 
             // 3. Update application status
             await client`
-                UPDATE coach_applications SET status = 'accepted' WHERE id = ${applicationId}
+                UPDATE coach_applications SET status = 'accepted' WHERE id = ${applicationId}::uuid
+            `;
+        } else {
+            // Reject: Delete everything mentioned
+            // 1. Delete application first (foreign key)
+            await client`
+                DELETE FROM coach_applications WHERE id = ${applicationId}::uuid
             `;
 
-            // NOTE: Future implementation - Send acceptance email here
-            /* 
-               await sendEmail({
-                  to: application.email,
-                  subject: "¡Bienvenido a pluravita! Tu solicitud ha sido aceptada",
-                  text: "..."
-               });
-            */
-        } else {
-            // Reject
+            // 2. Delete support ticket
             await client`
-                UPDATE users SET has_pending_application = false WHERE id = ${application.user_id}
+                DELETE FROM support_tickets WHERE user_id = ${application.user_id}::uuid AND subject = 'Nueva solicitud de Coach'
             `;
+
+            // 3. Delete user
             await client`
-                UPDATE coach_applications SET status = 'rejected' WHERE id = ${applicationId}
+                DELETE FROM users WHERE id = ${application.user_id}::uuid
             `;
+
+            // NOTE: Technically we could keep the application record with 'rejected' status 
+            // but the user requested "que lo quite" (to remove it).
         }
+
 
         revalidatePath("/admin/dashboard");
         return { success: `Solicitud ${action === 'accept' ? 'aceptada' : 'rechazada'} correctamente.` };
