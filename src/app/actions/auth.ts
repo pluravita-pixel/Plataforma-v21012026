@@ -82,9 +82,8 @@ export async function login(prevState: any, formData: FormData) {
                     console.error("Usuario autenticado pero no encontrado en tabla users DB");
                     redirectPath = "/patient/dashboard";
                 } else {
-                    // Si es psicólogo, actualizamos de forma "fire and forget" si es posible, 
-                    // o combinamos si es crítico, pero para no retrasar mucho:
-                    if (user.role === 'psychologist') {
+                    // Si es psicólogo o coach (por si acaso se usa ese término en la DB)
+                    if (user.role === 'psychologist' || user.role === 'coach') {
                         // Lo hacemos lo más rápido posible
                         await client`UPDATE psychologists SET last_login = NOW() WHERE user_id = ${data.user.id}::uuid`;
                         redirectPath = "/psychologist/dashboard";
@@ -93,9 +92,21 @@ export async function login(prevState: any, formData: FormData) {
                     } else if (user.hasPendingApplication) {
                         redirectPath = "/coach-onboarding";
                     } else {
-                        redirectPath = "/patient/dashboard";
+                        // Verificación adicional: ¿Tiene una solicitud aceptada?
+                        const acceptedApp = await client`
+                            SELECT id FROM coach_applications 
+                            WHERE user_id = ${data.user.id}::uuid AND status = 'accepted'
+                            LIMIT 1
+                        `;
+
+                        if (acceptedApp.length > 0) {
+                            redirectPath = "/psychologist/dashboard";
+                        } else {
+                            redirectPath = "/patient/dashboard";
+                        }
                     }
                 }
+
 
             } catch (dbError) {
                 console.error("Error crítico de base de datos al login:", dbError);
