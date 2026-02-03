@@ -49,6 +49,7 @@ const mapPsychologist = (p: any) => p ? ({
     completedSessions: p.completed_sessions,
     createdAt: p.created_at,
     refCode: p.ref_code,
+    meetingLink: p.meeting_link,
 }) : null;
 
 export async function refreshPsychologistStats(psychologistId: string) {
@@ -169,6 +170,7 @@ export async function updatePsychologistSettings(userId: string, data: {
     specialty?: string;
     price?: number | string;
     languages?: string[];
+    meetingLink?: string;
 }) {
     const user = await ensurePsychologist();
     if (userId !== user.id && user.role !== 'admin') {
@@ -187,6 +189,7 @@ export async function updatePsychologistSettings(userId: string, data: {
     if (data.specialty !== undefined) updateObj.specialty = data.specialty;
     if (data.price !== undefined) updateObj.price = data.price;
     if (data.languages !== undefined) updateObj.languages = data.languages;
+    if (data.meetingLink !== undefined) updateObj.meeting_link = data.meetingLink;
 
     // Ensure referral code
     const current = await client`SELECT ref_code FROM psychologists WHERE user_id = ${userId}`;

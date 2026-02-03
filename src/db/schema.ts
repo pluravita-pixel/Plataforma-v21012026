@@ -48,6 +48,7 @@ export const psychologists = pgTable("psychologists", {
   balance: decimal("balance", { precision: 10, scale: 2 }).default("0.00"),
   price: decimal("price", { precision: 10, scale: 2 }).default("35.00"),
   tags: text("tags").array(), // For experience tags
+  meetingLink: text("meeting_link"), // Fixed link for Zoom / Google Meet
   createdAt: timestamp("created_at").defaultNow().notNull(),
   lastLogin: timestamp("last_login"), // Specifically requested for this table too
 });

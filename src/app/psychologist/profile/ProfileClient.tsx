@@ -30,6 +30,7 @@ interface ProfileClientProps {
         languages: string[] | null;
         tags: string[] | null;
         refCode?: string | null;
+        meetingLink?: string | null;
     };
 }
 
@@ -44,7 +45,8 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
         image: psychologist.image || "",
         price: psychologist.price || "35.00",
         languages: psychologist.languages || ["Español"],
-        tags: psychologist.tags || []
+        tags: psychologist.tags || [],
+        meetingLink: psychologist.meetingLink || ""
     });
     const [newTag, setNewTag] = useState("");
     const [isSaving, setIsSaving] = useState(false);
@@ -118,7 +120,8 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                 username: profile.username.toLowerCase().replace(/\s+/g, '-'),
                 languages: profile.languages,
                 tags: profile.tags,
-                image: profile.image || undefined
+                image: profile.image || undefined,
+                meetingLink: profile.meetingLink
             });
             toast.success("Perfil actualizado con éxito");
         } catch (error) {
@@ -271,6 +274,20 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                                             />
                                         </div>
                                     </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-600">Link de Zoom / Sesión (PMI) *</label>
+                                    <div className="relative">
+                                        <Camera className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                        <input
+                                            type="text"
+                                            className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all font-mono"
+                                            value={profile.meetingLink}
+                                            onChange={(e) => setProfile({ ...profile, meetingLink: e.target.value })}
+                                            placeholder="https://zoom.us/j/tu-pmi-o-sala"
+                                        />
+                                    </div>
+                                    <p className="text-[10px] text-gray-400 italic">Aquí debes poner tu Sala de Reunión Personal habitual de Zoom o Google Meet.</p>
                                 </div>
 
                                 <div className="space-y-2">

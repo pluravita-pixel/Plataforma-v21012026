@@ -33,7 +33,8 @@ export default async function ProfilePage() {
                 image: psychologist.image,
                 price: psychologist.price,
                 languages: psychologist.languages,
-                tags: psychologist.tags
+                tags: psychologist.tags,
+                meetingLink: psychologist.meetingLink
             }}
         />
     );

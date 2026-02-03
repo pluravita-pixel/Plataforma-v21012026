@@ -2,9 +2,8 @@ export const dynamic = 'force-dynamic';
 import { getCurrentUser } from "@/app/actions/auth";
 import { client } from "@/db";
 import { redirect } from "next/navigation";
-import MeetingRoom from "@/components/meeting/MeetingRoom";
 import { Card } from "@/components/ui/card";
-import { VideoOff } from "lucide-react";
+import { VideoOff, Video } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -27,6 +26,7 @@ export default async function SessionPage({ params }: SessionPageProps) {
                 a.*,
                 p.user_id as psychologist_user_id,
                 p.full_name as psychologist_name,
+                p.meeting_link as psychologist_meeting_link,
                 u.full_name as patient_name
             FROM appointments a
             JOIN psychologists p ON a.psychologist_id = p.id
@@ -90,18 +90,56 @@ export default async function SessionPage({ params }: SessionPageProps) {
             );
         }
 
-        // Pass necessary data to the Client Component
-        const sessionProps = {
-            appointmentId: appointment.id,
-            startTime: appointment.date ? new Date(appointment.date).toISOString() : new Date().toISOString(),
-            userRole: isPsychologist ? 'psychologist' : 'patient' as 'psychologist' | 'patient',
-            userName: isPsychologist ? appointment.psychologist_name : (appointment.patient_name || user.fullName),
-            userEmail: user.email,
-            patientId: appointment.patient_id,
-            psychologistId: appointment.psychologist_id
-        };
+        if (!appointment.psychologist_meeting_link) {
+            return (
+                <div className="flex h-screen items-center justify-center bg-neutral-50 p-6">
+                    <Card className="p-12 text-center max-w-md bg-white rounded-[2.5rem] border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
+                        <VideoOff className="w-16 h-16 mx-auto text-red-500 mb-6" />
+                        <h1 className="text-2xl font-black uppercase italic mb-4">Link no disponible</h1>
+                        <p className="text-gray-600 font-bold mb-8 uppercase text-xs tracking-tight">
+                            El coach aún no ha configurado su link de Zoom/Sesión. Por favor, contacta con soporte o espera a que el profesional lo añada a su perfil.
+                        </p>
+                        <Button asChild className="w-full h-14 rounded-none border-4 border-black bg-black text-white font-black uppercase hover:bg-gray-800 transition-all shadow-[6px_6px_0px_0px_rgba(166,131,99,1)]">
+                            <Link href="/">Volver</Link>
+                        </Button>
+                    </Card>
+                </div>
+            );
+        }
 
-        return <MeetingRoom {...sessionProps} />;
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-[#F9F5F0] p-6">
+                <Card className="p-12 text-center max-w-lg bg-white rounded-[3rem] border border-[#A68363]/10 shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-2 bg-[#A68363]"></div>
+
+                    <div className="w-24 h-24 bg-[#A68363]/10 rounded-full flex items-center justify-center mx-auto mb-8">
+                        <Video className="w-10 h-10 text-[#A68363]" />
+                    </div>
+
+                    <h1 className="text-3xl font-black text-[#4A3C31] mb-2 text-balance leading-tight">
+                        Tu sesión con {appointment.psychologist_name} está lista
+                    </h1>
+                    <p className="text-[#6B6B6B] leading-relaxed mb-10 text-sm">
+                        Al hacer clic en el botón de abajo, serás redirigido a la sala de Zoom externa del profesional. Por favor, asegúrate de tener instalada la aplicación de Zoom.
+                    </p>
+
+                    <div className="space-y-4">
+                        <Button asChild className="w-full h-16 rounded-2xl bg-[#A68363] hover:bg-[#8B6B4E] text-white font-black text-lg shadow-lg hover:shadow-xl transition-all group">
+                            <a href={appointment.psychologist_meeting_link} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3">
+                                ENTRAR A LA SESIÓN (ZOOM)
+                                <span className="p-1 bg-white/20 rounded-lg group-hover:translate-x-1 transition-transform">
+                                    <Video className="h-5 w-5" />
+                                </span>
+                            </a>
+                        </Button>
+
+                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest pt-4">
+                            ID DE SESIÓN: {id.slice(0, 8)}...
+                        </p>
+                    </div>
+                </Card>
+            </div>
+        );
 
     } catch (error) {
         console.error("Error accessing session:", error);
