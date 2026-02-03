@@ -28,7 +28,8 @@ export default function AdminLayout({
 
     const navItems = [
         { icon: LayoutDashboard, label: "Resumen", href: "/admin/dashboard" },
-        { icon: ShieldCheck, label: "Coaches Pendientes", href: "/admin/coaches-pending" },
+        { icon: Users, label: "Gestionar Coaches", href: "/admin/coaches" },
+        { icon: ShieldCheck, label: "Solicitudes", href: "/admin/coaches-pending" },
         { icon: UserPlus, label: "Añadir Coach", href: "/admin/add-psychologist" },
         { icon: MessageCircle, label: "Soporte", href: "/admin/support" },
         { icon: Settings, label: "Configuración", href: "/admin/settings" },

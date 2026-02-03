@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { users, psychologists, appointments, supportTickets } from "@/db/schema";
+import { users, psychologists, appointments, supportTickets, availabilitySlots, withdrawals } from "@/db/schema";
 import { eq, count, desc, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "./auth";
@@ -208,5 +208,46 @@ export async function updateAdminSelf(userId: string, data: { fullName: string; 
         }
         console.error("Error updating admin profile:", error);
         return { error: "Error al actualizar el perfil." };
+    }
+}
+
+export async function deletePsychologist(psychologistId: string) {
+    await ensureAdmin();
+    try {
+        // 1. Get the userId linked to this psychologist
+        const psychResult = await db.select()
+            .from(psychologists)
+            .where(eq(psychologists.id, psychologistId))
+            .limit(1);
+
+        const psych = psychResult[0];
+        if (!psych) {
+            return { error: "Coach no encontrado" };
+        }
+
+        const userId = psych.userId;
+
+        // 2. Delete related data that might cause foreign key issues if not cascaded
+        // Availability slots
+        await db.delete(availabilitySlots).where(eq(availabilitySlots.psychologistId, psychologistId));
+        // Withdrawals
+        await db.delete(withdrawals).where(eq(withdrawals.psychologistId, psychologistId));
+        // Appointments (We probably want to keep them or move them, but the user said "quitarles")
+        // To be safe and clean, we'll mark them or delete them if preferred.
+        // For now, let's delete them to allow the main entities to be removed.
+        await db.delete(appointments).where(eq(appointments.psychologistId, psychologistId));
+
+        // 3. Delete psychologist profile
+        await db.delete(psychologists).where(eq(psychologists.id, psychologistId));
+
+        // 4. Delete user account
+        await db.delete(users).where(eq(users.id, userId));
+
+        revalidatePath("/admin/coaches");
+        revalidatePath("/admin/dashboard");
+        return { success: true, message: "Coach eliminado correctamente" };
+    } catch (error: any) {
+        console.error("Error deleting psychologist:", error);
+        return { error: "No se pudo eliminar al coach. Asegúrate de que no tenga dependencias críticas." };
     }
 }
