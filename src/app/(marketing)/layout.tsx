@@ -41,7 +41,7 @@ export default function MarketingLayout({
     return (
         <div className="min-h-screen flex flex-col font-sans">
             {/* Navbar */}
-            <header className="sticky top-0 z-50 w-full bg-white/70 backdrop-blur-md border-b border-gray-100">
+            <header className={`sticky top-0 z-50 w-full border-b border-gray-100 transition-all duration-300 ${mobileMenuOpen ? 'bg-white shadow-lg' : 'bg-white/70 backdrop-blur-md'}`}>
                 <div className="container mx-auto px-6 md:px-12 lg:px-20 h-20 flex items-center">
                     <Link href="#" className="flex items-center h-full group">
                         <Logo className="w-48 sm:w-64 h-16 sm:h-20" />
