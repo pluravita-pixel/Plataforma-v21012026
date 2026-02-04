@@ -13,7 +13,9 @@ import {
     LogOut,
     MessageCircle,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    Menu,
+    X
 } from "lucide-react";
 import { LogoutButton } from "@/components/logout-button";
 import { UserNav } from "@/components/user-nav";
@@ -25,6 +27,7 @@ export default function AdminLayout({
     children: React.ReactNode;
 }) {
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const navItems = [
         { icon: LayoutDashboard, label: "Resumen", href: "/admin/dashboard" },
@@ -37,17 +40,28 @@ export default function AdminLayout({
 
     return (
         <div className="flex h-screen bg-white overflow-hidden font-bold">
+            {/* Mobile Menu Backdrop */}
+            {mobileMenuOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+                    onClick={() => setMobileMenuOpen(false)}
+                />
+            )}
+
             {/* Sidebar */}
             <aside
                 className={cn(
                     "bg-gray-50 text-black flex flex-col transition-all duration-300 ease-in-out relative z-50 neo-border-r border-r-4 border-black",
-                    isCollapsed ? "w-24" : "w-72"
+                    isCollapsed ? "w-24" : "w-72",
+                    // Mobile: hidden by default, shown as overlay when menu is open
+                    "fixed lg:relative inset-y-0 left-0",
+                    mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
                 )}
             >
-                {/* Collapse Toggle */}
+                {/* Collapse Toggle - Desktop only */}
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="absolute -right-5 top-10 w-10 h-10 bg-black rounded-none flex items-center justify-center text-white z-50 hover:bg-gray-800 transition-colors neo-border-l-0"
+                    className="hidden lg:flex absolute -right-5 top-10 w-10 h-10 bg-black rounded-none items-center justify-center text-white z-50 hover:bg-gray-800 transition-colors neo-border-l-0"
                 >
                     {isCollapsed ? <ChevronRight className="h-6 w-6" /> : <ChevronLeft className="h-6 w-6" />}
                 </button>
@@ -71,6 +85,7 @@ export default function AdminLayout({
                             key={item.href}
                             href={item.href}
                             prefetch={true}
+                            onClick={() => setMobileMenuOpen(false)}
                             className={cn(
                                 "flex items-center gap-4 px-6 py-4 text-black hover:bg-black hover:text-white transition-all duration-200 font-black uppercase tracking-tight group relative neo-border border-2 hover:border-black",
                                 isCollapsed && "justify-center px-0"
@@ -97,7 +112,16 @@ export default function AdminLayout({
 
             {/* Main Content */}
             <main className="flex-1 overflow-y-auto flex flex-col relative bg-white">
-                <header className="bg-white border-b-4 border-black h-24 flex items-center justify-between px-10 sticky top-0 z-20">
+                <header className="bg-white border-b-4 border-black h-24 flex items-center justify-between px-6 lg:px-10 sticky top-0 z-20">
+                    {/* Mobile Menu Button */}
+                    <button
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        className="lg:hidden p-2 text-black hover:text-gray-600 transition-colors"
+                        aria-label="Toggle menu"
+                    >
+                        {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                    </button>
+
                     <div className="flex items-center gap-6">
                         <span className="text-black/40 text-[10px] font-black uppercase tracking-widest hidden sm:inline">Portal Administrativo</span>
                         <span className="text-black/20 hidden sm:inline">/</span>
@@ -109,7 +133,7 @@ export default function AdminLayout({
                         <UserNav />
                     </div>
                 </header>
-                <div className="p-12 max-w-7xl mx-auto w-full">
+                <div className="p-6 lg:p-12 max-w-7xl mx-auto w-full">
                     {children}
                 </div>
             </main>

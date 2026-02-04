@@ -14,7 +14,9 @@ import {
     MessageCircle,
     LogOut,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    Menu,
+    X
 } from "lucide-react";
 import { LogoutButton } from "@/components/logout-button";
 import { UserNav } from "@/components/user-nav";
@@ -27,6 +29,7 @@ export default function PatientLayout({
 }) {
     const pathname = usePathname();
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const navItems = [
         { icon: LayoutDashboard, label: "Inicio", href: "/patient/dashboard" },
@@ -37,17 +40,28 @@ export default function PatientLayout({
 
     return (
         <div className="flex h-screen bg-[#FAFAFA] font-sans overflow-hidden">
+            {/* Mobile Menu Backdrop */}
+            {mobileMenuOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+                    onClick={() => setMobileMenuOpen(false)}
+                />
+            )}
+
             {/* Sidebar */}
             <aside
                 className={cn(
-                    "bg-white border-r border-gray-100 flex flex-col shadow-sm transition-all duration-300 ease-in-out relative z-30",
-                    isCollapsed ? "w-20" : "w-64"
+                    "bg-white border-r border-gray-100 flex flex-col shadow-sm transition-all duration-300 ease-in-out relative z-50",
+                    isCollapsed ? "w-20" : "w-64",
+                    // Mobile: hidden by default, shown as overlay when menu is open
+                    "fixed lg:relative inset-y-0 left-0",
+                    mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
                 )}
             >
-                {/* Collapse Toggle */}
+                {/* Collapse Toggle - Desktop only */}
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="absolute -right-3 top-12 w-6 h-6 bg-[#4A3C31] rounded-full flex items-center justify-center text-white shadow-lg z-50 hover:bg-black transition-colors"
+                    className="hidden lg:flex absolute -right-3 top-12 w-6 h-6 bg-[#4A3C31] rounded-full items-center justify-center text-white shadow-lg z-50 hover:bg-black transition-colors"
                 >
                     {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
                 </button>
@@ -71,6 +85,7 @@ export default function PatientLayout({
                                 key={item.href}
                                 href={item.href}
                                 prefetch={true}
+                                onClick={() => setMobileMenuOpen(false)}
                                 className={cn(
                                     "flex items-center gap-3 px-5 py-4 rounded-2xl transition-all duration-300 font-bold tracking-wide group relative",
                                     isActive
@@ -107,7 +122,16 @@ export default function PatientLayout({
 
             {/* Main Content */}
             <main className="flex-1 overflow-y-auto flex flex-col relative">
-                <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 h-20 flex items-center justify-between px-10 sticky top-0 z-20">
+                <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 h-20 flex items-center justify-between px-6 lg:px-10 sticky top-0 z-20">
+                    {/* Mobile Menu Button */}
+                    <button
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        className="lg:hidden p-2 text-gray-600 hover:text-[#A68363] transition-colors"
+                        aria-label="Toggle menu"
+                    >
+                        {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                    </button>
+
                     <div className="flex items-center gap-3">
                         <span className="text-gray-300 font-medium hidden sm:inline">Panel</span>
                         <span className="text-gray-200 hidden sm:inline">/</span>
@@ -120,7 +144,7 @@ export default function PatientLayout({
                         <UserNav />
                     </div>
                 </header>
-                <div className="p-10 max-w-7xl mx-auto w-full">
+                <div className="p-6 lg:p-10 max-w-7xl mx-auto w-full">
                     {children}
                 </div>
             </main>

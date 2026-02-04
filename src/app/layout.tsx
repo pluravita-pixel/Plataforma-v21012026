@@ -19,6 +19,9 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 export const metadata: Metadata = {
   title: "pluravita | Plataforma de bienestar emocional",
   description: "Conecta con los mejores coaches certificados.",
+  icons: {
+    icon: '/favicon-p.png',
+  },
 };
 
 export default function RootLayout({

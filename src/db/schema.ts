@@ -79,6 +79,7 @@ export const appointments = pgTable("appointments", {
   paymentStatus: text("payment_status").default("unpaid").notNull(), // unpaid, paid, refunded
   stripeSessionId: text("stripe_session_id"),
   isAnonymous: boolean("is_anonymous").default(false).notNull(),
+  meetingLink: text("meeting_link"), // Unique meeting link for this specific session
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

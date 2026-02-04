@@ -19,8 +19,9 @@ import { es } from "date-fns/locale";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { completeAppointment } from "@/app/actions/psychologists";
+import { completeAppointment, updateAppointmentMeetingLink } from "@/app/actions/psychologists";
 import { FileUploader } from "@/components/files/FileUploader";
+import { Input } from "@/components/ui/input";
 
 interface AppointmentDetailsClientProps {
     appointment: any;
@@ -31,7 +32,9 @@ export default function AppointmentDetailsClient({ appointment, coachId }: Appoi
     const router = useRouter();
     const [notes, setNotes] = useState(appointment.psychologistNotes || "");
     const [tips, setTips] = useState(appointment.improvementTips || "");
+    const [meetingLink, setMeetingLink] = useState(appointment.meetingLink || "");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isUpdatingLink, setIsUpdatingLink] = useState(false);
 
     const handleComplete = async () => {
         if (!notes.trim()) {
@@ -50,6 +53,18 @@ export default function AppointmentDetailsClient({ appointment, coachId }: Appoi
 
         if (result.success) {
             toast.success("Sesión completada con éxito.");
+            router.refresh();
+        } else {
+            toast.error(result.error || "Algo salió mal.");
+        }
+    };
+
+    const handleUpdateLink = async () => {
+        setIsUpdatingLink(true);
+        const result = await updateAppointmentMeetingLink(appointment.id, meetingLink);
+        setIsUpdatingLink(false);
+        if (result.success) {
+            toast.success("Link de sesión actualizado");
             router.refresh();
         } else {
             toast.error(result.error || "Algo salió mal.");
@@ -105,6 +120,27 @@ export default function AppointmentDetailsClient({ appointment, coachId }: Appoi
                             <p className="text-sm text-gray-600 italic">"{appointment.reason}"</p>
                         </div>
                     )}
+                </div>
+
+                <div className="space-y-4 border-t border-gray-100 pt-8 mt-4">
+                    <Label className="font-bold text-[#4A3C31] text-xs uppercase tracking-widest">Link de esta Sesión Específica (Zoom/Meet)</Label>
+                    <div className="flex gap-3">
+                        <Input
+                            placeholder="Redirección personalizada: https://zoom.us/j/..."
+                            value={meetingLink}
+                            onChange={(e) => setMeetingLink(e.target.value)}
+                            className="h-12 border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:ring-0"
+                            disabled={appointment.status === 'completed'}
+                        />
+                        <Button
+                            onClick={handleUpdateLink}
+                            disabled={isUpdatingLink || appointment.status === 'completed'}
+                            className="bg-black text-white px-6 h-12 rounded-none border-4 border-black shadow-[4px_4px_0px_0px_rgba(166,131,99,1)] active:shadow-none active:translate-x-1 active:translate-y-1 font-black uppercase text-xs"
+                        >
+                            {isUpdatingLink ? "..." : "Guardar Link"}
+                        </Button>
+                    </div>
+                    <p className="text-[10px] text-gray-400 italic">Si dejas esto vacío, se usará tu link por defecto del perfil.</p>
                 </div>
 
                 {appointment.status === 'scheduled' && (

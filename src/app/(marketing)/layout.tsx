@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Facebook, Twitter, Linkedin, Instagram, Youtube } from "lucide-react";
+import { MessageCircle, Facebook, Twitter, Linkedin, Instagram, Youtube, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useModals } from "@/components/modal-provider";
 import { UserNav } from "@/components/user-nav";
@@ -20,6 +20,7 @@ export default function MarketingLayout({
     const router = useRouter();
     const [user, setUser] = useState<any>(null);
     const [hasCompletedTest, setHasCompletedTest] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     useEffect(() => {
         getCurrentUser().then(u => {
@@ -43,7 +44,7 @@ export default function MarketingLayout({
             <header className="sticky top-0 z-50 w-full bg-white/70 backdrop-blur-md border-b border-gray-100">
                 <div className="container mx-auto px-6 md:px-12 lg:px-20 h-20 flex items-center">
                     <Link href="#" className="flex items-center h-full group">
-                        <Logo className="w-64 h-20" />
+                        <Logo className="w-48 sm:w-64 h-16 sm:h-20" />
                     </Link>
 
                     {/* Desktop Nav */}
@@ -66,11 +67,95 @@ export default function MarketingLayout({
                         )}
                     </nav>
 
-                    {/* Auth Buttons */}
-                    <div className="flex items-center gap-4">
+                    {/* Desktop Auth Buttons */}
+                    <div className="hidden lg:flex items-center gap-4">
                         <UserNav />
                     </div>
+
+                    {/* Mobile Menu Button */}
+                    <button
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        className="lg:hidden ml-auto p-2 text-[#6B6B6B] hover:text-[#A68363] transition-colors"
+                        aria-label="Toggle menu"
+                    >
+                        {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                    </button>
                 </div>
+
+                {/* Mobile Menu */}
+                {mobileMenuOpen && (
+                    <>
+                        {/* Backdrop */}
+                        <div
+                            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+                            onClick={() => setMobileMenuOpen(false)}
+                        />
+
+                        {/* Menu Panel */}
+                        <div className="fixed top-20 right-0 bottom-0 w-full max-w-sm bg-white z-50 lg:hidden shadow-2xl animate-in slide-in-from-right duration-300">
+                            <nav className="flex flex-col p-6 space-y-4">
+                                <Link
+                                    href="/affinity-test"
+                                    onClick={(e) => {
+                                        handleCoachesLinkClick(e);
+                                        setMobileMenuOpen(false);
+                                    }}
+                                    className="text-[#6B6B6B] hover:text-[#A68363] transition-colors py-3 px-4 rounded-lg hover:bg-[#F2EDE7] font-medium"
+                                >
+                                    Coaches en línea
+                                </Link>
+                                <Link
+                                    href="#"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="text-[#6B6B6B] hover:text-[#A68363] transition-colors py-3 px-4 rounded-lg hover:bg-[#F2EDE7] font-medium"
+                                >
+                                    Precios
+                                </Link>
+                                <Link
+                                    href="#faq"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="text-[#6B6B6B] hover:text-[#A68363] transition-colors py-3 px-4 rounded-lg hover:bg-[#F2EDE7] font-medium"
+                                >
+                                    Preguntas frecuentes
+                                </Link>
+
+                                <div className="border-t border-gray-100 pt-4 mt-4">
+                                    {user?.role === 'psychologist' ? (
+                                        <Link
+                                            href="/psychologist/dashboard"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                            className="text-[#A68363] font-bold py-3 px-4 rounded-lg hover:bg-[#F2EDE7] block"
+                                        >
+                                            Panel de Coach
+                                        </Link>
+                                    ) : user ? (
+                                        <Link
+                                            href="/coach-onboarding"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                            className="text-[#A68363] font-bold py-3 px-4 rounded-lg hover:bg-[#F2EDE7] block"
+                                        >
+                                            Únete como coach
+                                        </Link>
+                                    ) : (
+                                        <Link
+                                            href="/register?role=coach"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                            className="text-[#A68363] font-bold py-3 px-4 rounded-lg hover:bg-[#F2EDE7] block"
+                                        >
+                                            Únete como coach
+                                        </Link>
+                                    )}
+                                </div>
+
+                                <div className="border-t border-gray-100 pt-4 mt-4">
+                                    <div onClick={() => setMobileMenuOpen(false)}>
+                                        <UserNav />
+                                    </div>
+                                </div>
+                            </nav>
+                        </div>
+                    </>
+                )}
             </header>
 
             <main className="flex-1 bg-[#F9F5F0]">

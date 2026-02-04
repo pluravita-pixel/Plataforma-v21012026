@@ -172,42 +172,85 @@ export async function updatePsychologistSettings(userId: string, data: {
     languages?: string[];
     meetingLink?: string;
 }) {
-    const user = await ensurePsychologist();
-    if (userId !== user.id && user.role !== 'admin') {
-        throw new Error("No puedes actualizar el perfil de otro usuario.");
+    try {
+        const user = await ensurePsychologist();
+        if (userId !== user.id && user.role !== 'admin') {
+            return { error: "No puedes actualizar el perfil de otro usuario." };
+        }
+
+        // Validate username uniqueness if provided
+        if (data.username) {
+            const existingUsername = await client`
+                SELECT id FROM psychologists 
+                WHERE username = ${data.username} 
+                AND user_id != ${userId}
+                LIMIT 1
+            `;
+            if (existingUsername.length > 0) {
+                return { error: "Este nombre de usuario ya está en uso. Por favor elige otro." };
+            }
+        }
+
+        // Dynamic update query construction
+        const updateObj: Record<string, any> = {};
+
+        if (data.image !== undefined) updateObj.image = data.image;
+        if (data.tags !== undefined) updateObj.tags = data.tags;
+        if (data.description !== undefined) updateObj.description = data.description;
+        if (data.iban !== undefined) updateObj.iban = data.iban;
+        if (data.payoutName !== undefined) updateObj.payout_name = data.payoutName;
+        if (data.username !== undefined) updateObj.username = data.username;
+        if (data.specialty !== undefined) updateObj.specialty = data.specialty;
+        if (data.price !== undefined) updateObj.price = data.price;
+        if (data.languages !== undefined) updateObj.languages = data.languages;
+        if (data.meetingLink !== undefined) updateObj.meeting_link = data.meetingLink;
+
+        // Ensure referral code
+        const current = await client`SELECT ref_code FROM psychologists WHERE user_id = ${userId}`;
+        if (!current[0]?.ref_code) {
+            updateObj.ref_code = crypto.randomUUID();
+        }
+
+        if (Object.keys(updateObj).length > 0) {
+            // Manual query construction to be safer
+            const setClauses = [];
+            const args = [];
+
+            if (updateObj.image !== undefined) { setClauses.push(`image = $${args.length + 1}`); args.push(updateObj.image); }
+            if (updateObj.tags !== undefined) { setClauses.push(`tags = $${args.length + 1}`); args.push(updateObj.tags); }
+            if (updateObj.description !== undefined) { setClauses.push(`description = $${args.length + 1}`); args.push(updateObj.description); }
+            if (updateObj.iban !== undefined) { setClauses.push(`iban = $${args.length + 1}`); args.push(updateObj.iban); }
+            if (updateObj.payout_name !== undefined) { setClauses.push(`payout_name = $${args.length + 1}`); args.push(updateObj.payout_name); }
+            if (updateObj.username !== undefined) { setClauses.push(`username = $${args.length + 1}`); args.push(updateObj.username); }
+            if (updateObj.specialty !== undefined) { setClauses.push(`specialty = $${args.length + 1}`); args.push(updateObj.specialty); }
+            if (updateObj.price !== undefined) { setClauses.push(`price = $${args.length + 1}`); args.push(updateObj.price); }
+            if (updateObj.languages !== undefined) { setClauses.push(`languages = $${args.length + 1}`); args.push(updateObj.languages); }
+            if (updateObj.meeting_link !== undefined) { setClauses.push(`meeting_link = $${args.length + 1}`); args.push(updateObj.meeting_link); }
+            if (updateObj.ref_code !== undefined) { setClauses.push(`ref_code = $${args.length + 1}`); args.push(updateObj.ref_code); }
+
+            if (setClauses.length > 0) {
+                // Warning: postgres.js template literal requires special handling for dynamic queries usually,
+                // but client`...` handles values. Mixing raw strings is tricky.
+                // Reverting to safe unsafe usage for column names but parametrized values.
+
+                // Better approach with postgres.js:
+                await client`
+                    UPDATE psychologists 
+                    SET ${client(updateObj)}
+                    WHERE user_id = ${userId}
+                `;
+            }
+        }
+
+        revalidatePath("/psychologist/dashboard");
+        revalidatePath("/psychologist/balance");
+        revalidatePath("/psychologist/profile");
+
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error updating psychologist settings:", error);
+        return { error: error.message || "Error al actualizar el perfil. Por favor intenta de nuevo." };
     }
-
-    // Dynamic update query construction
-    const updateObj: Record<string, any> = {};
-
-    if (data.image !== undefined) updateObj.image = data.image;
-    if (data.tags !== undefined) updateObj.tags = data.tags;
-    if (data.description !== undefined) updateObj.description = data.description;
-    if (data.iban !== undefined) updateObj.iban = data.iban;
-    if (data.payoutName !== undefined) updateObj.payout_name = data.payoutName;
-    if (data.username !== undefined) updateObj.username = data.username;
-    if (data.specialty !== undefined) updateObj.specialty = data.specialty;
-    if (data.price !== undefined) updateObj.price = data.price;
-    if (data.languages !== undefined) updateObj.languages = data.languages;
-    if (data.meetingLink !== undefined) updateObj.meeting_link = data.meetingLink;
-
-    // Ensure referral code
-    const current = await client`SELECT ref_code FROM psychologists WHERE user_id = ${userId}`;
-    if (!current[0]?.ref_code) {
-        updateObj.ref_code = crypto.randomUUID();
-    }
-
-    if (Object.keys(updateObj).length > 0) {
-        await client`
-            UPDATE psychologists 
-            SET ${client(updateObj)}
-            WHERE user_id = ${userId}
-        `;
-    }
-
-    revalidatePath("/psychologist/dashboard");
-    revalidatePath("/psychologist/balance");
-    revalidatePath("/psychologist/profile");
 }
 
 export async function getUpcomingAppointments(psychologistId: string) {
@@ -580,5 +623,36 @@ export async function completeAppointment(data: { id: string, notes: string, tip
     } catch (error) {
         console.error("Error completing appointment:", error);
         return { error: "Error al completar la cita" };
+    }
+}
+
+export async function updateAppointmentMeetingLink(appointmentId: string, meetingLink: string) {
+    try {
+        const user = await ensurePsychologist();
+
+        // Verify ownership
+        const appt = await client`
+            SELECT a.id FROM appointments a
+            JOIN psychologists p ON a.psychologist_id = p.id
+            WHERE a.id = ${appointmentId} AND p.user_id = ${user.id}
+            LIMIT 1
+        `;
+
+        if (appt.length === 0) {
+            return { error: "Cita no encontrada o no autorizada" };
+        }
+
+        await client`
+            UPDATE appointments
+            SET meeting_link = ${meetingLink}
+            WHERE id = ${appointmentId}
+        `;
+
+        revalidatePath(`/psychologist/appointments/${appointmentId}`);
+        revalidatePath("/psychologist/dashboard");
+        return { success: true };
+    } catch (error) {
+        console.error("Error updating meeting link:", error);
+        return { error: "Error al actualizar el link de la reunión" };
     }
 }

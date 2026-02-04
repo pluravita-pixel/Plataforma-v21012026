@@ -106,6 +106,19 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
             return;
         }
 
+        // Validate username format
+        const cleanUsername = profile.username.toLowerCase().replace(/\s+/g, '-');
+        const usernameRegex = /^[a-z0-9-]+$/;
+        if (!usernameRegex.test(cleanUsername)) {
+            toast.error("El nombre de usuario solo puede contener letras, números y guiones");
+            return;
+        }
+
+        if (cleanUsername.length < 3) {
+            toast.error("El nombre de usuario debe tener al menos 3 caracteres");
+            return;
+        }
+
         if (profile.languages.length === 0) {
             toast.error("Selecciona al menos un idioma");
             return;
@@ -113,19 +126,27 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
 
         setIsSaving(true);
         try {
-            await updatePsychologistSettings(psychologist.userId, {
+            const result = await updatePsychologistSettings(psychologist.userId, {
                 description: profile.description,
                 specialty: profile.specialty,
                 price: profile.price,
-                username: profile.username.toLowerCase().replace(/\s+/g, '-'),
+                username: cleanUsername,
                 languages: profile.languages,
                 tags: profile.tags,
                 image: profile.image || undefined,
                 meetingLink: profile.meetingLink
             });
-            toast.success("Perfil actualizado con éxito");
-        } catch (error) {
-            toast.error("Error al actualizar el perfil");
+
+            if (result && 'error' in result) {
+                toast.error(result.error);
+            } else {
+                toast.success("Perfil actualizado con éxito");
+                // Update local state with clean username
+                setProfile({ ...profile, username: cleanUsername });
+            }
+        } catch (error: any) {
+            console.error("Error saving profile:", error);
+            toast.error(error.message || "Error al actualizar el perfil");
         } finally {
             setIsSaving(false);
         }

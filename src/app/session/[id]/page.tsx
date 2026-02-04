@@ -24,6 +24,7 @@ export default async function SessionPage({ params }: SessionPageProps) {
         const apptResult = await client`
             SELECT 
                 a.*,
+                a.meeting_link as appointment_meeting_link,
                 p.user_id as psychologist_user_id,
                 p.full_name as psychologist_name,
                 p.meeting_link as psychologist_meeting_link,
@@ -90,7 +91,9 @@ export default async function SessionPage({ params }: SessionPageProps) {
             );
         }
 
-        if (!appointment.psychologist_meeting_link) {
+        const finalMeetingLink = appointment.appointment_meeting_link || appointment.psychologist_meeting_link;
+
+        if (!finalMeetingLink) {
             return (
                 <div className="flex h-screen items-center justify-center bg-neutral-50 p-6">
                     <Card className="p-12 text-center max-w-md bg-white rounded-[2.5rem] border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
@@ -125,7 +128,7 @@ export default async function SessionPage({ params }: SessionPageProps) {
 
                     <div className="space-y-4">
                         <Button asChild className="w-full h-16 rounded-2xl bg-[#A68363] hover:bg-[#8B6B4E] text-white font-black text-lg shadow-lg hover:shadow-xl transition-all group">
-                            <a href={appointment.psychologist_meeting_link} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3">
+                            <a href={finalMeetingLink} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3">
                                 ENTRAR A LA SESIÓN (ZOOM)
                                 <span className="p-1 bg-white/20 rounded-lg group-hover:translate-x-1 transition-transform">
                                     <Video className="h-5 w-5" />
