@@ -20,12 +20,16 @@ import { getCurrentUser } from "@/app/actions/auth";
 export default function LandingPage() {
     const { openAffinityModal, openTestCompletedModal } = useModals();
     const router = useRouter();
-    const [stats, setStats] = useState({ realUsers: 0, realSessions: 0, realCoaches: 0 });
+    const [stats, setStats] = useState({ realUsers: 0, realSessions: 0, realListeners: 0 });
     const [hasCompletedTest, setHasCompletedTest] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
-        getGlobalStats().then(setStats);
+        getGlobalStats().then(data => setStats({
+            realUsers: data.realUsers,
+            realSessions: data.realSessions,
+            realListeners: data.realOyentes
+        }));
         getCurrentUser().then(user => {
             if (user) {
                 setIsLoggedIn(true);
@@ -37,7 +41,7 @@ export default function LandingPage() {
     const handleBrowsingClick = (e: React.MouseEvent) => {
         if (hasCompletedTest) {
             e.preventDefault();
-            router.push("/patient/search");
+            router.push("/usuario/search");
         }
     };
 
@@ -58,7 +62,7 @@ export default function LandingPage() {
     const faqs = [
         {
             question: "¿Qué es pluravita?",
-            answer: "Somos ese refugio digital donde puedes ser tú mismx. Una comunidad de coaches que no solo tienen títulos, sino que saben lo que es pasarlo mal y están aquí para escucharte sin filtros. Un espacio seguro, privado y pensado para tu generación."
+            answer: "Somos ese refugio digital donde puedes ser tú mismx. Una comunidad de oyentes que no solo tienen títulos, sino que saben lo que es pasarlo mal y están aquí para escucharte sin filtros. Es un espacio para hablar, privado y pensado para tu generación."
         },
         {
             question: "¿Cómo puedo pagar mis sesiones?",
@@ -74,7 +78,7 @@ export default function LandingPage() {
         },
         {
             question: "¿Qué pasa exactamente en una sesión?",
-            answer: "Es tu espacio. Hablarás de lo que te preocupa, de tus metas o simplemente de cómo te sientes hoy. Tu coach te escuchará y te dará herramientas prácticas para que puedas gestionar tu día a día con más calma."
+            answer: "Es tu espacio. Hablarás de lo que te preocupa, de tus metas o simplemente de cómo te sientes hoy. Tu oyente te escuchará y te dará herramientas prácticas para que puedas gestionar tu día a día con más calma."
         },
         {
             question: "¿Cómo sé si estoy avanzando?",
@@ -82,10 +86,10 @@ export default function LandingPage() {
         },
         {
             question: "¿Cómo elijo a la persona adecuada?",
-            answer: "Tenemos un Test de Afinidad que hace el trabajo sucio por ti. Te sugerimos a los coaches que más encajan con tu personalidad para que no pierdas tiempo buscando. Queremos que el 'clic' sea inmediato."
+            answer: "Tenemos un Test de Afinidad que hace el trabajo sucio por ti. Te sugerimos a los oyentes que más encajan con tu personalidad para que no pierdas tiempo buscando. Queremos que el 'clic' sea inmediato."
         },
         {
-            question: "¿Quiénes son los coaches?",
+            question: "¿Quiénes son los oyentes?",
             answer: "Son personas como tú, que entienden tu realidad. No usamos un lenguaje frío; buscamos una conexión humana real que te haga sentir que, al otro lado de la pantalla, hay alguien que de verdad te pilla."
         },
         {
@@ -112,7 +116,7 @@ export default function LandingPage() {
                         </h1>
 
                         <p className="text-lg text-[#6B6B6B] leading-relaxed max-w-xl">
-                            Sabemos que a veces el mundo pesa. En pluravita, conectas con coaches que entienden tu realidad, sin juicios y desde tu sofá. Un espacio seguro, privado y tan real como tú. Desde <b>15€</b>.
+                            Sabemos que a veces el mundo pesa. En pluravita, conectas con oyentes que entienden tu realidad, sin juicios y desde tu sofá. Es un espacio para hablar, privado y tan real como tú. Desde <b>15€</b>.
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-5 pt-4">
@@ -121,7 +125,7 @@ export default function LandingPage() {
                                 onClick={handleBrowsingClick}
                                 className="neo-btn-primary h-16 text-lg"
                             >
-                                <Link href="/affinity-test">Ver coaches en línea</Link>
+                                <Link href="/affinity-test">Ver oyentes en línea</Link>
                             </Button>
                         </div>
 
@@ -202,7 +206,7 @@ export default function LandingPage() {
                         onClick={handleBrowsingClick}
                         className="neo-btn-primary h-16 scale-110"
                     >
-                        <Link href="/affinity-test">Ver coaches en línea</Link>
+                        <Link href="/affinity-test">Ver oyentes en línea</Link>
                     </Button>
                 </div>
             </section>
@@ -220,7 +224,7 @@ export default function LandingPage() {
                             {/* Mock Image */}
                             <Image
                                 src="/images/hero-illustration.jpg"
-                                alt="Sesión de coaching empática"
+                                alt="Sesión de oyente empática"
                                 fill
                                 className="object-cover"
                             />
@@ -230,7 +234,7 @@ export default function LandingPage() {
                                 Lo más importante para nosotros es que te sientas realmente cómodocx desde el segundo uno.
                             </p>
                             <p className="text-gray-700">
-                                Si en tu primera cita sientes que no hay química con tu coach, no te preocupes, lo entendemos perfectamente. <span className="font-bold text-[#4A3C31]">Te regalamos otra sesión</span> con un coach diferente <span className="font-bold text-[#4A3C31]">sin que pagues ni un euro más</span>.
+                                Si en tu primera cita sientes que no hay química con tu oyente, no te preocupes, lo entendemos perfectamente. <span className="font-bold text-[#4A3C31]">Te regalamos otra sesión</span> con un oyente diferente <span className="font-bold text-[#4A3C31]">sin que pagues ni un euro más</span>.
                             </p>
                             <p className="text-[#6B6B6B]">
                                 Estamos aquí para que el camino sea fácil. <span className="font-bold text-[#4A3C31]">Tu tranquilidad y tu proceso son lo que de verdad nos importa.</span>
@@ -240,7 +244,7 @@ export default function LandingPage() {
                                 onClick={handleBrowsingClick}
                                 className="neo-btn-primary h-14"
                             >
-                                <Link href="/affinity-test">Elegir coach</Link>
+                                <Link href="/affinity-test">Elegir oyente</Link>
                             </Button>
                         </div>
                     </div>
@@ -309,7 +313,7 @@ export default function LandingPage() {
                                 Por eso creamos nuestro Test de Afinidad. No es un examen, <span className="font-bold">es una forma de conocerte para recomendarte a alguien que realmente vibre con lo que buscas.</span>
                             </p>
                             <p className="text-gray-700">
-                                Tómate un minuto, descubre quién es tu coach ideal y quítate un peso de encima. <span className="font-bold">Fácil, seguro y diseñado para que te sientas cómodx.</span>
+                                Tómate un minuto, descubre quién es tu oyente ideal y quítate un peso de encima. <span className="font-bold">Fácil, seguro y diseñado para que te sientas cómodx.</span>
                             </p>
                             <Button
                                 onClick={handleAnsweringClick}

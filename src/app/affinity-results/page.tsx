@@ -6,25 +6,26 @@ import { MessageCircle, Copy, Check, Star, Globe, Calendar, Video, UserCircle, S
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
-import { getPsychologists } from "@/app/actions/psychologists"
-import { getCurrentUser } from "@/app/actions/auth" // Added
-import type { Psychologist, User } from "@/db/schema"
+import { getOyentes } from "@/app/actions/oyentes"
+import { getCurrentUser } from "@/app/actions/auth"
+import type { User } from "@/db/schema"
 import { BookingModal } from "@/components/booking/BookingModal"
 import { Logo } from "@/components/logo";
 
 export default function AffinityResultsPage() {
     const [copied, setCopied] = useState(false)
-    const [psychologists, setPsychologists] = useState<Psychologist[]>([])
-    const [currentUser, setCurrentUser] = useState<any>(null) // Added
+    const [psychologists, setPsychologists] = useState<any[]>([])
+    const [currentUser, setCurrentUser] = useState<any>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         const fetchPsychs = async () => {
             const [data, user] = await Promise.all([
-                getPsychologists(),
+                getOyentes(),
                 getCurrentUser()
             ])
-            setPsychologists(data as Psychologist[])
+            const sortedData = (data as any[]).sort((a, b) => (Number(b.rating) || 0) - (Number(a.rating) || 0));
+            setPsychologists(sortedData);
             setCurrentUser(user)
             setLoading(false)
         }
@@ -193,7 +194,7 @@ export default function AffinityResultsPage() {
                                             <span className="text-[11px] font-bold text-gray-700 uppercase tracking-wider">Altamente compatible</span>
                                         </div>
                                         <div className="absolute top-4 right-4 bg-[#A68363] text-white px-3 py-1.5 rounded-full shadow-lg text-[11px] font-black">
-                                            {95 + (i % 5)}% MATCH
+                                            {99 - (i % 5)}% MATCH
                                         </div>
                                     </div>
 
@@ -218,7 +219,7 @@ export default function AffinityResultsPage() {
                                         </div>
 
                                         <div className="flex flex-wrap gap-2">
-                                            {psych.tags?.map(tag => (
+                                            {psych.tags?.map((tag: string) => (
                                                 <span key={tag} className="px-3 py-1 bg-[#F2EDE7] text-[#6B6B6B] text-[11px] font-bold rounded-full">
                                                     {tag}
                                                 </span>
@@ -231,8 +232,8 @@ export default function AffinityResultsPage() {
                                                 <p className="text-lg font-black text-[#4A3C31]">{psych.price}€</p>
                                             </div>
                                             <BookingModal
-                                                psychologistId={psych.id}
-                                                psychologistName={psych.fullName}
+                                                listenerId={psych.id}
+                                                listenerName={psych.fullName}
                                                 price={Number(psych.price) || 0}
                                                 currentUser={currentUser}
                                             />

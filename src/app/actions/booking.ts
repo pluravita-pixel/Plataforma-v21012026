@@ -1,26 +1,26 @@
 "use server";
 
 import { db, client } from "@/db";
-import { psychologists, availabilitySlots, appointments, users } from "@/db/schema";
+import { oyentes, availabilitySlots, appointments, users } from "@/db/schema";
 import { eq, and, gte, lte, desc, sql, count } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { refreshPsychologistStats } from "./psychologists";
+import { refreshOyenteStats } from "./oyentes";
 import { getCurrentUser } from "./auth";
 
-async function verifyPsychologist(psychologistId?: string) {
+async function verifyOyente(oyenteId?: string) {
     const user = await getCurrentUser();
     if (!user) throw new Error("No autorizado");
 
     if (user.role === 'admin') return user;
 
-    if (user.role !== 'psychologist') {
-        throw new Error("Se requiere rol de coach.");
+    if (user.role !== 'oyente') {
+        throw new Error("Se requiere rol de oyente.");
     }
 
-    if (psychologistId) {
-        const result = await client`SELECT id FROM psychologists WHERE user_id = ${user.id} LIMIT 1`;
-        if (result.length === 0 || result[0].id !== psychologistId) {
-            throw new Error("No autorizado para este coach.");
+    if (oyenteId) {
+        const result = await client`SELECT id FROM oyentes WHERE user_id = ${user.id} LIMIT 1`;
+        if (result.length === 0 || result[0].id !== oyenteId) {
+            throw new Error("No autorizado para este oyente.");
         }
     }
     return user;
@@ -28,8 +28,7 @@ async function verifyPsychologist(psychologistId?: string) {
 
 // --- Availability Actions ---
 
-export async function getAvailabilitySlots(psychologistId: string, startDate?: Date, endDate?: Date) {
-    // Default to next 30 days if not provided
+export async function getAvailabilitySlots(oyenteId: string, startDate?: Date, endDate?: Date) {
     const start = startDate || new Date();
     const end = endDate || new Date(new Date().setDate(new Date().getDate() + 30));
 
@@ -38,10 +37,10 @@ export async function getAvailabilitySlots(psychologistId: string, startDate?: D
         .from(availabilitySlots)
         .where(
             and(
-                eq(availabilitySlots.psychologistId, psychologistId),
+                eq(availabilitySlots.oyenteId, oyenteId),
                 gte(availabilitySlots.startTime, start),
                 lte(availabilitySlots.endTime, end),
-                eq(availabilitySlots.isBooked, false) // Only fetch unbooked slots
+                eq(availabilitySlots.isBooked, false)
             )
         )
         .orderBy(availabilitySlots.startTime);
@@ -49,16 +48,16 @@ export async function getAvailabilitySlots(psychologistId: string, startDate?: D
     return slots;
 }
 
-export async function createAvailabilitySlot(psychologistId: string, startTime: Date, endTime: Date) {
-    await verifyPsychologist(psychologistId);
+export async function createAvailabilitySlot(oyenteId: string, startTime: Date, endTime: Date) {
+    await verifyOyente(oyenteId);
     try {
         await db.insert(availabilitySlots).values({
-            psychologistId,
+            oyenteId,
             startTime,
             endTime,
             isBooked: false,
         });
-        revalidatePath("/psychologist/calendar");
+        revalidatePath("/oyente/calendar");
         return { success: true };
     } catch (error: any) {
         if (error.digest === 'DYNAMIC_SERVER_USAGE' || (error.message && error.message.includes('Dynamic server usage'))) {
@@ -70,17 +69,17 @@ export async function createAvailabilitySlot(psychologistId: string, startTime: 
 }
 
 export async function deleteAvailabilitySlot(slotId: string) {
-    const user = await verifyPsychologist();
+    const user = await verifyOyente();
     try {
         if (user.role !== 'admin') {
-            const slotResult = await client`SELECT psychologist_id FROM availability_slots WHERE id = ${slotId} LIMIT 1`;
-            const psychResult = await client`SELECT id FROM psychologists WHERE user_id = ${user.id} LIMIT 1`;
-            if (slotResult[0]?.psychologist_id !== psychResult[0]?.id) {
+            const slotResult = await client`SELECT oyente_id FROM availability_slots WHERE id = ${slotId} LIMIT 1`;
+            const psychResult = await client`SELECT id FROM oyentes WHERE user_id = ${user.id} LIMIT 1`;
+            if (slotResult[0]?.oyente_id !== psychResult[0]?.id) {
                 throw new Error("Este slot no te pertenece.");
             }
         }
         await db.delete(availabilitySlots).where(eq(availabilitySlots.id, slotId));
-        revalidatePath("/psychologist/calendar");
+        revalidatePath("/oyente/calendar");
         return { success: true };
     } catch (error: any) {
         if (error.digest === 'DYNAMIC_SERVER_USAGE' || (error.message && error.message.includes('Dynamic server usage'))) {
@@ -90,43 +89,13 @@ export async function deleteAvailabilitySlot(slotId: string) {
     }
 }
 
-// --- Bulk Update Action ---
-export async function bulkUpdateSlots(psychologistId: string, desiredSlots: { startTime: Date | string, endTime: Date | string }[]) {
-    await verifyPsychologist(psychologistId);
+export async function saveSchedule(oyenteId: string, slots: { id: string, startTime: Date | string, endTime: Date | string }[]) {
+    await verifyOyente(oyenteId);
 
     try {
-        // 1. Get existing UNBOOKED slots to compare
-        // We only want to manage slots that are currently "future" or "relevant"?
-        // Simpler: Delete all unbooked slots and re-insert.
-        // Risk: If pagination exists (not yet), we might delete future slots we didn't see.
-        // Assuming we loaded "next 30 days".
-        // Let's rely on the client sending us what it wants to *keep* + *add*.
-        // Actually, deleting ALL unbooked slots is risky if the user acts on a subset.
-        // Let's try to match by ID?
-        // The client generates `temp-` IDs.
-        // Existing slots have UUIDs.
-
-        // Strategy: 
-        // 1. IDs present in desiredSlots that are UUIDs -> Keep (Do nothing).
-        // 2. IDs present in DB but NOT in desiredSlots -> Delete.
-        // 3. IDs starting with "temp-" -> Insert.
-
-        // This requires `desiredSlots` to include IDs.
-        return { error: "This function requires IDs to perform safe diffs." };
-    } catch (e) {
-        return { error: "Bulk update failed" };
-    }
-}
-
-export async function saveSchedule(psychologistId: string, slots: { id: string, startTime: Date | string, endTime: Date | string }[]) {
-    await verifyPsychologist(psychologistId);
-
-    try {
-        // 1. Identify slots to delete: present in DB (unbooked) but missing in `slots` list
-        // Fetch all current unbooked slots for this psych
         const currentDbSlots = await client`
             SELECT id FROM availability_slots 
-            WHERE psychologist_id = ${psychologistId} 
+            WHERE oyente_id = ${oyenteId} 
             AND is_booked = false
         `;
 
@@ -140,28 +109,25 @@ export async function saveSchedule(psychologistId: string, slots: { id: string, 
             `;
         }
 
-        // 2. Identify slots to add: start with 'temp-'
         const slotsToAdd = slots.filter(s => s.id.startsWith('temp-'));
 
         if (slotsToAdd.length > 0) {
             const values = slotsToAdd.map(s => ({
-                psychologist_id: psychologistId,
+                oyente_id: oyenteId,
                 start_time: new Date(s.startTime).toISOString(),
                 end_time: new Date(s.endTime).toISOString(),
                 is_booked: false
             }));
 
-            // Construct multi-row insert
-            // Drizzle is cleaner for this
             await db.insert(availabilitySlots).values(values.map(v => ({
-                psychologistId: v.psychologist_id,
+                oyenteId: v.oyente_id,
                 startTime: new Date(v.start_time),
                 endTime: new Date(v.end_time),
                 isBooked: v.is_booked
             })));
         }
 
-        revalidatePath("/psychologist/calendar");
+        revalidatePath("/oyente/calendar");
         return { success: true };
     } catch (error: any) {
         if (error.digest === 'DYNAMIC_SERVER_USAGE' || (error.message && error.message.includes('Dynamic server usage'))) {
@@ -174,9 +140,9 @@ export async function saveSchedule(psychologistId: string, slots: { id: string, 
 
 
 export async function createPendingAppointment(data: {
-    patientName: string;
-    patientEmail: string;
-    psychologistId: string;
+    usuarioNombre: string;
+    usuarioEmail: string;
+    oyenteId: string;
     slotId: string;
     startTime: Date;
     discountCodeId?: string;
@@ -184,46 +150,40 @@ export async function createPendingAppointment(data: {
     isAnonymous?: boolean;
 }) {
     const user = await getCurrentUser();
-    // If logged in, email must match
-    if (user && user.email !== data.patientEmail && user.role !== 'admin') {
+    if (user && user.email !== data.usuarioEmail && user.role !== 'admin') {
         throw new Error("No puedes reservar citas para otra persona.");
     }
 
     try {
-        // 1. Ensure user exists (using raw client to avoid pooler issues)
-        const userResults = await client`SELECT id FROM users WHERE email = ${data.patientEmail} LIMIT 1`;
+        const userResults = await client`SELECT id FROM users WHERE email = ${data.usuarioEmail} LIMIT 1`;
         let userId = userResults[0]?.id;
 
         if (!userId) {
-            // Check again inside a small retry or just try to insert
             try {
                 const newUserResults = await client`
                     INSERT INTO users (email, full_name, role)
-                    VALUES (${data.patientEmail}, ${data.patientName}, 'patient')
+                    VALUES (${data.usuarioEmail}, ${data.usuarioNombre}, 'usuario')
                     RETURNING id
                 `;
                 userId = newUserResults[0].id;
             } catch (insErr) {
-                // If it fails with duplicate key, fetch again
-                const finalCheck = await client`SELECT id FROM users WHERE email = ${data.patientEmail} LIMIT 1`;
+                const finalCheck = await client`SELECT id FROM users WHERE email = ${data.usuarioEmail} LIMIT 1`;
                 userId = finalCheck[0]?.id;
                 if (!userId) throw insErr;
             }
         }
 
-        // 2. Mark slot as booked
         await client`
             UPDATE availability_slots 
             SET is_booked = true 
             WHERE id = ${data.slotId}
         `;
 
-        // 3. Create Appointment with 'pending_payment' status
         const apptResults = await client`
             INSERT INTO appointments (
-                patient_id, psychologist_id, patient_name, date, price, status, discount_code_id, is_anonymous
+                usuario_id, oyente_id, usuario_nombre, date, price, status, discount_code_id, is_anonymous
             ) VALUES (
-                ${userId}, ${data.psychologistId}, ${data.patientName || null}, ${new Date(data.startTime).toISOString()}, 
+                ${userId}, ${data.oyenteId}, ${data.usuarioNombre || null}, ${new Date(data.startTime).toISOString()}, 
                 ${data.finalPrice || null}, 'pending_payment', ${data.discountCodeId || null}, ${data.isAnonymous || false}
             )
             RETURNING id
@@ -242,22 +202,20 @@ export async function createPendingAppointment(data: {
 
 export async function confirmAppointmentPayment(appointmentId: string) {
     try {
-        // 1. Mark as scheduled using raw client
         await client`
             UPDATE appointments 
             SET status = 'scheduled' 
             WHERE id = ${appointmentId}
         `;
 
-        // 2. Fetch psychologist_id to refresh stats
-        const results = await client`SELECT psychologist_id FROM appointments WHERE id = ${appointmentId} LIMIT 1`;
+        const results = await client`SELECT oyente_id FROM appointments WHERE id = ${appointmentId} LIMIT 1`;
         if (results[0]) {
-            await refreshPsychologistStats(results[0].psychologist_id);
+            await refreshOyenteStats(results[0].oyente_id);
         }
 
-        revalidatePath("/patient/dashboard");
-        revalidatePath("/psychologist/dashboard");
-        revalidatePath("/psychologist/patients");
+        revalidatePath("/usuario/dashboard");
+        revalidatePath("/oyente/dashboard");
+        revalidatePath("/oyente/usuarios");
     } catch (error: any) {
         if (error.digest === 'DYNAMIC_SERVER_USAGE' || (error.message && error.message.includes('Dynamic server usage'))) {
             throw error;
@@ -266,17 +224,16 @@ export async function confirmAppointmentPayment(appointmentId: string) {
     }
 }
 
-export async function getPatientAppointments(patientId: string) {
+export async function getUsuarioAppointments(usuarioId: string) {
     const user = await getCurrentUser();
-    if (!user || (user.id !== patientId && user.role !== 'admin')) {
+    if (!user || (user.id !== usuarioId && user.role !== 'admin')) {
         throw new Error("No autorizado.");
     }
-    // Assuming 'appointments' has a 'patientId' field and relation to 'psychologist'
     const userAppointments = await db.query.appointments.findMany({
-        where: eq(appointments.patientId, patientId),
+        where: eq(appointments.usuarioId, usuarioId),
         orderBy: [desc(appointments.date)],
         with: {
-            psychologist: true // Ensure 'psychologist' relation exists and is fetched
+            oyente: true
         }
     });
     return userAppointments;

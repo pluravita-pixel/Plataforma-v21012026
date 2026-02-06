@@ -5,7 +5,7 @@ export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const session = request.cookies.get("session_id")?.value;
 
-    const protectedPaths = ['/admin', '/psychologist', '/patient'];
+    const protectedPaths = ['/admin', '/psychologist', '/usuario'];
     const isProtected = protectedPaths.some(path => pathname.startsWith(path));
 
     if (isProtected && !session) {

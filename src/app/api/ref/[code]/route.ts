@@ -6,7 +6,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ code
     const { code } = await params;
 
     if (!code) {
-        redirect("/patient/search");
+        redirect("/usuario/search");
     }
 
     try {
@@ -15,12 +15,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ code
         `;
 
         if (results.length > 0) {
-            redirect(`/patient/search?ref=${results[0].id}`);
+            redirect(`/usuario/search?ref=${results[0].id}`);
         } else {
-            redirect("/patient/search");
+            redirect("/usuario/search");
         }
     } catch (error) {
         console.error("Error looking up ref code:", error);
-        redirect("/patient/search");
+        redirect("/usuario/search");
     }
 }

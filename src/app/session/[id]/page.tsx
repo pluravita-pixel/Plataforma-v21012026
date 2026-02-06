@@ -46,7 +46,7 @@ export default async function SessionPage({ params }: SessionPageProps) {
                         <h1 className="text-xl font-bold mb-2">Sesión no encontrada</h1>
                         <p className="text-neutral-500 mb-6">La sesión que buscas no existe o ha sido eliminada.</p>
                         <Button asChild>
-                            <Link href="/patient/dashboard">Volver al Dashboard</Link>
+                            <Link href="/usuario/dashboard">Volver al Dashboard</Link>
                         </Button>
                     </Card>
                 </div>
@@ -55,7 +55,7 @@ export default async function SessionPage({ params }: SessionPageProps) {
 
         // Determine Role and Access
         const isSpecialUser = user.email === 'psicologo_test@ejemplo.com' || user.email === 'sanmiguelgil1@gmail.com';
-        const isPsychologist = appointment.psychologist_user_id === user.id || (isSpecialUser && user.role === 'psychologist');
+        const isPsychologist = appointment.psychologist_user_id === user.id || (isSpecialUser && user.role === 'oyente');
         const isPatient = (appointment.patient_id === user.id || (isSpecialUser && user.role === 'patient')) && !isPsychologist;
 
         if (!isPsychologist && !isPatient) {
@@ -82,7 +82,7 @@ export default async function SessionPage({ params }: SessionPageProps) {
                         <h1 className="text-xl font-bold mb-2">Sesión Cancelada</h1>
                         <p className="text-neutral-500 mb-6">Esta sesión ha sido cancelada.</p>
                         <Button asChild>
-                            <Link href={isPsychologist ? "/psychologist/dashboard" : "/patient/dashboard"}>
+                            <Link href={isPsychologist ? "/psychologist/dashboard" : "/usuario/dashboard"}>
                                 Volver al Dashboard
                             </Link>
                         </Button>
@@ -100,7 +100,7 @@ export default async function SessionPage({ params }: SessionPageProps) {
                         <VideoOff className="w-16 h-16 mx-auto text-red-500 mb-6" />
                         <h1 className="text-2xl font-black uppercase italic mb-4">Link no disponible</h1>
                         <p className="text-gray-600 font-bold mb-8 uppercase text-xs tracking-tight">
-                            El coach aún no ha configurado su link de Zoom/Sesión. Por favor, contacta con soporte o espera a que el profesional lo añada a su perfil.
+                            El oyente aún no ha configurado su link de Zoom/Sesión. Por favor, contacta con soporte o espera a que el profesional lo añada a su perfil.
                         </p>
                         <Button asChild className="w-full h-14 rounded-none border-4 border-black bg-black text-white font-black uppercase hover:bg-gray-800 transition-all shadow-[6px_6px_0px_0px_rgba(166,131,99,1)]">
                             <Link href="/">Volver</Link>

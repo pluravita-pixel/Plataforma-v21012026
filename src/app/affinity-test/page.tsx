@@ -75,7 +75,7 @@ const STEPS = [
     },
     {
         id: "therapist_gender",
-        title: "¿Prefieres que tu coach sea hombre o mujer?",
+        title: "¿Prefieres que tu oyente sea hombre o mujer?",
         subtitle: "",
         options: [
             { id: "woman", label: "Mujer" },
@@ -112,7 +112,7 @@ export default function AffinityTestPage() {
                     .single()
 
                 if (data?.has_completed_affinity) {
-                    router.push("/patient/search")
+                    router.push("/usuario/search")
                 }
             }
         }
@@ -195,7 +195,7 @@ export default function AffinityTestPage() {
     return (
         <div className="min-h-screen relative overflow-hidden flex flex-col items-center bg-[#F9F5F0] px-4">
             <title>Test de Afinidad | pluravita</title>
-            <meta name="description" content="Encuentra a tu coach ideal con nuestro test de afinidad." />
+            <meta name="description" content="Encuentra a tu oyente ideal con nuestro test de afinidad." />
 
             {/* Background */}
             <div className="absolute inset-0 z-0 bg-[#F9F5F0]">
@@ -214,7 +214,7 @@ export default function AffinityTestPage() {
                         {/* Test Content starts with spacing */}
                         <div className="w-full pt-16">
                             <h1 className="text-xl font-medium text-[#4A3C31] mb-8 text-center">
-                                Encuentra a tu coach ideal
+                                Encuentra a tu oyente ideal
                             </h1>
 
                             {/* Progress Bar Container */}
@@ -235,7 +235,7 @@ export default function AffinityTestPage() {
                                     animate={{ opacity: 1, y: 0 }}
                                     className="text-sm text-gray-500 max-w-xl mx-auto mb-10 leading-relaxed font-medium"
                                 >
-                                    Las siguientes preguntas están diseñadas para encontrar a tu coach ideal según tus necesidades y preferencias personales.
+                                    Las siguientes preguntas están diseñadas para encontrar a tu oyente ideal según tus necesidades y preferencias personales.
                                 </motion.p>
                             )}
                         </div>
@@ -431,7 +431,7 @@ export default function AffinityTestPage() {
                                 transition={{ delay: 0.8 }}
                                 className="text-gray-500 font-medium text-md"
                             >
-                                Estamos buscando a los mejores coaches para ti
+                                Estamos buscando a los mejores oyentes para ti
                             </motion.p>
                         </div>
 

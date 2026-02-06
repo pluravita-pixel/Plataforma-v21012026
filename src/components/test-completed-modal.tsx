@@ -31,7 +31,7 @@ export function TestCompletedModal({ isOpen, onOpenChange }: TestCompletedModalP
                     </DialogTitle>
 
                     <p className="text-gray-500 text-sm font-medium leading-relaxed mb-10 px-4">
-                        Ya hemos analizado tu perfil y tenemos una selección personalizada de coaches para ti. No es necesario que repitas el test.
+                        Ya hemos analizado tu perfil y tenemos una selección personalizada de oyentes para ti. No es necesario que repitas el test.
                     </p>
 
                     <div className="flex flex-col gap-3">
@@ -39,8 +39,8 @@ export function TestCompletedModal({ isOpen, onOpenChange }: TestCompletedModalP
                             asChild
                             className="w-full bg-[#A68363] hover:bg-[#8C6B4D] text-white font-black py-7 rounded-2xl text-lg shadow-xl shadow-[#A68363]/20 transition-all hover:-translate-y-1 active:scale-95"
                         >
-                            <Link href="/patient/search">
-                                Ver psicólogos disponibles
+                            <Link href="/usuario/search">
+                                Ver oyentes disponibles
                                 <ArrowRight className="ml-2 h-5 w-5" />
                             </Link>
                         </Button>

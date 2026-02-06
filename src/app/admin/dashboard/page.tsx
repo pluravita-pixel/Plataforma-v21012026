@@ -22,7 +22,7 @@ export default async function AdminDashboard() {
 
     const stats = [
         { label: "Usuarios Registrados", value: statsData.users, icon: Users, color: "text-black", bg: "bg-white" },
-        { label: "Coaches Registrados", value: statsData.psychologists, icon: UserCheck, color: "text-black", bg: "bg-gray-100" },
+        { label: "Oyentes Registrados", value: statsData.psychologists, icon: UserCheck, color: "text-black", bg: "bg-gray-100" },
         { label: "Total Sesiones", value: statsData.sessions, icon: Calendar, color: "text-black", bg: "bg-gray-50" },
     ];
 
@@ -53,9 +53,9 @@ export default async function AdminDashboard() {
             </div>
 
             <div className="grid grid-cols-1 gap-12">
-                {/* Psychologists List */}
+                {/* Oyentes List */}
                 <div className="bg-white p-10 neo-border neo-shadow">
-                    <h2 className="text-3xl font-black text-black mb-10 uppercase tracking-tighter">Coaches en la Web</h2>
+                    <h2 className="text-3xl font-black text-black mb-10 uppercase tracking-tighter">Oyentes en la Web</h2>
                     <div className="space-y-6 max-h-[700px] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-black">
                         {allPsychologists.length > 0 ? allPsychologists.map((p, i) => (
                             <div key={i} className="flex items-center justify-between p-6 bg-white neo-border hover:bg-gray-50 transition-colors neo-shadow-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none">
@@ -73,7 +73,7 @@ export default async function AdminDashboard() {
                                     <p className="text-xs text-black/40 font-bold uppercase tracking-widest leading-none mt-1">{p.email}</p>
                                 </div>
                             </div>
-                        )) : <p className="text-black font-bold uppercase opacity-20 text-center py-20">No hay coaches registrados</p>}
+                        )) : <p className="text-black font-bold uppercase opacity-20 text-center py-20">No hay oyentes registrados</p>}
                     </div>
                 </div>
             </div>

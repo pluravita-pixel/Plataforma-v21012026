@@ -32,17 +32,16 @@ export function UserNav() {
     const [loading, setLoading] = useState(true);
     const [isPending, startTransition] = useTransition();
     const [isOpen, setIsOpen] = useState(false);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-    const [newName, setNewName] = useState("");
-    const [isUpdating, setIsUpdating] = useState(false);
 
     useEffect(() => {
         const fetchUser = async () => {
             try {
                 const userData = await getCurrentUser();
                 setUser(userData);
-                if (userData) setNewName(userData.fullName || "");
+                if (userData) {
+                    // Pre-fetch or handle user data if needed
+                }
             } catch (error) {
                 console.error("Failed to fetch user:", error);
             } finally {
@@ -59,21 +58,6 @@ export function UserNav() {
         });
     };
 
-    const handleUpdateName = async () => {
-        if (!newName.trim()) return;
-
-        setIsUpdating(true);
-        const result = await updateProfile(newName);
-        setIsUpdating(false);
-
-        if ("success" in result) {
-            toast.success("Nombre actualizado");
-            setUser({ ...user, fullName: newName });
-            setIsEditModalOpen(false);
-        } else {
-            toast.error(result.error);
-        }
-    };
 
     if (loading) {
         return <Loader2 className="h-5 w-5 animate-spin text-gray-400" />;
@@ -110,7 +94,9 @@ export function UserNav() {
                 </Avatar>
                 <div className="hidden sm:block text-left">
                     <p className="text-xs font-bold text-gray-900 line-clamp-1">{user.fullName || "Usuario"}</p>
-                    <p className="text-[10px] text-gray-500 line-clamp-1 uppercase tracking-wider">{user.role}</p>
+                    <p className="text-[10px] text-gray-500 line-clamp-1 uppercase tracking-wider">
+                        {user.role === 'oyente' ? 'OYENTE' : user.role}
+                    </p>
                 </div>
                 <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
             </button>
@@ -136,24 +122,44 @@ export function UserNav() {
                                 <LayoutDashboard className="h-4 w-4" />
                                 Panel de Admin
                             </Link>
-                        ) : user.role === 'psychologist' ? (
-                            <Link
-                                href="/psychologist/dashboard"
-                                className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-[#F2EDE7] hover:text-[#A68363] transition-colors"
-                                onClick={() => setIsOpen(false)}
-                            >
-                                <LayoutDashboard className="h-4 w-4" />
-                                Panel de Coach
-                            </Link>
+                        ) : user.role === 'oyente' ? (
+                            <>
+                                <Link
+                                    href="/oyente/dashboard"
+                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-[#F2EDE7] hover:text-[#A68363] transition-colors"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    <LayoutDashboard className="h-4 w-4" />
+                                    Panel de Oyente
+                                </Link>
+                                <Link
+                                    href="/oyente/settings"
+                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-[#F2EDE7] hover:text-[#A68363] transition-colors"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    <Settings className="h-4 w-4" />
+                                    Ajustes de cuenta
+                                </Link>
+                            </>
                         ) : (
-                            <Link
-                                href="/patient/dashboard"
-                                className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-[#F2EDE7] hover:text-[#A68363] transition-colors"
-                                onClick={() => setIsOpen(false)}
-                            >
-                                <LayoutDashboard className="h-4 w-4" />
-                                Mi Dashboard
-                            </Link>
+                            <>
+                                <Link
+                                    href="/usuario/dashboard"
+                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-[#F2EDE7] hover:text-[#A68363] transition-colors"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    <LayoutDashboard className="h-4 w-4" />
+                                    Mi Dashboard
+                                </Link>
+                                <Link
+                                    href="/usuario/profile"
+                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-[#F2EDE7] hover:text-[#A68363] transition-colors"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    <Settings className="h-4 w-4" />
+                                    Ajustes de cuenta
+                                </Link>
+                            </>
                         )}
 
                         <div className="h-px bg-gray-50 my-1" />
@@ -172,35 +178,6 @@ export function UserNav() {
                 </>
             )}
 
-            {/* Edit Profile Dialog */}
-            <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle>Editar perfil</DialogTitle>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid gap-2">
-                            <Label htmlFor="name">Nombre completo</Label>
-                            <Input
-                                id="name"
-                                value={newName}
-                                onChange={(e) => setNewName(e.target.value)}
-                                placeholder="Escribe tu nombre"
-                            />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
-                        <Button
-                            onClick={handleUpdateName}
-                            disabled={isUpdating}
-                            className="bg-[#A68363] hover:opacity-90 text-white"
-                        >
-                            {isUpdating ? "Guardando..." : "Guardar cambios"}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
 
             {/* Logout Confirm Dialog */}
             <Dialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>

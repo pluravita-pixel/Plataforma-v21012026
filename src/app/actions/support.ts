@@ -18,7 +18,7 @@ export async function createTicket(subject: string, message: string) {
             status: "open",
         });
 
-        revalidatePath("/psychologist/support");
+        revalidatePath("/oyente/support");
         revalidatePath("/admin/support");
         return { success: true };
     } catch (error) {
@@ -83,11 +83,6 @@ export async function replyToTicket(ticketId: string, response: string) {
             .set({
                 adminResponse: response,
                 isRead: true
-                // Keep status open so user can see reply, or maybe resolved?
-                // Usually reply means admin acted. Let's keep it open or have a 'replied' status?
-                // Schema limits to 'open'/'resolved'. Let's keep 'open' or move to 'resolved' if checking.
-                // For now, just adding response. Admin can resolve separately or I'll add auto-resolve?
-                // Let's leave status as is, just add response.
             })
             .where(eq(supportTickets.id, ticketId));
 

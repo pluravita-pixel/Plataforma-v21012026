@@ -36,16 +36,15 @@ export async function GET(request: NextRequest) {
             if (user) {
                 if (user.role === 'admin') {
                     return NextResponse.redirect(`${requestUrl.origin}/admin/dashboard`);
-                } else if (user.role === 'psychologist') {
-                    return NextResponse.redirect(`${requestUrl.origin}/psychologist/dashboard`);
+                } else if (user.role === 'oyente' || user.role === 'psychologist' || user.role === 'coach') {
+                    return NextResponse.redirect(`${requestUrl.origin}/oyente/dashboard`);
                 } else if (user.hasPendingApplication) {
-                    return NextResponse.redirect(`${requestUrl.origin}/coach-onboarding`);
+                    return NextResponse.redirect(`${requestUrl.origin}/registro-oyente`);
                 }
             }
         }
     }
 
-    // Default redirect for patients or fallback
-    return NextResponse.redirect(`${requestUrl.origin}/patient/dashboard`);
+    // Default redirect for usuarios or fallback
+    return NextResponse.redirect(`${requestUrl.origin}/usuario/dashboard`);
 }
-

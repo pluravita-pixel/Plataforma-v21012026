@@ -11,7 +11,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
         pathname.startsWith('/psychologist') ||
         pathname.startsWith('/admin') ||
         pathname.startsWith('/dashboard') ||
-        pathname.startsWith('/patient/dashboard');
+        pathname.startsWith('/usuario/dashboard');
 
     if (skipTransition) {
         return <>{children}</>;

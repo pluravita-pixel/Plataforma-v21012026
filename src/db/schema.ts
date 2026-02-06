@@ -6,7 +6,7 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   fullName: text("full_name"),
   phone: text("phone"),
-  role: text("role").default("patient").notNull(), // 'patient', 'psychologist', 'admin'
+  role: text("role").default("usuario").notNull(), // 'usuario', 'oyente', 'admin'
   sessionsCount: integer("sessions_count").default(0),
   lastLogin: timestamp("last_login"),
   hasCompletedAffinity: boolean("has_completed_affinity").default(false).notNull(),
@@ -14,7 +14,7 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const coachApplications = pgTable("coach_applications", {
+export const oyenteSolicitudes = pgTable("oyente_solicitudes", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
   fullName: text("full_name").notNull(),
@@ -28,7 +28,7 @@ export const coachApplications = pgTable("coach_applications", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const psychologists = pgTable("psychologists", {
+export const oyentes = pgTable("oyentes", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").references(() => users.id, { onUpdate: "cascade" }).notNull(),
   fullName: text("full_name").notNull(),
@@ -36,8 +36,8 @@ export const psychologists = pgTable("psychologists", {
   username: text("username").unique(), // Unique username for public profile URL
   totalSessions: integer("total_sessions").default(0),
   completedSessions: integer("completed_sessions").default(0),
-  totalPatients: integer("total_patients").default(0),
-  activePatients: integer("active_patients").default(0),
+  totalUsers: integer("total_usuarios").default(0),
+  activeUsers: integer("active_usuarios").default(0),
   rating: text("rating").default("5.0"),
   specialty: text("specialty"),
   languages: text("languages").array(), // Languages: Español, Inglés, Francés, Alemán
@@ -65,15 +65,15 @@ export const discountCodes = pgTable("discount_codes", {
 
 export const appointments = pgTable("appointments", {
   id: uuid("id").primaryKey().defaultRandom(),
-  patientId: uuid("patient_id").references(() => users.id, { onUpdate: "cascade" }).notNull(),
-  psychologistId: uuid("psychologist_id").references(() => psychologists.id).notNull(),
-  patientName: text("patient_name"), // Override for anonymity or custom names during booking
+  usuarioId: uuid("usuario_id").references(() => users.id, { onUpdate: "cascade" }).notNull(),
+  oyenteId: uuid("oyente_id").references(() => oyentes.id).notNull(),
+  usuarioNombre: text("usuario_nombre"), // Override for anonymity or custom names during booking
   date: timestamp("date").notNull(),
   reason: text("reason"),
   status: text("status").default("scheduled").notNull(), // scheduled, completed, cancelled
   price: decimal("price", { precision: 10, scale: 2 }),
   discountCodeId: uuid("discount_code_id").references(() => discountCodes.id),
-  psychologistNotes: text("psychologist_notes"), // Notes/tips from psychologist after session
+  oyenteNotas: text("oyente_notas"), // Notes/tips from psychologist after session
   improvementTips: text("improvement_tips"), // Personalized improvement tips
   rating: integer("rating"), // Patient rating 1-5
   paymentStatus: text("payment_status").default("unpaid").notNull(), // unpaid, paid, refunded
@@ -96,7 +96,7 @@ export const supportTickets = pgTable("support_tickets", {
 
 export const withdrawals = pgTable("withdrawals", {
   id: uuid("id").primaryKey().defaultRandom(),
-  psychologistId: uuid("psychologist_id").references(() => psychologists.id).notNull(),
+  oyenteId: uuid("oyente_id").references(() => oyentes.id).notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   status: text("status").default("pending").notNull(), // pending, completed, rejected
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -109,20 +109,18 @@ export const usersRelations = relations(users, ({ many }) => ({
   appointments: many(appointments),
 }));
 
-
-
 export const discountCodesRelations = relations(discountCodes, ({ many }) => ({
   appointments: many(appointments),
 }));
 
 export const appointmentsRelations = relations(appointments, ({ one, many }) => ({
-  patient: one(users, {
-    fields: [appointments.patientId],
+  usuario: one(users, {
+    fields: [appointments.usuarioId],
     references: [users.id],
   }),
-  psychologist: one(psychologists, {
-    fields: [appointments.psychologistId],
-    references: [psychologists.id],
+  oyente: one(oyentes, {
+    fields: [appointments.oyenteId],
+    references: [oyentes.id],
   }),
   discountCode: one(discountCodes, {
     fields: [appointments.discountCodeId],
@@ -139,16 +137,16 @@ export const supportTicketsRelations = relations(supportTickets, ({ one }) => ({
 }));
 
 export const withdrawalsRelations = relations(withdrawals, ({ one }) => ({
-  psychologist: one(psychologists, {
-    fields: [withdrawals.psychologistId],
-    references: [psychologists.id],
+  oyente: one(oyentes, {
+    fields: [withdrawals.oyenteId],
+    references: [oyentes.id],
   }),
 }));
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
-export type Psychologist = typeof psychologists.$inferSelect;
-export type NewPsychologist = typeof psychologists.$inferInsert;
+export type Oyente = typeof oyentes.$inferSelect;
+export type NewOyente = typeof oyentes.$inferInsert;
 export type Appointment = typeof appointments.$inferSelect;
 export type NewAppointment = typeof appointments.$inferInsert;
 export type SupportTicket = typeof supportTickets.$inferSelect;
@@ -156,12 +154,12 @@ export type Withdrawal = typeof withdrawals.$inferSelect;
 export type NewWithdrawal = typeof withdrawals.$inferInsert;
 export type DiscountCode = typeof discountCodes.$inferSelect;
 export type NewDiscountCode = typeof discountCodes.$inferInsert;
-export type CoachApplication = typeof coachApplications.$inferSelect;
-export type NewCoachApplication = typeof coachApplications.$inferInsert;
+export type OyenteSolicitud = typeof oyenteSolicitudes.$inferSelect;
+export type NewOyenteSolicitud = typeof oyenteSolicitudes.$inferInsert;
 
 export const availabilitySlots = pgTable("availability_slots", {
   id: uuid("id").primaryKey().defaultRandom(),
-  psychologistId: uuid("psychologist_id").references(() => psychologists.id).notNull(),
+  oyenteId: uuid("oyente_id").references(() => oyentes.id).notNull(),
   startTime: timestamp("start_time").notNull(),
   endTime: timestamp("end_time").notNull(),
   isBooked: boolean("is_booked").default(false).notNull(),
@@ -191,14 +189,13 @@ export const sessionFilesRelations = relations(sessionFiles, ({ one }) => ({
 }));
 
 export const availabilitySlotsRelations = relations(availabilitySlots, ({ one }) => ({
-  psychologist: one(psychologists, {
-    fields: [availabilitySlots.psychologistId],
-    references: [psychologists.id],
+  oyente: one(oyentes, {
+    fields: [availabilitySlots.oyenteId],
+    references: [oyentes.id],
   }),
 }));
 
-// Added availabilitySlots to psychologistsRelations
-export const psychologistsRelations = relations(psychologists, ({ many }) => ({
+export const oyentesRelations = relations(oyentes, ({ many }) => ({
   withdrawals: many(withdrawals),
   appointments: many(appointments),
   availabilitySlots: many(availabilitySlots),

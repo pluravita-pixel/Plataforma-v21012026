@@ -27,15 +27,15 @@ interface Slot {
 }
 
 interface BookingModalProps {
-    psychologistId: string;
-    psychologistName: string;
+    listenerId: string;
+    listenerName: string;
     price: number;
     currentUser: any | null;
     customTrigger?: React.ReactNode;
     defaultOpen?: boolean;
 }
 
-export function BookingModal({ psychologistId, psychologistName, price, currentUser, customTrigger, defaultOpen = false }: BookingModalProps) {
+export function BookingModal({ listenerId: psychologistId, listenerName: psychologistName, price, currentUser, customTrigger, defaultOpen = false }: BookingModalProps) {
     const supabase = createClient();
     const router = useRouter();
     const [step, setStep] = useState(1);
@@ -447,7 +447,7 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
                                                 <EyeOff className="h-4 w-4 text-[#A68363]" />
                                                 <div>
                                                     <p className="text-sm font-bold text-[#4A3C31]">Modo Anónimo</p>
-                                                    <p className="text-[10px] text-gray-400">Ocultar mi nombre real al especialista</p>
+                                                    <p className="text-[10px] text-gray-400">Ocultar mi nombre real al oyente</p>
                                                 </div>
                                             </div>
                                             <Switch
@@ -683,7 +683,7 @@ export function BookingModal({ psychologistId, psychologistName, price, currentU
                                 <Button
                                     onClick={() => {
                                         setIsOpen(false);
-                                        router.push('/patient/dashboard');
+                                        router.push('/usuario/dashboard');
                                     }}
                                     className="mt-8 bg-[#A68363] hover:bg-[#8C6B4D] text-white rounded-xl font-bold px-10 h-12 shadow-lg"
                                 >

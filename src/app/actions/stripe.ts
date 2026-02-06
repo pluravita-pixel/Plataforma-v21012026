@@ -16,13 +16,12 @@ export async function createCheckoutSession(appointmentId: string, returnUrl?: s
     try {
         const stripe = getStripe();
         const base = process.env.NEXT_PUBLIC_APP_URL || "";
-        const finalReturnUrl = returnUrl || `${base}/patient/dashboard`;
+        const finalReturnUrl = returnUrl || `${base}/usuario/dashboard`;
 
-        // 1. Fetch appointment details
         const apptResults = await client`
-            SELECT a.*, p.full_name as coach_name 
+            SELECT a.*, p.full_name as oyente_name 
             FROM appointments a
-            JOIN psychologists p ON a.psychologist_id = p.id
+            JOIN oyentes p ON a.oyente_id = p.id
             WHERE a.id = ${appointmentId}
             LIMIT 1
         `;
@@ -30,7 +29,6 @@ export async function createCheckoutSession(appointmentId: string, returnUrl?: s
 
         if (!appointment) throw new Error("Cita no encontrada");
 
-        // 2. Create Stripe Session
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             line_items: [
@@ -38,7 +36,7 @@ export async function createCheckoutSession(appointmentId: string, returnUrl?: s
                     price_data: {
                         currency: "eur",
                         product_data: {
-                            name: `Sesión con ${appointment.coach_name}`,
+                            name: `Sesión con ${appointment.oyente_name}`,
                             description: `Cita reservada para el ${new Date(appointment.date).toLocaleString('es-ES')}`,
                         },
                         unit_amount: Math.round(Number(appointment.price || 0) * 100),
@@ -54,7 +52,6 @@ export async function createCheckoutSession(appointmentId: string, returnUrl?: s
             },
         });
 
-        // 3. Update appointment with session ID
         await client`
             UPDATE appointments 
             SET stripe_session_id = ${session.id}

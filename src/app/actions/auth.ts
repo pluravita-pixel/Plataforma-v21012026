@@ -7,7 +7,6 @@ import { client } from "@/db"; // Importamos el cliente directo, NO Drizzle
 import { cache } from "react";
 
 // Helper para cliente Supabase
-// Singleton pattern for Supabase client
 let supabaseInstance: ReturnType<typeof createClient> | null = null;
 
 const getSupabase = () => {
@@ -64,7 +63,6 @@ export async function login(prevState: any, formData: FormData) {
     let authError: string | null = null;
 
     try {
-        // 1. Autenticación con Supabase
         const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password,
@@ -79,7 +77,6 @@ export async function login(prevState: any, formData: FormData) {
         }
 
         if (data.session && data.user) {
-            // 2. Establecer Cookie de Sesión - Fast path
             const cookieStore = await cookies();
             cookieStore.set("session_id", data.session.access_token, {
                 httpOnly: true,
@@ -89,9 +86,7 @@ export async function login(prevState: any, formData: FormData) {
                 sameSite: "lax",
             });
 
-            // 3. Obtener Rol y Actualizar last_login en UNA SOLA consulta
             try {
-                // Actualizamos users y obtenemos info básica
                 const usersResult = await client`
                     UPDATE users 
                     SET last_login = NOW() 
@@ -103,37 +98,32 @@ export async function login(prevState: any, formData: FormData) {
 
                 if (!user) {
                     console.error("Usuario autenticado pero no encontrado en tabla users DB");
-                    redirectPath = "/patient/dashboard";
+                    redirectPath = "/usuario/dashboard";
                 } else {
-                    // Si es psicólogo o coach (por si acaso se usa ese término en la DB)
-                    if (user.role === 'psychologist' || user.role === 'coach') {
-                        // Lo hacemos lo más rápido posible
-                        await client`UPDATE psychologists SET last_login = NOW() WHERE user_id = ${data.user.id}::uuid`;
-                        redirectPath = "/psychologist/dashboard";
+                    if (user.role === 'oyente' || user.role === 'psychologist' || user.role === 'coach') {
+                        await client`UPDATE oyentes SET last_login = NOW() WHERE user_id = ${data.user.id}::uuid`;
+                        redirectPath = "/oyente/dashboard";
                     } else if (user.role === 'admin') {
                         redirectPath = "/admin/dashboard";
                     } else if (user.hasPendingApplication) {
-                        redirectPath = "/coach-onboarding";
+                        redirectPath = "/registro-oyente";
                     } else {
-                        // Verificación adicional: ¿Tiene una solicitud aceptada?
                         const acceptedApp = await client`
-                            SELECT id FROM coach_applications 
+                            SELECT id FROM oyente_solicitudes 
                             WHERE user_id = ${data.user.id}::uuid AND status = 'accepted'
                             LIMIT 1
                         `;
 
                         if (acceptedApp.length > 0) {
-                            redirectPath = "/psychologist/dashboard";
+                            redirectPath = "/oyente/dashboard";
                         } else {
-                            redirectPath = "/patient/dashboard";
+                            redirectPath = "/usuario/dashboard";
                         }
                     }
                 }
-
-
             } catch (dbError) {
                 console.error("Error crítico de base de datos al login:", dbError);
-                redirectPath = "/patient/dashboard";
+                redirectPath = "/usuario/dashboard";
             }
         }
     } catch (err) {
@@ -157,7 +147,6 @@ export const getCurrentUser = cache(async function getCurrentUser() {
 
         if (error || !user) return null;
 
-        // Fetch raw user data
         const result = await client`
             SELECT 
                 id, 
@@ -185,7 +174,6 @@ export const getCurrentUser = cache(async function getCurrentUser() {
 export async function logout() {
     try {
         const cookieStore = await cookies();
-        // Clear cookie explicitly with path and maxAge 0
         cookieStore.set("session_id", "", {
             path: "/",
             maxAge: 0,
@@ -198,16 +186,14 @@ export async function logout() {
         console.error("Logout error:", error);
     }
 
-    // Redirect must be outside try/catch or re-thrown if it's a "NEXT_REDIRECT" error
     redirect("/");
 }
 
-// Mantenemos register simplificado también
 export async function register(prevState: any, formData: FormData) {
     const email = (formData.get("email") as string).toLowerCase().trim();
     const password = formData.get("password") as string;
     const fullName = formData.get("fullName") as string;
-    const isCoachApplication = formData.get("role") === "coach";
+    const isOyenteApplication = formData.get("role") === "oyente" || formData.get("role") === "coach";
     const supabase = getSupabase();
 
     try {
@@ -218,7 +204,7 @@ export async function register(prevState: any, formData: FormData) {
                 emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
                 data: {
                     full_name: fullName,
-                    is_coach_application: isCoachApplication
+                    is_oyente_application: isOyenteApplication
                 }
             }
         });
@@ -226,13 +212,11 @@ export async function register(prevState: any, formData: FormData) {
         if (error) return { error: error.message };
 
         if (data.user) {
-            // Check if user exists (Pre-seeded by Admin)
             const existing = await client`SELECT * FROM users WHERE email = ${email} LIMIT 1`;
 
-            let role = 'patient';
+            let role = 'usuario';
 
             if (existing.length > 0) {
-                // User was pre-registered by admin
                 const oldUser = existing[0];
                 role = oldUser.role;
 
@@ -244,9 +228,9 @@ export async function register(prevState: any, formData: FormData) {
                         WHERE id = ${oldUser.id}
                     `;
 
-                    if (role === 'psychologist') {
+                    if (role === 'oyente' || role === 'psychologist' || role === 'coach') {
                         await client`
-                            UPDATE psychologists 
+                            UPDATE oyentes 
                             SET user_id = ${data.user.id},
                                 full_name = ${fullName || oldUser.full_name}
                             WHERE user_id = ${oldUser.id}
@@ -254,24 +238,21 @@ export async function register(prevState: any, formData: FormData) {
                     }
                 }
             } else {
-                // New User Registration
                 await client`
                     INSERT INTO users (id, email, full_name, role)
-                    VALUES (${data.user.id}::uuid, ${email}::text, ${fullName}::text, 'patient')
+                    VALUES (${data.user.id}::uuid, ${email}::text, ${fullName}::text, 'usuario')
                 `;
 
-                // If it's a coach application, create a support ticket for admin
-                if (isCoachApplication) {
-                    const ticketMessage = `El usuario ${fullName} (${email}) se ha registrado y desea ser Coach. Verifique su perfil.`;
+                if (isOyenteApplication) {
+                    const ticketMessage = `El usuario ${fullName} (${email}) se ha registrado y desea ser Oyente. Verifique su perfil.`;
                     await client`
                         INSERT INTO support_tickets (user_id, subject, message, status)
-                        VALUES (${data.user.id}::uuid, 'Nueva solicitud de Coach', ${ticketMessage}::text, 'open')
+                        VALUES (${data.user.id}::uuid, 'Nueva solicitud de Oyente', ${ticketMessage}::text, 'open')
                     `;
                 }
             }
 
-            // Determine Success Message / Redirect
-            if (isCoachApplication) {
+            if (isOyenteApplication) {
                 const cookieStore = await cookies();
                 cookieStore.set("session_id", data.session?.access_token || "", {
                     httpOnly: true,
@@ -279,10 +260,9 @@ export async function register(prevState: any, formData: FormData) {
                     maxAge: data.session?.expires_in || 3600,
                     path: "/",
                 });
-                redirect("/coach-onboarding");
+                redirect("/registro-oyente");
             }
 
-            // Auto-login if session exists
             if (data.session) {
                 const cookieStore = await cookies();
                 cookieStore.set("session_id", data.session.access_token, {
@@ -292,9 +272,9 @@ export async function register(prevState: any, formData: FormData) {
                     path: "/",
                 });
 
-                if (role === 'psychologist') redirect("/psychologist/dashboard");
+                if (role === 'oyente' || role === 'psychologist' || role === 'coach') redirect("/oyente/dashboard");
                 if (role === 'admin') redirect("/admin/dashboard");
-                redirect("/patient/dashboard");
+                redirect("/usuario/dashboard");
             } else {
                 return { success: "Registro exitoso. Revisa tu email para confirmar tu cuenta." };
             }
@@ -306,10 +286,7 @@ export async function register(prevState: any, formData: FormData) {
     }
 }
 
-// Funciones dummy para mantener compatibilidad si se importan en otros lados, 
-// pero idealmente no se deberían usar si no son críticas.
 export async function loginAnonymously() {
-    // Implementación simplificada si hiciera falta
     return { error: "Deshabilitado temporalmente" };
 }
 
@@ -366,4 +343,3 @@ export async function resetPassword(prevState: any, formData: FormData) {
         return { error: "Error al intentar restablecer la contraseña." };
     }
 }
-

@@ -41,7 +41,7 @@ export default function MarketingLayout({
     return (
         <div className="min-h-screen flex flex-col font-sans">
             {/* Navbar */}
-            <header className={`sticky top-0 z-50 w-full border-b border-gray-100 transition-all duration-300 ${mobileMenuOpen ? 'bg-white shadow-lg' : 'bg-white/70 backdrop-blur-md'}`}>
+            <header className={`sticky top-0 z-50 w-full border-b border-gray-100 transition-all duration-300 ${mobileMenuOpen ? 'bg-white shadow-lg' : 'bg-white shadow-sm'}`}>
                 <div className="container mx-auto px-6 md:px-12 lg:px-20 h-20 flex items-center">
                     <Link href="#" className="flex items-center h-full group">
                         <Logo className="w-48 sm:w-64 h-16 sm:h-20" />
@@ -54,16 +54,14 @@ export default function MarketingLayout({
                             onClick={handleCoachesLinkClick}
                             className="text-[#6B6B6B] hover:text-[#A68363] transition-colors"
                         >
-                            Coaches en línea
+                            Oyentes en línea
                         </Link>
                         <Link href="#" className="text-[#6B6B6B] hover:text-[#A68363] transition-colors">Precios</Link>
                         <Link href="#faq" className="text-[#6B6B6B] hover:text-[#A68363] transition-colors">Preguntas frecuentes</Link>
-                        {user?.role === 'psychologist' ? (
-                            <Link href="/psychologist/dashboard" className="text-[#A68363] font-bold border-l pl-8 hover:opacity-80 transition-opacity">Panel de Coach</Link>
-                        ) : user ? (
-                            <Link href="/coach-onboarding" className="text-[#A68363] font-bold border-l pl-8 hover:opacity-80 transition-opacity">Únete como coach</Link>
-                        ) : (
-                            <Link href="/register?role=coach" className="text-[#A68363] font-bold border-l pl-8 hover:opacity-80 transition-opacity">Únete como coach</Link>
+                        {user?.role === 'oyente' ? (
+                            <Link href="/oyente/dashboard" className="text-[#A68363] font-bold border-l pl-8 hover:opacity-80 transition-opacity">Panel de Oyente</Link>
+                        ) : !user && (
+                            <Link href="/register?role=coach" className="text-[#A68363] font-bold border-l pl-8 hover:opacity-80 transition-opacity">Únete como oyente</Link>
                         )}
                     </nav>
 
@@ -102,7 +100,7 @@ export default function MarketingLayout({
                                     }}
                                     className="text-[#6B6B6B] hover:text-[#A68363] transition-colors py-3 px-4 rounded-lg hover:bg-[#F2EDE7] font-medium"
                                 >
-                                    Coaches en línea
+                                    Oyentes en línea
                                 </Link>
                                 <Link
                                     href="#"
@@ -120,37 +118,27 @@ export default function MarketingLayout({
                                 </Link>
 
                                 <div className="border-t border-gray-100 pt-4 mt-4">
-                                    {user?.role === 'psychologist' ? (
+                                    {user?.role === 'oyente' ? (
                                         <Link
-                                            href="/psychologist/dashboard"
+                                            href="/oyente/dashboard"
                                             onClick={() => setMobileMenuOpen(false)}
                                             className="text-[#A68363] font-bold py-3 px-4 rounded-lg hover:bg-[#F2EDE7] block"
                                         >
-                                            Panel de Coach
+                                            Panel de Oyente
                                         </Link>
-                                    ) : user ? (
-                                        <Link
-                                            href="/coach-onboarding"
-                                            onClick={() => setMobileMenuOpen(false)}
-                                            className="text-[#A68363] font-bold py-3 px-4 rounded-lg hover:bg-[#F2EDE7] block"
-                                        >
-                                            Únete como coach
-                                        </Link>
-                                    ) : (
+                                    ) : !user && (
                                         <Link
                                             href="/register?role=coach"
                                             onClick={() => setMobileMenuOpen(false)}
                                             className="text-[#A68363] font-bold py-3 px-4 rounded-lg hover:bg-[#F2EDE7] block"
                                         >
-                                            Únete como coach
+                                            Únete como oyente
                                         </Link>
                                     )}
                                 </div>
 
                                 <div className="border-t border-gray-100 pt-4 mt-4">
-                                    <div onClick={() => setMobileMenuOpen(false)}>
-                                        <UserNav />
-                                    </div>
+                                    <UserNav />
                                 </div>
                             </nav>
                         </div>
@@ -174,7 +162,7 @@ export default function MarketingLayout({
                         <div className="text-center max-w-md">
                             <h3 className="font-bold text-[#4A3C31] mb-3">Sobre nosotros</h3>
                             <p className="text-sm text-[#6B6B6B] leading-relaxed">
-                                pluravita es una plataforma de coaches en línea. Ayudamos a las personas a encontrar a su coach ideal y a comenzar su proceso en línea de forma fácil, segura y privada.
+                                pluravita es una plataforma de oyentes en línea. Ayudamos a las personas a encontrar a su oyente ideal y a comenzar su proceso en línea de forma fácil, segura y privada.
                             </p>
                         </div>
 
