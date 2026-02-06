@@ -138,6 +138,51 @@ export async function saveSchedule(oyenteId: string, slots: { id: string, startT
     }
 }
 
+export async function saveRecurringSchedule(oyenteId: string, template: { dayOfWeek: number, hours: number[] }[]) {
+    await verifyOyente(oyenteId);
+
+    try {
+        const slotsToAdd = [];
+        const now = new Date();
+
+        // Loop for 4 weeks
+        for (let week = 0; week < 4; week++) {
+            for (const dayLimit of template) {
+                // Find the next occurrence of dayOfWeek
+                const d = new Date(now);
+                d.setDate(now.getDate() + (week * 7) + ((dayLimit.dayOfWeek + 7 - now.getDay()) % 7));
+                d.setHours(0, 0, 0, 0);
+
+                if (d < new Date(new Date().setHours(0, 0, 0, 0))) continue;
+
+                for (const hour of dayLimit.hours) {
+                    const start = new Date(d);
+                    start.setHours(hour, 0, 0, 0);
+                    const end = new Date(start);
+                    end.setHours(hour + 1, 0, 0, 0);
+
+                    slotsToAdd.push({
+                        oyenteId,
+                        startTime: start,
+                        endTime: end,
+                        isBooked: false
+                    });
+                }
+            }
+        }
+
+        if (slotsToAdd.length > 0) {
+            await db.insert(availabilitySlots).values(slotsToAdd);
+        }
+
+        revalidatePath("/oyente/calendar");
+        return { success: true };
+    } catch (error: any) {
+        console.error("Recurring save error:", error);
+        return { error: "Error al generar slots recurrentes." };
+    }
+}
+
 
 export async function createPendingAppointment(data: {
     usuarioNombre: string;

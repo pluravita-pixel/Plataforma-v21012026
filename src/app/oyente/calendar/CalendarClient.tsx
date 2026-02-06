@@ -11,13 +11,25 @@ import {
     Trash2,
     Settings,
     Check as CheckUser,
-    Lock
+    Lock,
+    Clock3
 } from "lucide-react";
 import Link from "next/link";
-import { createAvailabilitySlot, deleteAvailabilitySlot, saveSchedule } from "@/app/actions/booking";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { createAvailabilitySlot, deleteAvailabilitySlot, saveSchedule, saveRecurringSchedule } from "@/app/actions/booking";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+    DialogDescription,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 
 interface Appointment {
     id: string;
@@ -36,11 +48,11 @@ interface Slot {
 export function CalendarClient({
     initialAppointments,
     initialSlots,
-    psychologistId
+    oyenteId
 }: {
     initialAppointments: Appointment[];
     initialSlots: Slot[];
-    psychologistId: string;
+    oyenteId: string;
 }) {
     const router = useRouter();
     const [view, setView] = useState("Semanas");
@@ -50,6 +62,8 @@ export function CalendarClient({
     // Batch Saving Logic
     const [tempSlots, setTempSlots] = useState<Slot[]>(initialSlots);
     const [originalSlots, setOriginalSlots] = useState<Slot[]>(initialSlots);
+    const [isRecurringModalOpen, setIsRecurringModalOpen] = useState(false);
+    const [isGenerating, setIsGenerating] = useState(false);
 
     // Sync when not editing? Or just on load? 
     // Usually standard is to sync on prop change if not dirty.
@@ -61,7 +75,7 @@ export function CalendarClient({
             // Save Changes
             if (JSON.stringify(tempSlots) !== JSON.stringify(originalSlots)) {
                 // Call bulk update
-                const result = await saveSchedule(psychologistId, tempSlots);
+                const result = await saveSchedule(oyenteId, tempSlots);
                 if (result.success) {
                     toast.success("Horario guardado correctamente");
                     setOriginalSlots(tempSlots);
@@ -82,13 +96,21 @@ export function CalendarClient({
     // --- Date Navigation Logic ---
     const goToPrevious = () => {
         const newDate = new Date(currentDate);
-        newDate.setDate(currentDate.getDate() - 7);
+        if (view === "Día") {
+            newDate.setDate(currentDate.getDate() - 1);
+        } else {
+            newDate.setDate(currentDate.getDate() - 7);
+        }
         setCurrentDate(newDate);
     };
 
     const goToNext = () => {
         const newDate = new Date(currentDate);
-        newDate.setDate(currentDate.getDate() + 7);
+        if (view === "Día") {
+            newDate.setDate(currentDate.getDate() + 1);
+        } else {
+            newDate.setDate(currentDate.getDate() + 7);
+        }
         setCurrentDate(newDate);
     };
 
@@ -121,6 +143,41 @@ export function CalendarClient({
         // Remove from tempSlots
         setTempSlots(tempSlots.filter(s => s.id !== slotId && s.startTime.getTime() !== startTime.getTime()));
     }
+
+    // --- Recurring Schedule Template Logic ---
+    const [template, setTemplate] = useState([
+        { dayOfWeek: 1, active: true, start: "09:00", end: "18:00" },
+        { dayOfWeek: 2, active: true, start: "09:00", end: "18:00" },
+        { dayOfWeek: 3, active: true, start: "09:00", end: "18:00" },
+        { dayOfWeek: 4, active: true, start: "09:00", end: "18:00" },
+        { dayOfWeek: 5, active: true, start: "09:00", end: "18:00" },
+        { dayOfWeek: 6, active: false, start: "10:00", end: "14:00" },
+        { dayOfWeek: 0, active: false, start: "10:00", end: "14:00" },
+    ]);
+
+    const handleApplyRecurring = async () => {
+        setIsGenerating(true);
+        const activeDays = template.filter(t => t.active).map(t => {
+            const startHour = parseInt(t.start.split(":")[0]);
+            const endHour = parseInt(t.end.split(":")[0]);
+            const hours = [];
+            for (let h = startHour; h < endHour; h++) {
+                hours.push(h);
+            }
+            return { dayOfWeek: t.dayOfWeek, hours };
+        });
+
+        const result = await saveRecurringSchedule(oyenteId, activeDays);
+        setIsGenerating(false);
+
+        if (result.success) {
+            toast.success("Horario recurrente generado para las próximas 4 semanas");
+            setIsRecurringModalOpen(false);
+            router.refresh();
+        } else {
+            toast.error(result.error || "Error al generar horario");
+        }
+    };
 
     // Determine which slots to show
     const displaySlots = isEditingAvailability ? tempSlots : initialSlots;
@@ -158,7 +215,8 @@ export function CalendarClient({
         startOfView = new Date(currentDate);
     }
 
-    const gridCols = view === "Día" ? "grid-cols-[auto_1fr]" : "grid-cols-[auto_repeat(7,1fr)]";
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const gridCols = view === "Día" ? "grid-cols-[auto_1fr]" : "grid-cols-[auto_1fr] md:grid-cols-[auto_repeat(7,1fr)]";
 
     const dates = Array.from({ length: view === "Día" ? 1 : 7 }).map((_, i) => {
         const d = new Date(startOfView);
@@ -188,13 +246,13 @@ export function CalendarClient({
                     </p>
                 </div>
 
-                <div className="flex items-center gap-4 bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
-                    <div className="flex bg-[#F9F9F9] rounded-xl p-1">
-                        {["Mes", "Semanas", "Día"].map((v) => (
+                <div className="flex flex-wrap items-center gap-3 md:gap-4 bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
+                    <div className="flex bg-[#F9F9F9] rounded-xl p-1 overflow-x-auto">
+                        {["Semanas", "Día"].map((v) => (
                             <button
                                 key={v}
                                 onClick={() => setView(v)}
-                                className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-300 ${view === v
+                                className={`px-3 md:px-5 py-2 rounded-lg text-[10px] md:text-xs font-bold transition-all duration-300 whitespace-nowrap ${view === v
                                     ? "bg-white text-[#4A3C31] shadow-md transform scale-105"
                                     : "text-gray-400 hover:text-gray-600"
                                     }`}
@@ -204,27 +262,40 @@ export function CalendarClient({
                         ))}
                     </div>
 
-                    <div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
+                    <div className="w-px h-8 bg-gray-200 hidden md:block"></div>
 
-                    <Button
-                        onClick={toggleEditMode}
-                        className={`rounded-xl px-6 h-11 font-bold text-sm transition-all duration-300 flex items-center gap-2 ${isEditingAvailability
-                            ? "bg-[#4A3C31] text-white hover:bg-[#2C241D] shadow-lg shadow-[#4A3C31]/20"
-                            : "bg-white text-[#4A3C31] border border-gray-200 hover:bg-[#F9F9F9]"
-                            }`}
-                    >
-                        {isEditingAvailability ? (
-                            <>
-                                <CheckUser className="h-4 w-4" />
-                                Guardar Cambios
-                            </>
-                        ) : (
-                            <>
-                                <Settings className="h-4 w-4" />
-                                Editar Horario
-                            </>
-                        )}
-                    </Button>
+                    <div className="flex gap-2">
+                        <Button
+                            onClick={() => setIsRecurringModalOpen(true)}
+                            variant="outline"
+                            className="rounded-xl px-4 h-11 font-bold text-sm border-dashed border-[#A68363] text-[#A68363] hover:bg-[#A68363]/5"
+                        >
+                            <CalendarIcon className="h-4 w-4 md:mr-2" />
+                            <span className="hidden md:inline">Horario Recurrente</span>
+                        </Button>
+
+                        <Button
+                            onClick={toggleEditMode}
+                            className={`rounded-xl px-4 md:px-6 h-11 font-bold text-sm transition-all duration-300 flex items-center gap-2 ${isEditingAvailability
+                                ? "bg-[#4A3C31] text-white hover:bg-[#2C241D] shadow-lg shadow-[#4A3C31]/20"
+                                : "bg-white text-[#4A3C31] border border-gray-200 hover:bg-[#F9F9F9]"
+                                }`}
+                        >
+                            {isEditingAvailability ? (
+                                <>
+                                    <CheckUser className="h-4 w-4" />
+                                    <span className="hidden sm:inline">Guardar Cambios</span>
+                                    <span className="sm:hidden">Guardar</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Settings className="h-4 w-4" />
+                                    <span className="hidden sm:inline">Editar Horario</span>
+                                    <span className="sm:hidden">Editar</span>
+                                </>
+                            )}
+                        </Button>
+                    </div>
                 </div>
             </div>
 
@@ -239,8 +310,8 @@ export function CalendarClient({
 
                 {/* Calendar Controls */}
                 <div className="p-8 border-b border-gray-50 flex items-center justify-between">
-                    <div className="flex items-center gap-6">
-                        <div className="flex gap-2 bg-[#F9F9F9] rounded-xl p-1">
+                    <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+                        <div className="flex gap-2 bg-[#F9F9F9] rounded-xl p-1 w-fit">
                             <button onClick={goToPrevious} className="p-2 hover:bg-white hover:shadow-sm rounded-lg text-gray-400 transition-all hover:text-[#4A3C31]">
                                 <ChevronLeft className="h-5 w-5" />
                             </button>
@@ -248,7 +319,7 @@ export function CalendarClient({
                                 <ChevronRight className="h-5 w-5" />
                             </button>
                         </div>
-                        <h2 className="text-2xl font-black text-[#4A3C31] capitalize tracking-tight">
+                        <h2 className="text-xl md:text-2xl font-black text-[#4A3C31] capitalize tracking-tight">
                             {currentDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
                         </h2>
                     </div>
@@ -263,7 +334,7 @@ export function CalendarClient({
 
                 {/* Scrollable Grid */}
                 <div className="flex-1 overflow-auto bg-[#FFFFFF]"> {/* Main bg white */}
-                    <div className={`grid ${view === 'Día' ? 'grid-cols-[auto_1fr]' : 'grid-cols-[auto_repeat(7,1fr)]'} divide-x divide-gray-200 min-w-[800px]`}>
+                    <div className={`grid ${gridCols} divide-x divide-gray-200 ${view === 'Día' ? '' : 'min-w-[800px] md:min-w-0'}`}>
 
                         {/* Time Column */}
                         <div className="pt-16 pb-4 flex flex-col items-center gap-[60px] bg-[#FAFAFA] border-r border-gray-200 w-20">
@@ -278,9 +349,9 @@ export function CalendarClient({
                         {dates.map((d, i) => (
                             <div key={i} className="flex flex-col relative group/col hover:bg-[#FAFAFA]/50 transition-colors">
                                 {/* Day Header */}
-                                <div className="p-5 text-center border-b border-gray-200 sticky top-0 z-10 bg-white/95 backdrop-blur-sm">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#A68363] mb-1.5">{d.day}</p>
-                                    <div className={`w-10 h-10 mx-auto flex items-center justify-center rounded-full text-lg font-black transition-all ${d.fullDate.toDateString() === new Date().toDateString()
+                                <div className="p-3 md:p-5 text-center border-b border-gray-200 sticky top-0 z-10 bg-white/95 backdrop-blur-sm">
+                                    <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-[#A68363] mb-1.5">{d.day}</p>
+                                    <div className={`w-8 h-8 md:w-10 md:h-10 mx-auto flex items-center justify-center rounded-full text-sm md:text-lg font-black transition-all ${d.fullDate.toDateString() === new Date().toDateString()
                                         ? "bg-[#4A3C31] text-white shadow-lg shadow-[#4A3C31]/30"
                                         : "text-[#4A3C31]"
                                         }`}>
@@ -380,6 +451,106 @@ export function CalendarClient({
                     </div>
                 </div>
             </div>
+            {/* Recurring Schedule Modal */}
+            <Dialog open={isRecurringModalOpen} onOpenChange={setIsRecurringModalOpen}>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-[2rem] p-0 border-none shadow-2xl">
+                    <div className="bg-[#4A3C31] p-8 text-white relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-[100px]"></div>
+                        <DialogHeader>
+                            <DialogTitle className="text-2xl font-black uppercase tracking-tight text-white flex items-center gap-3">
+                                <Clock3 className="h-7 w-7 text-[#A68363]" />
+                                Configurar Horario Base
+                            </DialogTitle>
+                            <DialogDescription className="text-white/60 font-medium">
+                                Define tu horario ideal para que se aplique automáticamente a las próximas 4 semanas.
+                            </DialogDescription>
+                        </DialogHeader>
+                    </div>
+
+                    <div className="p-8 space-y-6">
+                        <div className="space-y-4">
+                            {template.map((day, idx) => (
+                                <div key={idx} className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border transition-all ${day.active ? 'bg-[#F2EDE7]/30 border-[#A68363]/20' : 'bg-gray-50 border-gray-100 opacity-60'}`}>
+                                    <div className="flex items-center gap-4 mb-4 sm:mb-0">
+                                        <Switch
+                                            checked={day.active}
+                                            onCheckedChange={(val) => {
+                                                const newTemplate = [...template];
+                                                newTemplate[idx].active = val;
+                                                setTemplate(newTemplate);
+                                            }}
+                                        />
+                                        <div>
+                                            <p className="font-bold text-[#4A3C31] capitalize">
+                                                {new Date(2024, 0, day.dayOfWeek === 0 ? 7 : day.dayOfWeek).toLocaleDateString('es-ES', { weekday: 'long' })}
+                                            </p>
+                                            <p className="text-[10px] uppercase font-black tracking-widest text-[#A68363]">
+                                                {day.active ? 'Activo' : 'Inactivo'}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {day.active && (
+                                        <div className="flex items-center gap-3 bg-white p-2 rounded-xl border border-gray-100 shadow-sm">
+                                            <div className="flex flex-col">
+                                                <Label className="text-[9px] uppercase font-black text-gray-400 mb-1 ml-1">Inicio</Label>
+                                                <Input
+                                                    type="time"
+                                                    value={day.start}
+                                                    onChange={(e) => {
+                                                        const newTemplate = [...template];
+                                                        newTemplate[idx].start = e.target.value;
+                                                        setTemplate(newTemplate);
+                                                    }}
+                                                    className="h-9 w-28 border-none bg-transparent font-bold text-[#4A3C31] focus-visible:ring-0"
+                                                />
+                                            </div>
+                                            <div className="w-px h-6 bg-gray-100"></div>
+                                            <div className="flex flex-col">
+                                                <Label className="text-[9px] uppercase font-black text-gray-400 mb-1 ml-1">Fin</Label>
+                                                <Input
+                                                    type="time"
+                                                    value={day.end}
+                                                    onChange={(e) => {
+                                                        const newTemplate = [...template];
+                                                        newTemplate[idx].end = e.target.value;
+                                                        setTemplate(newTemplate);
+                                                    }}
+                                                    className="h-9 w-28 border-none bg-transparent font-bold text-[#4A3C31] focus-visible:ring-0"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100 flex gap-3">
+                            <Plus className="h-5 w-5 text-amber-600 flex-shrink-0" />
+                            <p className="text-xs text-amber-800 leading-relaxed font-medium">
+                                <b>Nota:</b> Al aplicar este horario, se generarán nuevos huecos de disponibilidad en los días seleccionados. Esto no borrará las citas que ya tengas confirmadas.
+                            </p>
+                        </div>
+                    </div>
+
+                    <DialogFooter className="p-8 bg-gray-50 flex flex-col sm:flex-row gap-3 border-t border-gray-100">
+                        <Button
+                            variant="outline"
+                            onClick={() => setIsRecurringModalOpen(false)}
+                            className="rounded-xl h-12 px-8 font-bold order-2 sm:order-1"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={handleApplyRecurring}
+                            disabled={isGenerating}
+                            className="bg-[#4A3C31] hover:bg-black text-white rounded-xl h-12 px-8 font-bold shadow-lg shadow-[#4A3C31]/20 order-1 sm:order-2"
+                        >
+                            {isGenerating ? "Generando..." : "Aplicar Horario"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
