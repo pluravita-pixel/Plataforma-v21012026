@@ -14,8 +14,9 @@ import {
     X
 } from "lucide-react";
 import Image from "next/image";
-import { updatePsychologistSettings } from "@/app/actions/psychologists";
+import { updateOyenteSettings } from "@/app/actions/oyentes";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
 
 interface ProfileClientProps {
     psychologist: {
@@ -100,6 +101,48 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
         });
     };
 
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validation
+        if (file.size > 2 * 1024 * 1024) {
+            toast.error("La imagen es demasiado grande. Máximo 2MB.");
+            return;
+        }
+
+        if (!file.type.startsWith("image/")) {
+            toast.error("Por favor, sube un archivo de imagen válido.");
+            return;
+        }
+
+        setIsSaving(true);
+        try {
+            const fileExt = file.name.split(".").pop();
+            const fileName = `${psychologist.id}/${Date.now()}.${fileExt}`;
+            const { data, error } = await supabase.storage
+                .from("profile-photos")
+                .upload(fileName, file, {
+                    cacheControl: "3600",
+                    upsert: true,
+                });
+
+            if (error) throw error;
+
+            const { data: { publicUrl } } = supabase.storage
+                .from("profile-photos")
+                .getPublicUrl(data.path);
+
+            setProfile({ ...profile, image: publicUrl });
+            toast.success("Imagen subida con éxito. No olvides guardar los cambios.");
+        } catch (error: any) {
+            console.error("Error uploading image:", error);
+            toast.error("No se pudo subir la imagen.");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     const handleSave = async () => {
         if (!profile.username || profile.username.trim() === "") {
             toast.error("El nombre de usuario es obligatorio");
@@ -124,9 +167,15 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
             return;
         }
 
+        const priceNum = parseFloat(profile.price);
+        if (isNaN(priceNum) || priceNum < 10 || priceNum > 305) {
+            toast.error("El precio debe estar entre 10€ y 305€");
+            return;
+        }
+
         setIsSaving(true);
         try {
-            const result = await updatePsychologistSettings(psychologist.userId, {
+            const result = await updateOyenteSettings(psychologist.userId, {
                 description: profile.description,
                 specialty: profile.specialty,
                 price: profile.price,
@@ -191,13 +240,22 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                                         <User className="h-12 w-12 text-blue-200" />
                                     )}
                                 </div>
-                                <div className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-lg border border-gray-100 text-[#A68363]">
+                                <label className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-lg border border-gray-100 text-[#A68363] cursor-pointer hover:bg-gray-50 transition-all">
                                     <Camera className="h-4 w-4" />
-                                </div>
+                                    <input
+                                        type="file"
+                                        className="hidden"
+                                        accept="image/*"
+                                        onChange={handleImageUpload}
+                                        disabled={isSaving}
+                                    />
+                                </label>
                             </div>
 
-                            <div className="space-y-2 mb-6">
-                                <label className="text-[10px] uppercase font-bold text-gray-400 block">URL de Imagen</label>
+                            <p className="text-[10px] text-gray-400 mt-2">Formatos: JPG, PNG. Máx. 2MB</p>
+
+                            <div className="space-y-2 mt-6 mb-6">
+                                <label className="text-[10px] uppercase font-bold text-gray-400 block">URL de Imagen (Opcional)</label>
                                 <input
                                     type="text"
                                     className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-[10px] focus:ring-1 focus:ring-[#A68363] transition-all"
@@ -288,7 +346,8 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                                             <Tag className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                                             <input
                                                 type="number"
-                                                step="0.01"
+                                                min="10"
+                                                max="305"
                                                 className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all"
                                                 value={profile.price}
                                                 onChange={(e) => setProfile({ ...profile, price: e.target.value })}

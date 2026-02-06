@@ -10,8 +10,17 @@ import {
     Info,
     ArrowUpRight
 } from "lucide-react";
-import { withdrawBalance, updatePsychologistSettings } from "@/app/actions/psychologists";
+import { withdrawBalance, updateOyenteSettings } from "@/app/actions/oyentes";
 import { toast } from "sonner";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+    DialogDescription,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 interface Withdrawal {
     id: string;
@@ -38,6 +47,7 @@ export function BalanceClient({ psychologist, withdrawals }: BalanceClientProps)
     const [isWithdrawing, setIsWithdrawing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [isIbanConfirmOpen, setIsIbanConfirmOpen] = useState(false);
 
     const handleWithdraw = async () => {
         if (balance < 50) {
@@ -57,10 +67,30 @@ export function BalanceClient({ psychologist, withdrawals }: BalanceClientProps)
         }
     };
 
+    const validateIBAN = (value: string) => {
+        const cleaned = value.replace(/\s/g, "").toUpperCase();
+        return /^ES\d{22}$/.test(cleaned);
+    };
+
     const handleSavePayoutDetails = async () => {
+        if (!iban.trim()) {
+            toast.error("Por favor, introduce tu IBAN.");
+            return;
+        }
+
+        if (!validateIBAN(iban)) {
+            toast.error("El formato del IBAN no es válido. Debe empezar por ES seguido de 22 dígitos.");
+            return;
+        }
+
+        setIsIbanConfirmOpen(true);
+    };
+
+    const confirmSavePayoutDetails = async () => {
+        setIsIbanConfirmOpen(false);
         setIsSaving(true);
         try {
-            await updatePsychologistSettings(psychologist.userId, {
+            await updateOyenteSettings(psychologist.userId, {
                 iban,
                 payoutName
             });
@@ -136,15 +166,20 @@ export function BalanceClient({ psychologist, withdrawals }: BalanceClientProps)
                                     onChange={(e) => setPayoutName(e.target.value)}
                                 />
                             </div>
-                            <div className="space-y-2">
+                            <div className="space-y-2 relative">
                                 <label className="text-sm font-medium text-gray-600">IBAN</label>
                                 <input
                                     type="text"
-                                    className="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500/20 transition-all uppercase"
+                                    className={`w-full bg-gray-50 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500/20 transition-all uppercase ${!iban ? 'border-orange-300' : 'border-gray-100'}`}
                                     placeholder="ES00 0000 0000 0000 0000 0000"
                                     value={iban}
-                                    onChange={(e) => setIban(e.target.value)}
+                                    onChange={(e) => setIban(e.target.value.replace(/\s/g, ""))}
                                 />
+                                {!iban && (
+                                    <p className="text-[10px] text-orange-600 font-bold mt-1 animate-pulse">
+                                        No has puesto ningún IBAN. Pon el tuyo y asegúrate dos veces que esté correcto.
+                                    </p>
+                                )}
                             </div>
                         </div>
 
@@ -215,6 +250,38 @@ export function BalanceClient({ psychologist, withdrawals }: BalanceClientProps)
                     </div>
                 </div>
             )}
+            {/* IBAN Confirmation Modal */}
+            <Dialog open={isIbanConfirmOpen} onOpenChange={setIsIbanConfirmOpen}>
+                <DialogContent className="max-w-sm rounded-[2rem] p-8 border-none shadow-2xl">
+                    <DialogHeader className="text-center">
+                        <div className="w-16 h-16 bg-blue-50 text-[#0077FF] rounded-full flex items-center justify-center mx-auto mb-4">
+                            <CreditCard className="h-8 w-8" />
+                        </div>
+                        <DialogTitle className="text-xl font-black text-gray-900">¿Confirmar IBAN?</DialogTitle>
+                        <DialogDescription className="text-gray-500 pt-2 font-medium">
+                            Asegúrate de que este sea tu IBAN correcto para recibir los pagos:
+                            <div className="mt-4 p-4 bg-gray-50 rounded-xl font-mono text-[#0077FF] font-bold tracking-wider">
+                                {iban}
+                            </div>
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="flex flex-col sm:flex-row gap-3 mt-6">
+                        <Button
+                            variant="outline"
+                            onClick={() => setIsIbanConfirmOpen(false)}
+                            className="w-full rounded-xl h-12 font-bold order-2 sm:order-1"
+                        >
+                            Revisar
+                        </Button>
+                        <Button
+                            onClick={confirmSavePayoutDetails}
+                            className="w-full bg-[#0077FF] hover:bg-blue-600 text-white rounded-xl h-12 font-bold shadow-lg shadow-blue-100 order-1 sm:order-2"
+                        >
+                            Sí, es correcto
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
