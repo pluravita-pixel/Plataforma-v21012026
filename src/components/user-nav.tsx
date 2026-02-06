@@ -60,18 +60,30 @@ export function UserNav() {
 
 
     if (loading) {
-        return <Loader2 className="h-5 w-5 animate-spin text-gray-400" />;
+        return (
+            <div className="flex items-center gap-2 animate-pulse">
+                <div className="h-8 w-8 bg-gray-200 rounded-full" />
+                <div className="hidden sm:block space-y-1">
+                    <div className="h-3 w-20 bg-gray-200 rounded" />
+                    <div className="h-2 w-16 bg-gray-200 rounded" />
+                </div>
+            </div>
+        );
     }
 
     if (!user) {
         return (
             <div className="flex items-center gap-4">
-                <Button variant="outline" asChild className="border-[#A68363] text-[#A68363] hover:bg-[#F2EDE7] font-semibold rounded-full px-6">
-                    <Link href="/login">Iniciar sesión</Link>
-                </Button>
-                <Button asChild className="bg-[#A68363] hover:opacity-90 text-white font-semibold rounded-full px-6 shadow-lg shadow-[#A68363]/20">
-                    <Link href="/register">Regístrate</Link>
-                </Button>
+                <Link href="/login" passHref legacyBehavior>
+                    <Button variant="outline" className="border-[#A68363] text-[#A68363] hover:bg-[#F2EDE7] font-semibold rounded-full px-6">
+                        Iniciar sesión
+                    </Button>
+                </Link>
+                <Link href="/register" passHref legacyBehavior>
+                    <Button className="bg-[#A68363] hover:opacity-90 text-white font-semibold rounded-full px-6 shadow-lg shadow-[#A68363]/20">
+                        Regístrate
+                    </Button>
+                </Link>
             </div>
         );
     }

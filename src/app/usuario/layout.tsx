@@ -32,10 +32,10 @@ export default function PatientLayout({
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const navItems = [
-        { icon: LayoutDashboard, label: "Inicio", href: "/patient/dashboard" },
-        { icon: Search, label: "Buscar Oyente", href: "/patient/search" },
-        { icon: Calendar, label: "Mis Citas", href: "/patient/appointments" },
-        { icon: UserCircle, label: "Mi Cuenta", href: "/patient/profile" },
+        { icon: LayoutDashboard, label: "Inicio", href: "/usuario/dashboard" },
+        { icon: Search, label: "Buscar Oyente", href: "/usuario/search" },
+        { icon: Calendar, label: "Mis Citas", href: "/usuario/appointments" },
+        { icon: UserCircle, label: "Mi Cuenta", href: "/usuario/profile" },
     ];
 
     return (
