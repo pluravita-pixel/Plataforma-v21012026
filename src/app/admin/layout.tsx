@@ -31,6 +31,7 @@ export default function AdminLayout({
 
     const navItems = [
         { icon: LayoutDashboard, label: "Resumen", href: "/admin/dashboard" },
+        { icon: Users, label: "Usuarios", href: "/admin/usuarios" },
         { icon: Users, label: "Oyentes", href: "/admin/coaches" },
         { icon: ShieldCheck, label: "Solicitudes", href: "/admin/coaches-pending" },
         { icon: UserPlus, label: "Añadir Oyente", href: "/admin/add-psychologist" },

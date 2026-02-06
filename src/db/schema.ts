@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, integer, boolean, decimal } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, integer, boolean, decimal, jsonb } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 export const users = pgTable("users", {
@@ -99,6 +99,13 @@ export const withdrawals = pgTable("withdrawals", {
   oyenteId: uuid("oyente_id").references(() => oyentes.id).notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   status: text("status").default("pending").notNull(), // pending, completed, rejected
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const affinityTests = pgTable("affinity_tests", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  responses: jsonb("responses").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

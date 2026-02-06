@@ -104,10 +104,10 @@ export function UserNav() {
             {isOpen && (
                 <>
                     <div
-                        className="fixed inset-0 z-[60]"
+                        className="fixed inset-0 z-[60] bg-black/20"
                         onClick={() => setIsOpen(false)}
                     />
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-[70] animate-in fade-in zoom-in duration-200">
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-[70] opacity-100">
                         <div className="px-4 py-3 border-b border-gray-50 mb-1">
                             <p className="text-xs font-medium text-gray-400 uppercase tracking-widest mb-1">Iniciado como</p>
                             <p className="text-sm font-bold text-gray-900 truncate">{user.email}</p>
