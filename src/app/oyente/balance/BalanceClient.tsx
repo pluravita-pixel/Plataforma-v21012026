@@ -161,7 +161,7 @@ export function BalanceClient({ psychologist, withdrawals }: BalanceClientProps)
                                 <input
                                     type="text"
                                     className="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500/20 transition-all"
-                                    placeholder="Nombre completo tal como aparece en el banco"
+                                    placeholder=""
                                     value={payoutName}
                                     onChange={(e) => setPayoutName(e.target.value)}
                                 />
@@ -171,7 +171,7 @@ export function BalanceClient({ psychologist, withdrawals }: BalanceClientProps)
                                 <input
                                     type="text"
                                     className={`w-full bg-gray-50 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500/20 transition-all uppercase ${!iban ? 'border-orange-300' : 'border-gray-100'}`}
-                                    placeholder="ES00 0000 0000 0000 0000 0000"
+                                    placeholder=""
                                     value={iban}
                                     onChange={(e) => setIban(e.target.value.replace(/\s/g, ""))}
                                 />

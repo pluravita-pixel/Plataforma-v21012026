@@ -1,6 +1,5 @@
-export const dynamic = 'force-dynamic';
 import { getCurrentUser } from "@/app/actions/auth";
-import { getPsychologistStatus } from "@/app/actions/psychologists";
+import { getOyenteStatus } from "@/app/actions/oyentes";
 import { redirect } from "next/navigation";
 import { ProfileClient } from "./ProfileClient";
 
@@ -11,9 +10,9 @@ export default async function ProfilePage() {
         redirect("/login");
     }
 
-    const psychologist = await getPsychologistStatus(user.id);
+    const oyente = await getOyenteStatus(user.id);
 
-    if (!psychologist) {
+    if (!oyente) {
         return (
             <div className="p-8 text-center bg-white rounded-3xl border border-gray-100">
                 <p className="text-gray-500">No se encontraron datos de coach para este usuario.</p>
@@ -24,17 +23,18 @@ export default async function ProfilePage() {
     return (
         <ProfileClient
             psychologist={{
-                id: psychologist.id,
-                userId: psychologist.userId,
-                fullName: psychologist.fullName,
-                description: psychologist.description,
-                specialty: psychologist.specialty,
-                username: psychologist.username,
-                image: psychologist.image,
-                price: psychologist.price,
-                languages: psychologist.languages,
-                tags: psychologist.tags,
-                meetingLink: psychologist.meetingLink
+                id: oyente.id,
+                userId: oyente.userId,
+                fullName: oyente.fullName,
+                description: oyente.description,
+                specialty: oyente.specialty,
+                username: oyente.username,
+                image: oyente.image,
+                price: oyente.price,
+                languages: oyente.languages,
+                tags: oyente.tags,
+                meetingLink: oyente.meetingLink,
+                studies: oyente.studies
             }}
         />
     );

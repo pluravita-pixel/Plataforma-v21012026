@@ -1,6 +1,5 @@
-export const dynamic = 'force-dynamic';
 import { getCurrentUser } from "@/app/actions/auth";
-import { getPsychologistStatus, getWithdrawals } from "@/app/actions/psychologists";
+import { getOyenteStatus, getWithdrawals } from "@/app/actions/oyentes";
 import { redirect } from "next/navigation";
 import { BalanceClient } from "./BalanceClient";
 
@@ -11,9 +10,9 @@ export default async function BalancePage() {
         redirect("/login");
     }
 
-    const psychologist = await getPsychologistStatus(user.id);
+    const oyente = await getOyenteStatus(user.id);
 
-    if (!psychologist) {
+    if (!oyente) {
         return (
             <div className="p-8 text-center bg-white rounded-3xl border border-gray-100">
                 <p className="text-gray-500">No se encontraron datos de coach para este usuario.</p>
@@ -21,7 +20,7 @@ export default async function BalancePage() {
         );
     }
 
-    const withdrawals = await getWithdrawals(psychologist.id);
+    const withdrawals = await getWithdrawals(oyente.id);
 
     return (
         <div className="space-y-8">
@@ -32,11 +31,11 @@ export default async function BalancePage() {
 
             <BalanceClient
                 psychologist={{
-                    id: psychologist.id,
-                    userId: psychologist.userId,
-                    balance: psychologist.balance,
-                    iban: psychologist.iban,
-                    payoutName: psychologist.payoutName,
+                    id: oyente.id,
+                    userId: oyente.userId,
+                    balance: oyente.balance,
+                    iban: oyente.iban,
+                    payoutName: oyente.payoutName,
                 }}
                 withdrawals={withdrawals}
             />

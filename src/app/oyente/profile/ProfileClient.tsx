@@ -32,6 +32,7 @@ interface ProfileClientProps {
         tags: string[] | null;
         refCode?: string | null;
         meetingLink?: string | null;
+        studies?: string | null;
     };
 }
 
@@ -47,7 +48,8 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
         price: psychologist.price || "35.00",
         languages: psychologist.languages || ["Español"],
         tags: psychologist.tags || [],
-        meetingLink: psychologist.meetingLink || ""
+        meetingLink: psychologist.meetingLink || "",
+        studies: psychologist.studies || ""
     });
     const [newTag, setNewTag] = useState("");
     const [isSaving, setIsSaving] = useState(false);
@@ -183,7 +185,8 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                 languages: profile.languages,
                 tags: profile.tags,
                 image: profile.image || undefined,
-                meetingLink: profile.meetingLink
+                meetingLink: profile.meetingLink,
+                studies: profile.studies
             });
 
             if (result && 'error' in result) {
@@ -320,7 +323,7 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                                             className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all"
                                             value={profile.username}
                                             onChange={(e) => setProfile({ ...profile, username: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
-                                            placeholder="tu-nombre-unico"
+                                            placeholder=""
                                         />
                                         <p className="text-[10px] text-gray-400">Este será tu URL público: pluravita.com/{profile.username || 'tu-username'}</p>
                                     </div>
@@ -336,7 +339,7 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                                                 className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all"
                                                 value={profile.specialty}
                                                 onChange={(e) => setProfile({ ...profile, specialty: e.target.value })}
-                                                placeholder="Ej: Coach de Vida, Coach Ejecutivo"
+                                                placeholder=""
                                             />
                                         </div>
                                     </div>
@@ -364,7 +367,7 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                                             className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all font-mono"
                                             value={profile.meetingLink}
                                             onChange={(e) => setProfile({ ...profile, meetingLink: e.target.value })}
-                                            placeholder="https://zoom.us/j/tu-pmi-o-sala"
+                                            placeholder=""
                                         />
                                     </div>
                                     <p className="text-[10px] text-gray-400 italic">Aquí debes poner tu Sala de Reunión Personal habitual de Zoom o Google Meet.</p>
@@ -376,7 +379,7 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                                         className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all min-h-[150px]"
                                         value={profile.description}
                                         onChange={(e) => setProfile({ ...profile, description: e.target.value })}
-                                        placeholder="Cuéntanos sobre tu enfoque de coaching, especialidades y trayectoria..."
+                                        placeholder=""
                                     />
                                     <p className="text-[10px] text-gray-400">Te recomendamos un mínimo de 300 caracteres para un perfil completo.</p>
                                 </div>
@@ -423,7 +426,7 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                                         <input
                                             type="text"
                                             className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all"
-                                            placeholder="Ej: Ansiedad, Depresión, Parejas..."
+                                            placeholder=""
                                             value={newTag}
                                             onChange={(e) => setNewTag(e.target.value)}
                                             onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
@@ -504,6 +507,16 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                                             Reservar Sesión
                                         </button>
                                     </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-600">Estudios Actuales</label>
+                                    <input
+                                        type="text"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all"
+                                        value={profile.studies}
+                                        onChange={(e) => setProfile({ ...profile, studies: e.target.value })}
+                                        placeholder="Ej: Grado en Psicología, Máster en Coaching..."
+                                    />
                                 </div>
                             </div>
 
