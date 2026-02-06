@@ -15,7 +15,7 @@ export async function validateDiscountCode(code: string, userId: string, email?:
             .where(and(eq(discountCodes.code, normalizedCode), eq(discountCodes.active, true)));
 
         if (!discountCode) {
-            return { error: "Código inválido o inactivo." };
+            return { error: "Código de descuento no es válido" };
         }
 
         // 2. Check expiration
@@ -42,7 +42,7 @@ export async function validateDiscountCode(code: string, userId: string, email?:
                 const [result] = await db
                     .select({ count: count() })
                     .from(appointments)
-                    .where(eq(appointments.patientId, targetUserId));
+                    .where(eq(appointments.usuarioId, targetUserId));
 
                 if (result.count > 0) {
                     return { error: "Este código es válido solo para tu primera sesión." };
@@ -65,7 +65,7 @@ export async function validateDiscountCode(code: string, userId: string, email?:
                 .select({ count: count() })
                 .from(appointments)
                 .where(and(
-                    eq(appointments.patientId, targetUserId),
+                    eq(appointments.usuarioId, targetUserId),
                     eq(appointments.discountCodeId, discountCode.id)
                 ));
 
