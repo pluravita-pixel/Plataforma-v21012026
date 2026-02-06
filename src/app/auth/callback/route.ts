@@ -23,28 +23,79 @@ export async function GET(request: NextRequest) {
                 sameSite: "lax",
             });
 
-            // Obtener el rol real del usuario desde la base de datos
-            const userResult = await client`
-                SELECT role, has_pending_application as "hasPendingApplication"
-                FROM users 
-                WHERE id = ${data.user.id}::uuid 
-                LIMIT 1
-            `;
+            try {
+                // Verificar si el usuario ya existe en nuestra base de datos
+                const existingUser = await client`
+                    SELECT id, role, has_pending_application as "hasPendingApplication"
+                    FROM users 
+                    WHERE id = ${data.user.id}::uuid 
+                    LIMIT 1
+                `;
 
-            const user = userResult[0];
+                let userRole = 'usuario';
+                let hasPendingApp = false;
 
-            if (user) {
-                if (user.role === 'admin') {
+                if (existingUser.length === 0) {
+                    // Usuario nuevo - crear en la base de datos
+                    const fullName = data.user.user_metadata?.full_name ||
+                        data.user.user_metadata?.name ||
+                        data.user.email?.split('@')[0] ||
+                        'Usuario';
+
+                    const userEmail = data.user.email || '';
+
+                    await client`
+                        INSERT INTO users (id, email, full_name, role, last_login)
+                        VALUES (
+                            ${data.user.id}::uuid, 
+                            ${userEmail}::text, 
+                            ${fullName}::text, 
+                            'usuario', 
+                            NOW()
+                        )
+                        ON CONFLICT (id) DO UPDATE 
+                        SET last_login = NOW()
+                    `;
+
+                    userRole = 'usuario';
+                } else {
+                    // Usuario existente - actualizar last_login
+                    await client`
+                        UPDATE users 
+                        SET last_login = NOW() 
+                        WHERE id = ${data.user.id}::uuid
+                    `;
+
+                    userRole = existingUser[0].role;
+                    hasPendingApp = existingUser[0].hasPendingApplication;
+                }
+
+                // Redirigir según el rol
+                if (userRole === 'admin') {
                     return NextResponse.redirect(`${requestUrl.origin}/admin/dashboard`);
-                } else if (user.role === 'oyente' || user.role === 'psychologist' || user.role === 'coach') {
+                } else if (userRole === 'oyente' || userRole === 'psychologist' || userRole === 'coach') {
+                    // Actualizar last_login en tabla oyentes también
+                    await client`
+                        UPDATE oyentes 
+                        SET last_login = NOW() 
+                        WHERE user_id = ${data.user.id}::uuid
+                    `;
                     return NextResponse.redirect(`${requestUrl.origin}/oyente/dashboard`);
-                } else if (user.hasPendingApplication) {
+                } else if (hasPendingApp) {
                     return NextResponse.redirect(`${requestUrl.origin}/registro-oyente`);
                 }
+
+                // Usuario normal
+                return NextResponse.redirect(`${requestUrl.origin}/usuario/dashboard`);
+
+            } catch (dbError) {
+                console.error("Error en callback de Google OAuth:", dbError);
+                // En caso de error, redirigir a dashboard de usuario por defecto
+                return NextResponse.redirect(`${requestUrl.origin}/usuario/dashboard`);
             }
         }
     }
 
-    // Default redirect for usuarios or fallback
-    return NextResponse.redirect(`${requestUrl.origin}/usuario/dashboard`);
+    // Si no hay código o hubo error, redirigir al login
+    return NextResponse.redirect(`${requestUrl.origin}/login`);
 }
