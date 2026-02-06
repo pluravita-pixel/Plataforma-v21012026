@@ -183,6 +183,12 @@ export default function MarketingLayout({
                     <div className="mt-12 pt-8 border-t border-gray-50 text-center text-xs text-gray-400">
                         © {new Date().getFullYear()} pluravita. Todos los derechos reservados.
                     </div>
+
+                    <div className="mt-4 flex flex-wrap justify-center gap-6 text-xs text-gray-500">
+                        <Link href="/aviso-legal" className="hover:text-[#A68363] transition-colors">Aviso Legal</Link>
+                        <Link href="/politica-privacidad" className="hover:text-[#A68363] transition-colors">Política de Privacidad</Link>
+                        <Link href="/politica-cookies" className="hover:text-[#A68363] transition-colors">Política de Cookies</Link>
+                    </div>
                 </div>
             </footer>
         </div>

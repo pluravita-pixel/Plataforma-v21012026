@@ -40,10 +40,6 @@ export function ListenerProfileModal({ listener: psychologist, isOpen, onClose, 
                                 {psychologist.fullName[0]}
                             </div>
                         )}
-                        <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white px-3 py-1 rounded-full shadow-md flex items-center gap-1">
-                            <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                            <span className="text-xs font-black text-[#4A3C31]">{psychologist.rating}</span>
-                        </div>
                     </div>
 
                     <h2 className="text-2xl font-black text-[#4A3C31] mb-2 leading-tight">

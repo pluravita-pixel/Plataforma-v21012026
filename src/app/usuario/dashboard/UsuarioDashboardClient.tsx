@@ -37,9 +37,7 @@ export default function PatientDashboardClient({ initialData }: PatientDashboard
                     <h1 className="text-5xl md:text-6xl font-black tracking-tight mb-4 lowercase first-letter:uppercase">
                         Hola, {user.fullName?.split(' ')[0] || 'Traveler'}
                     </h1>
-                    <p className="text-white/60 text-xl font-medium max-w-lg leading-relaxed">
-                        Tu viaje hacia el bienestar continúa hoy. Estamos aquí para apoyarte en cada paso.
-                    </p>
+
                 </div>
             </div>
 

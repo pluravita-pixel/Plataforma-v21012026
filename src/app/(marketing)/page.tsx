@@ -62,7 +62,7 @@ export default function LandingPage() {
     const faqs = [
         {
             question: "¿Qué es pluravita?",
-            answer: "Somos ese refugio digital donde puedes ser tú mismx. Una comunidad de oyentes que no solo tienen títulos, sino que saben lo que es pasarlo mal y están aquí para escucharte sin filtros. Es un espacio para hablar, privado y pensado para tu generación."
+            answer: "Somos una comunidad de oyentes que están aquí para escucharte. Es un espacio para hablar creado por gente joven para jóvenes."
         },
         {
             question: "¿Cómo puedo pagar mis sesiones?",
@@ -70,7 +70,7 @@ export default function LandingPage() {
         },
         {
             question: "¿Qué puedo esperar de este proceso?",
-            answer: "Espera sentirte validado. No es una clase magistral ni alguien dándote lecciones, es una conversación real donde tú eres el protagonista y nosotros el apoyo que necesitas para ordenar el caos."
+            answer: "Nosotros prometemos escucharte. No es una clase magistral ni alguien dándote lecciones, es una conversación real donde tú eres el protagonista y nosotros te proporcionamos un par de orejas que te van escuchar y entender de verdad."
         },
         {
             question: "¿Cuánto tiempo dura esto?",
@@ -78,15 +78,15 @@ export default function LandingPage() {
         },
         {
             question: "¿Qué pasa exactamente en una sesión?",
-            answer: "Es tu espacio. Hablarás de lo que te preocupa, de tus metas o simplemente de cómo te sientes hoy. Tu oyente te escuchará y te dará herramientas prácticas para que puedas gestionar tu día a día con más calma."
+            answer: "Es tu espacio. Hablarás de lo que te preocupa, de tus metas o simplemente de cómo te sientes hoy. Tu oyente te escuchará y verá como puedes ser la mejor versión de ti mismo."
         },
         {
             question: "¿Cómo sé si estoy avanzando?",
-            answer: "Lo notarás cuando empieces a ver las cosas con más claridad, cuando esas situaciones que antes te agobiaban ya no pesen tanto y cuando sientas que tienes el control sobre tus emociones. Estaremos celebrando cada pequeño paso contigo."
+            answer: "Lo notarás cuando empieces a ver las cosas con más claridad, cuando esas situaciones que antes te agobiaban ya no pesen tanto y cuando sientas que tienes el control sobre tu paz."
         },
         {
             question: "¿Cómo elijo a la persona adecuada?",
-            answer: "Tenemos un Test de Afinidad que hace el trabajo sucio por ti. Te sugerimos a los oyentes que más encajan con tu personalidad para que no pierdas tiempo buscando. Queremos que el 'clic' sea inmediato."
+            answer: "Tenemos un Test de Afinidad que hace el trabajo por ti. Te sugerimos a los oyentes que más encajan con tu personalidad para que no pierdas tiempo buscando. Queremos que el 'clic' sea inmediato."
         },
         {
             question: "¿Quiénes son los oyentes?",
@@ -94,7 +94,7 @@ export default function LandingPage() {
         },
         {
             question: "¿Qué enfoque me va mejor?",
-            answer: "Cada persona es un mundo, por eso tenemos especialistas en todo: ansiedad, carrera, relaciones... Nuestro sistema te ayudará a encontrar exactamente lo que tu mente está pidiendo ahora mismo."
+            answer: "Cada persona es un mundo, por nuestros oyentes son personas normales como tú. El enfoque lo iras descubriendo poco a poco por ti mismo con tu oyente"
         },
         {
             question: "¿Es normal sentir nervios antes de la primera vez?",

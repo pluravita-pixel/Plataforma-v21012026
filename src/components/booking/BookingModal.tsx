@@ -16,7 +16,6 @@ import { checkUserExists } from "@/app/actions/auth";
 import { validateDiscountCode } from "@/app/actions/discounts";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
-import { PaymentForm } from "@/components/payment/PaymentForm";
 import { useRouter, useSearchParams } from "next/navigation";
 
 interface Slot {
@@ -65,7 +64,6 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
 
     // Payment/Loading States
     const [isLoading, setIsLoading] = useState(false);
-    const [showCardForm, setShowCardForm] = useState(false);
 
     // --- Init Data on Open & Handle Canceled Return ---
     useEffect(() => {
@@ -281,49 +279,7 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
         }
     };
 
-    const handleMockPaymentSuccess = async () => {
-        if (!selectedSlot) return;
-        setIsLoading(true);
 
-        try {
-            const finalPriceCalc = appliedDiscount
-                ? price * (1 - appliedDiscount.percent / 100)
-                : price;
-
-            const anonymousId = Math.random().toString(36).substring(2, 8).toUpperCase();
-            const patientName = isAnonymous ? `Usuario-${anonymousId}` : formData.name;
-
-            // 1. Create Pending Appointment
-            const result = await createPendingAppointment({
-                usuarioNombre: patientName,
-                usuarioEmail: formData.email,
-                oyenteId: psychologistId,
-                slotId: selectedSlot.id,
-                startTime: selectedSlot.startTime,
-                discountCodeId: appliedDiscount?.id,
-                finalPrice: finalPriceCalc.toFixed(2),
-                isAnonymous: isAnonymous
-            });
-
-            if (result.error || !result.appointmentId) {
-                toast.error(result.error || "Error al crear la reserva");
-                setIsLoading(false);
-                return;
-            }
-
-            // 2. Confirm immediately (Mock Success)
-            await confirmAppointmentPayment(result.appointmentId);
-            setStep(4);
-            setShowCardForm(false);
-            toast.success("¡Pago con tarjeta simulado correctamente!");
-
-        } catch (error) {
-            console.error("Mock payment error:", error);
-            toast.error("Error al procesar el pago");
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
     // --- Helpers ---
     const finalPrice = appliedDiscount ? price * (1 - appliedDiscount.percent / 100) : price;
@@ -600,68 +556,45 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
                                     </div>
                                 </div>
 
-                                {showCardForm ? (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        className="space-y-4"
-                                    >
-                                        <PaymentForm
-                                            amount={finalPrice}
-                                            onSuccess={handleMockPaymentSuccess}
-                                            onCancel={() => setShowCardForm(false)}
-                                        />
-                                    </motion.div>
-                                ) : (
-                                    <div className="space-y-4">
-                                        <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-start gap-3">
-                                            <Lock className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                                            <p className="text-xs text-blue-700">
-                                                {finalPrice === 0
-                                                    ? "Esta sesión es gratuita. Pulsa el botón para confirmar tu reserva."
-                                                    : "Elige tu método de pago para completar la reserva."}
-                                            </p>
-                                        </div>
-
-                                        <div className="space-y-3">
-                                            <Button
-                                                onClick={handleStripePayment}
-                                                disabled={isLoading}
-                                                className="w-full bg-[#A68363] hover:bg-[#8C6B4D] text-white rounded-xl h-14 font-extrabold shadow-lg flex items-center justify-center gap-2 group transition-all"
-                                            >
-                                                {isLoading ? (
-                                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                                ) : finalPrice === 0 ? (
-                                                    "Confirmar Reserva Gratuita"
-                                                ) : (
-                                                    <>
-                                                        <CreditCard className="h-5 w-5 group-hover:scale-110 transition-transform" />
-                                                        Pagar con Stripe →
-                                                    </>
-                                                )}
-                                            </Button>
-
-                                            {finalPrice > 0 && (
-                                                <Button
-                                                    variant="outline"
-                                                    onClick={() => setShowCardForm(true)}
-                                                    disabled={isLoading}
-                                                    className="w-full border-2 border-gray-200 hover:border-[#A68363] hover:bg-[#A68363]/5 text-gray-700 font-bold rounded-xl h-14 transition-all"
-                                                >
-                                                    Pagar con Tarjeta (Directo)
-                                                </Button>
-                                            )}
-
-                                            <Button
-                                                variant="ghost"
-                                                onClick={() => setStep(2)}
-                                                className="w-full text-gray-400 hover:text-gray-600 font-bold"
-                                            >
-                                                Volver a Horarios
-                                            </Button>
-                                        </div>
+                                <div className="space-y-4">
+                                    <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-start gap-3">
+                                        <Lock className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                                        <p className="text-xs text-blue-700">
+                                            {finalPrice === 0
+                                                ? "Esta sesión es gratuita. Pulsa el botón para confirmar tu reserva."
+                                                : "Elige tu método de pago para completar la reserva."}
+                                        </p>
                                     </div>
-                                )}
+
+                                    <div className="space-y-3">
+                                        <Button
+                                            onClick={handleStripePayment}
+                                            disabled={isLoading}
+                                            className="w-full bg-[#A68363] hover:bg-[#8C6B4D] text-white rounded-xl h-14 font-extrabold shadow-lg flex items-center justify-center gap-2 group transition-all"
+                                        >
+                                            {isLoading ? (
+                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                            ) : finalPrice === 0 ? (
+                                                "Confirmar Reserva Gratuita"
+                                            ) : (
+                                                <>
+                                                    <CreditCard className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                                                    Pagar →
+                                                </>
+                                            )}
+                                        </Button>
+
+
+
+                                        <Button
+                                            variant="ghost"
+                                            onClick={() => setStep(2)}
+                                            className="w-full text-gray-400 hover:text-gray-600 font-bold"
+                                        >
+                                            Volver a Horarios
+                                        </Button>
+                                    </div>
+                                </div>
                             </motion.div>
                         )}
 

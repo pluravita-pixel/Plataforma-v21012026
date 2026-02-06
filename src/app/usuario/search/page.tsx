@@ -15,13 +15,12 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
 function PatientSearchContent() {
-    const [listeners, setListeners] = useState<any[]>([]);
-    const [currentUser, setCurrentUser] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState("");
     const searchParams = useSearchParams();
     const refId = searchParams.get("ref");
 
+    const [listeners, setListeners] = useState<any[]>([]);
+    const [currentUser, setCurrentUser] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
     const [selectedListener, setSelectedListener] = useState<any>(null);
     const [isProfileDesktopOpen, setIsProfileDesktopOpen] = useState(false);
 
@@ -52,46 +51,20 @@ function PatientSearchContent() {
         loadData();
     }, [refId]);
 
-    const filteredListeners = listeners.filter(l =>
-        l.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (l.specialty && l.specialty.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
-
     return (
         <div className="space-y-12 animate-fade-in-up">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                 <div className="flex-1">
                     <h1 className="text-5xl md:text-7xl font-black text-black tracking-tighter uppercase mb-4">
-                        Buscar Oyente
+                        Oyentes Disponibles
                     </h1>
                     <p className="text-black font-bold text-lg uppercase tracking-tight bg-accent inline-block px-4 py-1 neo-border">
-                        Encuentra al profesional ideal para tu proceso
+                        A veces solo necesitamos a alguien que nos escuche
                     </p>
-
-                    <div className="mt-10 relative max-w-2xl group">
-                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-black z-10" />
-                        <input
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="BUSCAR POR NOMBRE O ESPECIALIDAD..."
-                            className="neo-input h-20 pl-16 pr-8 text-xl neo-shadow-sm uppercase"
-                        />
-                    </div>
-                </div>
-
-                <div className="flex gap-4">
-                    <button className="neo-btn bg-white hover:bg-gray-100 flex items-center gap-2">
-                        <Filter className="h-5 w-5" />
-                        Filtros
-                    </button>
-                    <button className="neo-btn bg-white hover:bg-gray-100 flex items-center gap-2">
-                        <SlidersHorizontal className="h-5 w-5" />
-                        Ordenar
-                    </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 pb-20">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 pb-20 mt-12">
                 {loading ? (
                     [1, 2, 3].map(i => (
                         <div key={i} className="neo-card bg-white h-96 animate-pulse">
@@ -101,7 +74,7 @@ function PatientSearchContent() {
                             <div className="h-16 bg-gray-200 neo-border w-full"></div>
                         </div>
                     ))
-                ) : filteredListeners.map((listener) => (
+                ) : listeners.map((listener) => (
                     <div
                         key={listener.id}
                         onClick={() => {
@@ -119,10 +92,6 @@ function PatientSearchContent() {
                                     height={96}
                                     className="object-cover"
                                 />
-                            </div>
-                            <div className="flex items-center gap-1 bg-secondary px-4 py-2 neo-border text-black font-black text-sm neo-shadow-sm">
-                                <Star className="h-4 w-4 fill-black" />
-                                {listener.rating}
                             </div>
                         </div>
 
@@ -149,13 +118,13 @@ function PatientSearchContent() {
                     </div>
                 ))}
 
-                {!loading && filteredListeners.length === 0 && (
+                {!loading && listeners.length === 0 && (
                     <div className="col-span-full py-20 text-center neo-card bg-secondary/20">
                         <div className="w-24 h-24 bg-white neo-border flex items-center justify-center mx-auto mb-6 neo-shadow">
                             <Sparkles className="h-12 w-12 text-black" />
                         </div>
-                        <h3 className="text-4xl font-black text-black uppercase mb-4">Sin coincidencias</h3>
-                        <p className="text-black font-bold uppercase max-w-xs mx-auto">Prueba buscando con otros términos o especialidades.</p>
+                        <h3 className="text-4xl font-black text-black uppercase mb-4">No hay oyentes disponibles</h3>
+                        <p className="text-black font-bold uppercase max-w-xs mx-auto">Vuelve más tarde para ver nuevos profesionales.</p>
                     </div>
                 )}
             </div>
