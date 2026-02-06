@@ -1,14 +1,14 @@
 export const dynamic = 'force-dynamic';
-import { getUserDashboardData } from "@/app/actions/patient";
-import PatientDashboardClient from "./PatientDashboardClient";
+import { getUsuarioDashboardData } from "@/app/actions/usuarios";
+import UsuarioDashboardClient from "./UsuarioDashboardClient";
 import { redirect } from "next/navigation";
 
 export default async function PatientDashboard() {
-    const data = await getUserDashboardData();
+    const data = await getUsuarioDashboardData();
 
     if (!data) {
         redirect("/login");
     }
 
-    return <PatientDashboardClient initialData={data} />;
+    return <UsuarioDashboardClient initialData={data} />;
 }

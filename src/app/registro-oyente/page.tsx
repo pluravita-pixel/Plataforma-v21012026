@@ -1,20 +1,20 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
+import { submitOyenteApplication } from "@/app/actions/oyente-solicitudes";
 import { getCurrentUser } from "@/app/actions/auth";
-import { submitCoachApplication } from "@/app/actions/coaches";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Logo } from "@/components/logo";
 import { Card } from "@/components/ui/card";
-import { CheckCircle2, Send, User, GraduationCap, Heart } from "lucide-react";
+import { CheckCircle2, User, GraduationCap, Heart, Send } from "lucide-react";
+import { Logo } from "@/components/logo";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 
-export default function CoachOnboardingPage() {
-    const [state, formAction, isPending] = useActionState(submitCoachApplication, null);
+export default function CoachRegistrationPage() {
+    const [state, formAction, isPending] = useActionState(submitOyenteApplication, null);
     const [user, setUser] = useState<any>(null);
     const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
     const [selectedDays, setSelectedDays] = useState<string[]>([]);
@@ -23,19 +23,13 @@ export default function CoachOnboardingPage() {
 
     useEffect(() => {
         getCurrentUser().then(u => {
-            if (!u) router.push("/login?redirect=/coach-onboarding");
-            if (u?.role === 'oyente') router.push("/psychologist/dashboard");
+            if (!u) router.push("/login?redirect=/registro-oyente");
+            if (u?.role === 'oyente') router.push("/oyente/dashboard");
             setUser(u);
         });
     }, [router]);
 
     if (!user) return null;
-
-    // Si el usuario es rechazado, mostramos el mensaje de rechazo
-    // (Esto se basa en si el usuario ya no existe en la DB o si tenemos una marca,
-    // pero como el usuario pidió borrarlo, el getCurrentUser devolverá null o error.
-    // Sin embargo, para una mejor UX, el sistema de borrado de handleCoachApplication
-    // borrará al usuario. Si el usuario intenta entrar de nuevo, no tendrá cuenta.)
 
     if (state?.success) {
         return (
@@ -50,7 +44,7 @@ export default function CoachOnboardingPage() {
                     </div>
                     <h1 className="text-3xl font-black text-[#4A3C31] mb-4 text-balance leading-tight">¡Solicitud enviada con éxito!</h1>
                     <p className="text-[#6B6B6B] leading-relaxed mb-8">
-                        Hemos recibido tu solicitud para formar parte de nuestro equipo de coaches. Un administrador la revisará cuidadosamente y recibirás una respuesta por email muy pronto.
+                        Hemos recibido tu solicitud para formar parte nuestros oyentes. Un administrador la revisará cuidadosamente.
                     </p>
                     <Button
                         asChild

@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { getAllPsychologists, getAllUsers } from "@/app/actions/admin";
+import { getAllOyentes, getAllUsers } from "@/app/actions/admin";
 import {
     Database,
     Table as TableIcon,
@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 export default async function DatabasePage() {
-    const psychologists = await getAllPsychologists();
+    const oyentes = await getAllOyentes();
     const users = await getAllUsers();
 
     return (
@@ -34,7 +34,7 @@ export default async function DatabasePage() {
                 </div>
             </div>
 
-            {/* Psychologists Table */}
+            {/* Oyentes Table */}
             <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
                 <div className="p-8 border-b border-gray-50 flex items-center justify-between bg-gray-50/50">
                     <div className="flex items-center gap-4">
@@ -64,7 +64,7 @@ export default async function DatabasePage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
-                            {psychologists.map((ps) => (
+                            {oyentes.map((ps) => (
                                 <tr key={ps.id} className="hover:bg-gray-50 transition-colors">
                                     <td className="px-8 py-4 text-[10px] font-mono text-gray-400 truncate max-w-[100px]">{ps.id}</td>
                                     <td className="px-8 py-4 text-sm font-bold text-gray-900">{ps.fullName}</td>

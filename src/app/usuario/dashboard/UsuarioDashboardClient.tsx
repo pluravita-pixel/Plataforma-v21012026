@@ -69,7 +69,7 @@ export default function PatientDashboardClient({ initialData }: PatientDashboard
                                         <Clock className="h-3 w-3" />
                                         Confirmada a las {format(new Date(nextAppointment.date), "HH:mm")} hrs
                                     </div>
-                                    <h3 className="text-3xl font-black text-[#4A3C31]">Sesión con {nextAppointment.psychologist.fullName}</h3>
+                                    <h3 className="text-3xl font-black text-[#4A3C31]">Sesión con {nextAppointment.oyente.fullName}</h3>
                                     <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Acompañamiento Psicoterapéutico Online</p>
                                 </div>
 

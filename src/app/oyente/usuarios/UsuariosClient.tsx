@@ -11,7 +11,7 @@ import {
     X,
     Check
 } from "lucide-react";
-import { cancelAppointmentByPsychologist } from "@/app/actions/psychologists";
+import { cancelAppointmentByOyente } from "@/app/actions/oyentes";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -42,7 +42,7 @@ export function PatientsClient({ initialPatients, psychologistId }: { initialPat
     const handleCancel = async () => {
         if (!showCancelModal) return;
         setIsCancelling(true);
-        const res = await cancelAppointmentByPsychologist(showCancelModal, psychologistId); // We need psychologistId here. Pass it as prop.
+        const res = await cancelAppointmentByOyente(showCancelModal, psychologistId); // We need psychologistId here. Pass it as prop.
         setIsCancelling(false);
         if (res.success) {
             alert(res.success); // Simple alert for now, or toast

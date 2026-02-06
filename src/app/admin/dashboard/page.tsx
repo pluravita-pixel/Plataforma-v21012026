@@ -1,6 +1,6 @@
 export const revalidate = 0;
 export const dynamic = 'force-dynamic';
-import { getAdminStats, getAllPsychologists } from "@/app/actions/admin";
+import { getAdminStats, getAllOyentes } from "@/app/actions/admin";
 import {
     Users,
     UserCheck,
@@ -15,14 +15,14 @@ import {
 } from "lucide-react";
 
 export default async function AdminDashboard() {
-    const [statsData, allPsychologists] = await Promise.all([
+    const [statsData, allOyentes] = await Promise.all([
         getAdminStats(),
-        getAllPsychologists()
+        getAllOyentes()
     ]);
 
     const stats = [
         { label: "Usuarios Registrados", value: statsData.users, icon: Users, color: "text-black", bg: "bg-white" },
-        { label: "Oyentes Registrados", value: statsData.psychologists, icon: UserCheck, color: "text-black", bg: "bg-gray-100" },
+        { label: "Oyentes Registrados", value: statsData.oyentes, icon: UserCheck, color: "text-black", bg: "bg-gray-100" },
         { label: "Total Sesiones", value: statsData.sessions, icon: Calendar, color: "text-black", bg: "bg-gray-50" },
     ];
 
@@ -57,7 +57,7 @@ export default async function AdminDashboard() {
                 <div className="bg-white p-10 neo-border neo-shadow">
                     <h2 className="text-3xl font-black text-black mb-10 uppercase tracking-tighter">Oyentes en la Web</h2>
                     <div className="space-y-6 max-h-[700px] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-black">
-                        {allPsychologists.length > 0 ? allPsychologists.map((p, i) => (
+                        {allOyentes.length > 0 ? allOyentes.map((p, i) => (
                             <div key={i} className="flex items-center justify-between p-6 bg-white neo-border hover:bg-gray-50 transition-colors neo-shadow-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none">
                                 <div className="flex items-center gap-6">
                                     <div className="w-14 h-14 neo-border bg-gray-200 flex items-center justify-center font-black text-black text-xl">

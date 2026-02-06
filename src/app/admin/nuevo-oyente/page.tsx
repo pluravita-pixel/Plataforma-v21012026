@@ -10,7 +10,7 @@ import {
     Loader2,
     ArrowRight
 } from "lucide-react";
-import { createPsychologistProfile } from "@/app/actions/admin";
+import { createOyenteProfile } from "@/app/actions/admin";
 
 export default function AddPsychologistPage() {
     const [name, setName] = useState("");
@@ -23,7 +23,7 @@ export default function AddPsychologistPage() {
         setLoading(true);
         setResult(null);
 
-        const res = await createPsychologistProfile(name, email);
+        const res = await createOyenteProfile(name, email);
         setResult(res);
         setLoading(false);
 

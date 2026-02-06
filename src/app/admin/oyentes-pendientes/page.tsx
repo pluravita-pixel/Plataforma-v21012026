@@ -1,39 +1,83 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { getPendingApplications, handleCoachApplication } from "@/app/actions/coaches";
+import { getPendingApplications, handleOyenteApplication } from "@/app/actions/oyente-solicitudes";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Check, X, Clock, Mail, Phone, GraduationCap, Heart, User, ChevronDown, CalendarClock } from "lucide-react";
+import { Check, X, Clock, Mail, Phone, GraduationCap, Heart, User, ChevronDown, CalendarClock, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
-export default function CoachesPendingPage() {
-    const [applications, setApplications] = useState<any[]>([]);
+interface Application {
+    id: string;
+    userId: string;
+    fullName: string;
+    email: string;
+    phone: string;
+    studies: string;
+    motivation: string;
+    languages: string;
+    interviewAvailability: string;
+    status: string;
+    createdAt: Date;
+}
+
+export default function PendingCoachesPage() {
+    const [applications, setApplications] = useState<Application[]>([]);
     const [loading, setLoading] = useState(true);
-    const [expandedId, setExpandedId] = useState<string | null>(null);
+    const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
     const [isPending, startTransition] = useTransition();
 
     const fetchApplications = async () => {
-        const apps = await getPendingApplications();
-        setApplications(apps);
-        setLoading(false);
+        try {
+            const data = await getPendingApplications();
+            // Map DB fields to camelCase
+            const mapped = data.map((a: any) => ({
+                id: a.id,
+                userId: a.user_id,
+                fullName: a.full_name,
+                email: a.email,
+                phone: a.phone,
+                studies: a.studies,
+                motivation: a.motivation,
+                languages: a.languages,
+                interviewAvailability: a.interview_availability,
+                status: a.status,
+                createdAt: new Date(a.created_at)
+            }));
+            setApplications(mapped);
+        } catch (error) {
+            console.error("Error fetching applications:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
         fetchApplications();
     }, []);
 
-    const onAction = (id: string, action: 'accept' | 'reject') => {
+    const handleAction = (id: string, action: 'accept' | 'reject') => {
         startTransition(async () => {
-            const result = await handleCoachApplication(id, action);
-            if (result.success) {
+            const res = await handleOyenteApplication(id, action);
+            if (res.success) {
                 fetchApplications();
             } else {
-                alert(result.error);
+                alert(res.error || "Error al procesar la solicitud");
             }
         });
+    };
+
+    const toggleExpand = (id: string) => {
+        const newSet = new Set(expandedIds);
+        if (newSet.has(id)) {
+            newSet.delete(id);
+        } else {
+            newSet.add(id);
+        }
+        setExpandedIds(newSet);
     };
 
     if (loading) return <div>Cargando solicitudes...</div>;
@@ -64,13 +108,13 @@ export default function CoachesPendingPage() {
                             className="overflow-hidden"
                         >
                             <Card
-                                onClick={() => setExpandedId(expandedId === app.id ? null : app.id)}
-                                className={`cursor-pointer border-4 border-black rounded-none transition-all duration-300 ${expandedId === app.id
-                                    ? "p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white scale-[1.01]"
-                                    : "p-4 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-gray-50/50"
+                                onClick={() => toggleExpand(app.id)}
+                                className={`cursor-pointer border-4 border-black rounded-none transition-all duration-300 ${expandedIds.has(app.id)
+                                        ? "p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white scale-[1.01]"
+                                        : "p-4 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-gray-50/50"
                                     }`}
                             >
-                                {expandedId === app.id ? (
+                                {expandedIds.has(app.id) ? (
                                     // VISTA EXPANDIDA (DETALLADA)
                                     <motion.div
                                         initial={{ opacity: 0 }}
@@ -127,26 +171,26 @@ export default function CoachesPendingPage() {
                                                         <Clock className="h-4 w-4" /> Disponibilidad Entrevista
                                                     </h4>
                                                     <p className="text-sm leading-relaxed text-gray-700 font-medium bg-gray-50 p-4 border-2 border-dashed border-gray-200">
-                                                        {app.interview_availability || "No especificado"}
+                                                        {app.interviewAvailability || "No especificado"}
                                                     </p>
                                                 </div>
                                             </div>
 
                                             <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest pt-4 border-t border-gray-100">
-                                                Recibida el {app.created_at ? format(new Date(app.created_at), "PPP 'a las' HH:mm", { locale: es }) : format(new Date(), "PPP 'a las' HH:mm", { locale: es })}
+                                                Recibida el {app.createdAt ? format(app.createdAt, "PPP 'a las' HH:mm", { locale: es }) : format(new Date(), "PPP 'a las' HH:mm", { locale: es })}
                                             </div>
                                         </div>
 
                                         <div className="flex lg:flex-col gap-4 justify-center lg:border-l-4 lg:border-black lg:pl-8">
                                             <Button
-                                                onClick={(e) => { e.stopPropagation(); onAction(app.id, 'accept'); }}
+                                                onClick={(e) => { e.stopPropagation(); handleAction(app.id, 'accept'); }}
                                                 disabled={isPending}
                                                 className="bg-green-500 hover:bg-green-600 text-white font-black uppercase tracking-widest h-16 px-8 rounded-none border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all flex items-center gap-2"
                                             >
                                                 <Check className="h-6 w-6" /> Aceptar
                                             </Button>
                                             <Button
-                                                onClick={(e) => { e.stopPropagation(); onAction(app.id, 'reject'); }}
+                                                onClick={(e) => { e.stopPropagation(); handleAction(app.id, 'reject'); }}
                                                 disabled={isPending}
                                                 className="bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-widest h-16 px-8 rounded-none border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all flex items-center gap-2"
                                             >
@@ -173,7 +217,7 @@ export default function CoachesPendingPage() {
                                         <div className="flex items-center gap-3">
                                             <div className="hidden md:flex items-center gap-1 text-[10px] uppercase font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded">
                                                 <CalendarClock className="h-3 w-3" />
-                                                {app.created_at ? format(new Date(app.created_at), "dd MMM", { locale: es }) : "Hoy"}
+                                                {app.createdAt ? format(app.createdAt, "dd MMM", { locale: es }) : "Hoy"}
                                             </div>
                                             <div className="flex items-center gap-1 px-2 py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 font-bold text-[10px] uppercase tracking-wider rounded">
                                                 <Clock className="h-3 w-3" /> Pendiente
@@ -193,25 +237,5 @@ export default function CoachesPendingPage() {
                 </AnimatePresence>
             </div>
         </div>
-    );
-}
-
-function ShieldCheck(props: any) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
-            <path d="m9 12 2 2 4-4" />
-        </svg>
     );
 }

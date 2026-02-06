@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { getCurrentUser } from "@/app/actions/auth";
-import { updatePatientProfile } from "@/app/actions/patient";
+import { updateUsuarioProfile } from "@/app/actions/usuarios";
 
 export default function PatientProfilePage() {
     const [user, setUser] = useState<any>(null);
@@ -39,7 +39,7 @@ export default function PatientProfilePage() {
 
     const handleSave = async () => {
         setIsSaving(true);
-        const result = await updatePatientProfile(form);
+        const result = await updateUsuarioProfile(form);
         setIsSaving(false);
 
         if (result.error) {

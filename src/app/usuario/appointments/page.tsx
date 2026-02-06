@@ -13,7 +13,7 @@ import { es } from "date-fns/locale";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { getAllUserAppointments, cancelAppointment } from "@/app/actions/patient";
+import { getAllUserAppointments, cancelAppointment } from "@/app/actions/usuarios";
 
 export default function PatientAppointmentsPage() {
     const router = useRouter();
@@ -85,14 +85,14 @@ export default function PatientAppointmentsPage() {
                                     <div className="flex-1 p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
                                         <div className="flex items-center gap-6">
                                             <div className="w-20 h-20 rounded-2xl bg-[#A68363]/10 flex items-center justify-center text-[#A68363] text-3xl font-black shadow-inner">
-                                                {appointment.psychologist.fullName[0]}
+                                                {appointment.oyente?.fullName?.[0] || "?"}
                                             </div>
                                             <div>
                                                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-wider mb-2">
                                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
                                                     Confirmada
                                                 </div>
-                                                <p className="text-2xl font-black text-[#4A3C31] mb-1">{appointment.psychologist.fullName}</p>
+                                                <p className="text-2xl font-black text-[#4A3C31] mb-1">{appointment.oyente?.fullName || "Oyente"}</p>
                                                 <p className="text-gray-400 font-bold text-sm uppercase tracking-wider">Sesión Online Individual</p>
                                                 {appointment.reason && (
                                                     <p className="mt-3 text-sm text-gray-500 italic bg-gray-50 p-3 rounded-xl border border-gray-100">

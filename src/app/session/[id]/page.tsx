@@ -20,18 +20,18 @@ export default async function SessionPage({ params }: SessionPageProps) {
     }
 
     try {
-        // Fetch appointment with psychologist details to verify access
+        // Fetch appointment with oyente details to verify access
         const apptResult = await client`
             SELECT 
                 a.*,
                 a.meeting_link as appointment_meeting_link,
-                p.user_id as psychologist_user_id,
-                p.full_name as psychologist_name,
-                p.meeting_link as psychologist_meeting_link,
-                u.full_name as patient_name
+                p.user_id as oyente_user_id,
+                p.full_name as oyente_name,
+                p.meeting_link as oyente_meeting_link,
+                u.full_name as usuario_name
             FROM appointments a
-            JOIN psychologists p ON a.psychologist_id = p.id
-            LEFT JOIN users u ON a.patient_id = u.id
+            JOIN oyentes p ON a.oyente_id = p.id
+            LEFT JOIN users u ON a.usuario_id = u.id
             WHERE a.id = ${id}
             LIMIT 1
         `;
@@ -55,10 +55,10 @@ export default async function SessionPage({ params }: SessionPageProps) {
 
         // Determine Role and Access
         const isSpecialUser = user.email === 'psicologo_test@ejemplo.com' || user.email === 'sanmiguelgil1@gmail.com';
-        const isPsychologist = appointment.psychologist_user_id === user.id || (isSpecialUser && user.role === 'oyente');
-        const isPatient = (appointment.patient_id === user.id || (isSpecialUser && user.role === 'patient')) && !isPsychologist;
+        const isOyente = appointment.oyente_user_id === user.id || (isSpecialUser && user.role === 'oyente');
+        const isUsuario = (appointment.usuario_id === user.id || (isSpecialUser && user.role === 'usuario')) && !isOyente;
 
-        if (!isPsychologist && !isPatient) {
+        if (!isOyente && !isUsuario) {
             return (
                 <div className="flex h-screen items-center justify-center bg-neutral-50">
                     <Card className="p-8 text-center max-w-md">
@@ -82,7 +82,7 @@ export default async function SessionPage({ params }: SessionPageProps) {
                         <h1 className="text-xl font-bold mb-2">Sesión Cancelada</h1>
                         <p className="text-neutral-500 mb-6">Esta sesión ha sido cancelada.</p>
                         <Button asChild>
-                            <Link href={isPsychologist ? "/psychologist/dashboard" : "/usuario/dashboard"}>
+                            <Link href={isOyente ? "/oyente/dashboard" : "/usuario/dashboard"}>
                                 Volver al Dashboard
                             </Link>
                         </Button>
@@ -91,7 +91,7 @@ export default async function SessionPage({ params }: SessionPageProps) {
             );
         }
 
-        const finalMeetingLink = appointment.appointment_meeting_link || appointment.psychologist_meeting_link;
+        const finalMeetingLink = appointment.appointment_meeting_link || appointment.oyente_meeting_link;
 
         if (!finalMeetingLink) {
             return (
@@ -120,7 +120,7 @@ export default async function SessionPage({ params }: SessionPageProps) {
                     </div>
 
                     <h1 className="text-3xl font-black text-[#4A3C31] mb-2 text-balance leading-tight">
-                        Tu sesión con {appointment.psychologist_name} está lista
+                        Tu sesión con {appointment.oyente_name} está lista
                     </h1>
                     <p className="text-[#6B6B6B] leading-relaxed mb-10 text-sm">
                         Al hacer clic en el botón de abajo, serás redirigido a la sala de Zoom externa del profesional. Por favor, asegúrate de tener instalada la aplicación de Zoom.
