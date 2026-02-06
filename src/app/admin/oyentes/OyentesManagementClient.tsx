@@ -16,7 +16,7 @@ import {
     Briefcase
 } from "lucide-react";
 import Image from "next/image";
-import { deletePsychologist } from "@/app/actions/admin";
+import { deleteOyente } from "@/app/actions/admin";
 import { toast } from "sonner";
 import {
     Dialog,
@@ -63,7 +63,7 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
         if (!selectedListener) return;
 
         startTransition(async () => {
-            const result = await deletePsychologist(selectedListener.id);
+            const result = await deleteOyente(selectedListener.id);
             if (result.success) {
                 toast.success("Oyente eliminado correctamente");
                 setListeners(listeners.filter(l => l.id !== selectedListener.id));

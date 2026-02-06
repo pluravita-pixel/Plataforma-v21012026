@@ -37,7 +37,7 @@ export default async function AdminUsersPage() {
                 <p className="text-gray-500 mt-1">Gestiona y visualiza todos los usuarios de la plataforma</p>
             </div>
 
-            <UsersListClient users={users} />
+            <UsersListClient users={[...users] as any} />
         </div>
     );
 }

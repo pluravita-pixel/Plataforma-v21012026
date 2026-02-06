@@ -19,7 +19,7 @@ import { es } from "date-fns/locale";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { completeAppointment, updateAppointmentMeetingLink } from "@/app/actions/psychologists";
+import { completeAppointment, updateAppointmentMeetingLink } from "@/app/actions/oyentes";
 import { FileUploader } from "@/components/files/FileUploader";
 import { Input } from "@/components/ui/input";
 
@@ -85,11 +85,11 @@ export default function AppointmentDetailsClient({ appointment, coachId }: Appoi
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                     <div className="flex items-center gap-4">
                         <div className="w-16 h-16 rounded-full bg-[#A68363]/10 flex items-center justify-center text-[#A68363] text-2xl font-black">
-                            {appointment.patient.fullName[0]}
+                            {appointment.usuario?.fullName?.[0]}
                         </div>
                         <div>
-                            <h1 className="text-3xl font-black text-[#4A3C31] tracking-tight">{appointment.patient.fullName}</h1>
-                            <p className="text-gray-400 font-medium">{appointment.patient.email}</p>
+                            <h1 className="text-3xl font-black text-[#4A3C31] tracking-tight">{appointment.usuario?.fullName}</h1>
+                            <p className="text-gray-400 font-medium">{appointment.usuario?.email}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">

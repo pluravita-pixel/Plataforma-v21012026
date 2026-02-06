@@ -1,5 +1,5 @@
 import { db } from "../db";
-import { users, psychologists, supportTickets } from "../db/schema";
+import { users, oyentes, supportTickets } from "../db/schema";
 import { eq } from "drizzle-orm";
 
 async function testMerge() {
@@ -19,16 +19,16 @@ async function testMerge() {
             id: stubId,
             email: testEmail,
             fullName: "Invite Pending",
-            role: "psychologist"
+            role: "oyente"
         });
 
-        await db.insert(psychologists).values({
+        await db.insert(oyentes).values({
             userId: stubId,
             fullName: "Invite Pending",
             email: testEmail,
             specialty: "Test Specialty"
         });
-        console.log("2. Created stub user and psychologist profile (Invitation).");
+        console.log("2. Created stub user and oyente profile (Invitation).");
 
         // 3. Simulate Merge
         console.log(`3. Simulating registration with new ID: ${realId}`);
@@ -52,10 +52,10 @@ async function testMerge() {
                 role: existingUser.role,
             });
 
-            console.log("   Moving psychologists to new ID...");
-            await db.update(psychologists)
+            console.log("   Moving oyentes to new ID...");
+            await db.update(oyentes)
                 .set({ userId: realId })
-                .where(eq(psychologists.userId, stubId));
+                .where(eq(oyentes.userId, stubId));
 
             console.log("   Deleting stub...");
             await db.delete(users).where(eq(users.id, stubId));
@@ -68,13 +68,13 @@ async function testMerge() {
             where: eq(users.email, testEmail),
         });
 
-        const updatedPsych = await db.query.psychologists.findFirst({
-            where: eq(psychologists.userId, realId),
+        const updatedPsych = await db.query.oyentes.findFirst({
+            where: eq(oyentes.userId, realId),
         });
 
         console.log("4. Verification:");
         console.log(`   User ID is real ID? ${updatedUser?.id === realId}`);
-        console.log(`   Psychologist linked to real ID? ${updatedPsych?.userId === realId}`);
+        console.log(`   Oyente linked to real ID? ${updatedPsych?.userId === realId}`);
 
         if (updatedUser?.id === realId && updatedPsych?.userId === realId) {
             console.log("--- SUCCESS: Non-cascading merge verified! ---");

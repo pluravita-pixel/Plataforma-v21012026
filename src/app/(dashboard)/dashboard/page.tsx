@@ -17,14 +17,14 @@ import {
     TableRow
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { NewPatientModal } from "@/components/new-patient-modal";
+import { NewPatientModal } from "@/components/nuevo-usuario-modal";
 import { getGlobalStats } from "@/app/actions/stats";
 import { useState, useEffect } from "react";
 
 const chartData: any[] = [];
 
 export default function OverviewPage() {
-    const [stats, setStats] = useState({ realUsers: 0, realSessions: 0, realCoaches: 0 });
+    const [stats, setStats] = useState({ realUsers: 0, realSessions: 0, realOyentes: 0 });
 
     useEffect(() => {
         getGlobalStats().then(setStats);
@@ -65,11 +65,11 @@ export default function OverviewPage() {
                 </Card>
                 <Card className="hover:shadow-md transition-shadow">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Coaches Activos</CardTitle>
+                        <CardTitle className="text-sm font-medium">Oyentes Activos</CardTitle>
                         <Activity className="h-4 w-4 text-primary" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{stats.realCoaches}</div>
+                        <div className="text-2xl font-bold">{stats.realOyentes}</div>
                         <p className="text-xs text-muted-foreground">Listos para empezar</p>
                     </CardContent>
                 </Card>

@@ -14,19 +14,19 @@ import { es } from "date-fns/locale";
 
 import { getCurrentUser } from "@/app/actions/auth";
 import {
-    getPsychologistStatus,
+    getOyenteStatus,
     getUpcomingAppointments,
     getWeeklyAppointmentsCount,
     getRecentConsultations,
     getWeeklyAppointments
-} from "@/app/actions/psychologists";
+} from "@/app/actions/oyentes";
 
 async function getPsychologistData() {
     const user = await getCurrentUser();
 
     if (!user || user.role !== 'oyente') return null;
 
-    const psych = await getPsychologistStatus(user.id);
+    const psych = await getOyenteStatus(user.id);
     if (!psych) return null;
 
     // Fetch parallel for speed
@@ -96,10 +96,10 @@ export default async function PsychologistDashboard() {
                             <div key={i} className="flex items-center justify-between p-4 rounded-3xl bg-[#FAFAFA] border border-gray-50 hover:border-[#A68363]/20 transition-all cursor-pointer group">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-full bg-[#A68363]/10 flex items-center justify-center font-black text-[#A68363]">
-                                        {app.patient?.fullName ? app.patient.fullName[0] : 'U'}
+                                        {app.usuario?.fullName ? app.usuario.fullName[0] : 'U'}
                                     </div>
                                     <div>
-                                        <p className="font-bold text-[#4A3C31] text-sm">{app.patient?.fullName || `Cita #${app.id}`}</p>
+                                        <p className="font-bold text-[#4A3C31] text-sm">{app.usuario?.fullName || `Cita #${app.id}`}</p>
                                         <div className="flex items-center text-xs text-gray-400 mt-1 font-medium">
                                             <Clock className="h-3 w-3 mr-1" />
                                             {format(new Date(app.date), "EEEE d 'a las' HH:mm", { locale: es })}
@@ -146,10 +146,10 @@ export default async function PsychologistDashboard() {
                             <div key={i} className="flex items-center justify-between p-4 rounded-3xl bg-[#FAFAFA] border border-gray-50">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center font-black text-emerald-600">
-                                        {app.patient?.fullName ? app.patient.fullName[0] : 'U'}
+                                        {app.usuario?.fullName ? app.usuario.fullName[0] : 'U'}
                                     </div>
                                     <div>
-                                        <p className="font-bold text-[#4A3C31] text-sm">{app.patient?.fullName || 'Usuario'}</p>
+                                        <p className="font-bold text-[#4A3C31] text-sm">{app.usuario?.fullName || 'Usuario'}</p>
                                         <p className="text-xs text-gray-500 mt-0.5 line-clamp-1 italic">"{app.reason || 'Seguimiento general'}"</p>
                                     </div>
                                 </div>
