@@ -233,9 +233,9 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
 
             // 1. Create Pending Appointment
             const result = await createPendingAppointment({
-                patientName: patientName,
-                patientEmail: formData.email,
-                psychologistId,
+                usuarioNombre: patientName,
+                usuarioEmail: formData.email,
+                oyenteId: psychologistId,
                 slotId: selectedSlot.id,
                 startTime: selectedSlot.startTime,
                 discountCodeId: appliedDiscount?.id,
@@ -295,9 +295,9 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
 
             // 1. Create Pending Appointment
             const result = await createPendingAppointment({
-                patientName: patientName,
-                patientEmail: formData.email,
-                psychologistId,
+                usuarioNombre: patientName,
+                usuarioEmail: formData.email,
+                oyenteId: psychologistId,
                 slotId: selectedSlot.id,
                 startTime: selectedSlot.startTime,
                 discountCodeId: appliedDiscount?.id,
