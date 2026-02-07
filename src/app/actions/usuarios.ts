@@ -35,14 +35,23 @@ export async function getUsuarioDashboardData() {
             `
         ]);
 
-        const nextAppt = nextApptResults[0] ? {
-            ...nextApptResults[0],
+        const cleanUser = user ? {
+            id: user.id,
+            email: user.email,
+            fullName: user.fullName,
+            role: user.role,
+            hasCompletedAffinity: user.hasCompletedAffinity,
+            lastLogin: user.lastLogin ? new Date(user.lastLogin).toISOString() : null,
+            createdAt: user.createdAt ? new Date(user.createdAt).toISOString() : null
+        } : null;
+
+        const cleanNextAppt = nextApptResults[0] ? {
+            id: nextApptResults[0].id,
+            date: new Date(nextApptResults[0].date).toISOString(),
+            status: nextApptResults[0].status,
             oyente: {
                 id: nextApptResults[0].p_id,
-                fullName: nextApptResults[0].p_full_name,
-                specialty: nextApptResults[0].p_specialty,
-                rating: nextApptResults[0].p_rating,
-                image: nextApptResults[0].p_image,
+                fullName: nextApptResults[0].p_full_name
             }
         } : null;
 
@@ -56,8 +65,8 @@ export async function getUsuarioDashboardData() {
         }));
 
         return {
-            user,
-            nextAppointment: nextAppt,
+            user: cleanUser,
+            nextAppointment: cleanNextAppt,
             recommendedListeners: oyentesList
         };
     } catch (error: any) {

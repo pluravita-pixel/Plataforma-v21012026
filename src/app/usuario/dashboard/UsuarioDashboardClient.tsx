@@ -21,12 +21,15 @@ interface PatientDashboardClientProps {
 }
 
 export default function PatientDashboardClient({ initialData }: PatientDashboardClientProps) {
+    if (!initialData) return <div className="p-8">No se encontraron datos del usuario.</div>;
     const router = useRouter();
     const { user, nextAppointment, recommendedListeners: recommendedCoaches } = initialData;
 
+    if (!user) return <div className="p-8">Sesión de usuario no válida.</div>;
+
     return (
         <div className="space-y-10 animate-in fade-in duration-700 pb-20">
-            {/* ... hero section omitted ... */}
+            {/* Hero Section */}
             <div className="relative overflow-hidden rounded-[3rem] bg-gradient-to-br from-[#4A3C31] to-[#2C241D] p-12 text-white shadow-2xl shadow-[#4A3C31]/20">
                 <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
                 <div className="relative z-10">
@@ -35,7 +38,7 @@ export default function PatientDashboardClient({ initialData }: PatientDashboard
                         Bienvenido de Nuevo
                     </div>
                     <h1 className="text-5xl md:text-6xl font-black tracking-tight mb-4 lowercase first-letter:uppercase">
-                        Hola, {user.fullName?.split(' ')[0] || 'Traveler'}
+                        Hola, {user.fullName ? user.fullName.split(' ')[0] : 'Traveler'}
                     </h1>
 
                 </div>
@@ -67,7 +70,7 @@ export default function PatientDashboardClient({ initialData }: PatientDashboard
                                         <Clock className="h-3 w-3" />
                                         Confirmada a las {format(new Date(nextAppointment.date), "HH:mm")} hrs
                                     </div>
-                                    <h3 className="text-3xl font-black text-[#4A3C31]">Sesión con {nextAppointment.oyente.fullName}</h3>
+                                    <h3 className="text-3xl font-black text-[#4A3C31]">Sesión con {nextAppointment.oyente?.fullName || "Oyente"}</h3>
                                     <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Acompañamiento Psicoterapéutico Online</p>
                                 </div>
 
@@ -112,13 +115,13 @@ export default function PatientDashboardClient({ initialData }: PatientDashboard
                     </div>
 
                     <div className="space-y-4">
-                        {recommendedCoaches.map((coach: any) => (
+                        {recommendedCoaches && recommendedCoaches.map((coach: any) => (
                             <div key={coach.id} className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-4 group">
                                 <div className="w-16 h-16 rounded-2xl bg-[#A68363]/10 flex items-center justify-center text-[#A68363] font-black text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                                    {coach.fullName[0]}
+                                    {coach.fullName ? coach.fullName[0] : '?'}
                                 </div>
                                 <div className="flex-1 overflow-hidden">
-                                    <h3 className="font-black text-[#4A3C31] truncate group-hover:text-[#A68363] transition-colors">{coach.fullName}</h3>
+                                    <h3 className="font-black text-[#4A3C31] truncate group-hover:text-[#A68363] transition-colors">{coach.fullName || "Oyente"}</h3>
                                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest truncate">{coach.specialty}</p>
                                     <div className="flex items-center gap-1 mt-1 text-amber-500">
                                         <Star className="h-3 w-3 fill-current" />
