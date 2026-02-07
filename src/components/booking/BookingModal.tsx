@@ -48,14 +48,10 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
     const [isLoginMode, setIsLoginMode] = useState(false); // Toggle between register/login if needed, defaulting to register for new users
 
     // Calendar State
-    const getTomorrow = () => {
-        const d = new Date();
-        d.setDate(d.getDate() + 1);
-        return d;
-    };
-    const [selectedDate, setSelectedDate] = useState<Date>(getTomorrow());
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [availableSlots, setAvailableSlots] = useState<Slot[]>([]);
     const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
+    const [isMounted, setIsMounted] = useState(false);
 
     // Discount Logic
     const [discountCode, setDiscountCode] = useState("");
@@ -65,7 +61,7 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
     // Payment/Loading States
     const [isLoading, setIsLoading] = useState(false);
 
-    // --- Init Data on Open & Handle Canceled Return ---
+    // Sync current user data
     useEffect(() => {
         if (isOpen && currentUser) {
             setFormData(prev => ({
@@ -76,36 +72,51 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
         }
     }, [isOpen, currentUser]);
 
+    // Handle hydration and canceled return logic
     useEffect(() => {
-        const checkCanceled = () => {
-            const isCanceled = searchParams.get("canceled") === "true";
-            const apptId = searchParams.get("appt");
-            const storedPsychId = localStorage.getItem("last_psych_id");
+        setIsMounted(true);
 
-            if (isCanceled && storedPsychId === psychologistId) {
-                // Recover data
+        // Initial date
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        setSelectedDate(tomorrow);
+
+        // Check for canceled payment return
+        const isCanceled = searchParams.get("canceled") === "true";
+        const storedPsychId = localStorage.getItem("last_psych_id");
+
+        if (isCanceled && storedPsychId === psychologistId) {
+            try {
                 const savedData = localStorage.getItem("booking_form_data");
                 const savedSlot = localStorage.getItem("booking_selected_slot");
 
                 if (savedData) setFormData(JSON.parse(savedData));
-                if (savedSlot) setSelectedSlot(JSON.parse(savedSlot));
+                if (savedSlot) {
+                    const parsedSlot = JSON.parse(savedSlot);
+                    // Convert back to Date objects if needed
+                    setSelectedSlot({
+                        ...parsedSlot,
+                        startTime: new Date(parsedSlot.startTime),
+                        endTime: new Date(parsedSlot.endTime)
+                    });
+                }
 
                 setIsOpen(true);
                 setStep(3);
                 setIsCanceledReturn(true);
 
-                // Clear state from URL
+                // Clear URL params
                 const newUrl = window.location.pathname;
                 window.history.replaceState({}, '', newUrl);
+            } catch (e) {
+                console.error("Error recovering booking state:", e);
             }
-        };
-
-        checkCanceled();
+        }
     }, [searchParams, psychologistId]);
 
     // --- Fetch Slots ---
     useEffect(() => {
-        if (isOpen && step === 2) {
+        if (isOpen && step === 2 && selectedDate) {
             const fetchSlots = async () => {
                 const start = new Date(selectedDate);
                 start.setHours(0, 0, 0, 0);
@@ -285,11 +296,13 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
     const finalPrice = appliedDiscount ? price * (1 - appliedDiscount.percent / 100) : price;
 
     const changeDate = (days: number) => {
+        if (!selectedDate) return;
         const newDate = new Date(selectedDate);
-        newDate.setDate(selectedDate.getDate() + days);
+        newDate.setDate(newDate.getDate() + days);
 
         // Enforce 24h rule
-        const tomorrow = getTomorrow();
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
         tomorrow.setHours(0, 0, 0, 0);
 
         const checkDate = new Date(newDate);
@@ -341,11 +354,11 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
                                     <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-4">
                                         <div className="flex items-center gap-3 mb-2">
                                             <div className="w-10 h-10 rounded-full bg-[#A68363] flex items-center justify-center text-white font-bold">
-                                                {currentUser.fullName?.[0]}
+                                                {currentUser.fullName ? currentUser.fullName[0] : (currentUser.email ? currentUser.email[0] : "U")}
                                             </div>
                                             <div>
-                                                <p className="font-bold text-[#4A3C31]">{currentUser.fullName}</p>
-                                                <p className="text-xs text-gray-400">{currentUser.email}</p>
+                                                <p className="font-bold text-[#4A3C31]">{currentUser.fullName || "Usuario"}</p>
+                                                <p className="text-xs text-gray-400">{currentUser.email || "---"}</p>
                                             </div>
                                         </div>
 
@@ -470,10 +483,10 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
                                     <Button variant="ghost" size="icon" onClick={() => changeDate(-1)}><ChevronLeft className="h-4 w-4 text-gray-400" /></Button>
                                     <div className="text-center">
                                         <p className="font-black text-[#4A3C31] uppercase text-sm">
-                                            {format(selectedDate, "EEEE", { locale: es })}
+                                            {selectedDate ? format(selectedDate, "EEEE", { locale: es }) : "..."}
                                         </p>
                                         <p className="text-xs text-gray-500 font-bold">
-                                            {format(selectedDate, "d 'de' MMMM", { locale: es })}
+                                            {selectedDate ? format(selectedDate, "d 'de' MMMM", { locale: es }) : "..."}
                                         </p>
                                     </div>
                                     <Button variant="ghost" size="icon" onClick={() => changeDate(1)}><ChevronRight className="h-4 w-4 text-gray-400" /></Button>

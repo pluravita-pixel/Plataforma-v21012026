@@ -136,19 +136,19 @@ export default function PatientDashboardClient({ initialData }: PatientDashboard
                         {recommendedCoaches && recommendedCoaches.map((coach: any) => (
                             <div key={coach.id} className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-4 group">
                                 <div className="w-16 h-16 rounded-2xl bg-[#A68363]/10 flex items-center justify-center text-[#A68363] font-black text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                                    {coach.fullName ? coach.fullName[0] : '?'}
+                                    {(coach.fullName && coach.fullName[0]) || '?'}
                                 </div>
                                 <div className="flex-1 overflow-hidden">
                                     <h3 className="font-black text-[#4A3C31] truncate group-hover:text-[#A68363] transition-colors">{coach.fullName || "Oyente"}</h3>
-                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest truncate">{coach.specialty}</p>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest truncate">{coach.specialty || "Especialista"}</p>
                                     <div className="flex items-center gap-1 mt-1 text-amber-500">
                                         <Star className="h-3 w-3 fill-current" />
-                                        <span className="text-[10px] font-black text-gray-900">{coach.rating}</span>
+                                        <span className="text-[10px] font-black text-gray-900">{coach.rating || "5.0"}</span>
                                     </div>
                                 </div>
                                 <BookingModal
                                     listenerId={coach.id}
-                                    listenerName={coach.fullName}
+                                    listenerName={coach.fullName || "Especialista"}
                                     price={Number(coach.price) || 0}
                                     currentUser={user}
                                     customTrigger={

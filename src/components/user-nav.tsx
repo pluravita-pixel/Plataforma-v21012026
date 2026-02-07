@@ -89,8 +89,8 @@ export function UserNav() {
     }
 
     const initials = user.fullName
-        ? user.fullName.split(" ").map((n: string) => n[0]).join("").toUpperCase()
-        : user.email[0].toUpperCase();
+        ? user.fullName.split(" ").filter(Boolean).map((n: string) => n[0]).join("").toUpperCase()
+        : (user.email ? user.email[0].toUpperCase() : "U");
 
     return (
         <div className="relative">
