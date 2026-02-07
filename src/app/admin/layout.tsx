@@ -32,9 +32,9 @@ export default function AdminLayout({
     const navItems = [
         { icon: LayoutDashboard, label: "Resumen", href: "/admin/dashboard" },
         { icon: Users, label: "Usuarios", href: "/admin/usuarios" },
-        { icon: Users, label: "Oyentes", href: "/admin/coaches" },
-        { icon: ShieldCheck, label: "Solicitudes", href: "/admin/coaches-pending" },
-        { icon: UserPlus, label: "Añadir Oyente", href: "/admin/add-psychologist" },
+        { icon: Users, label: "Oyentes", href: "/admin/oyentes" },
+        { icon: ShieldCheck, label: "Solicitudes", href: "/admin/oyentes-pendientes" },
+        { icon: UserPlus, label: "Añadir Oyente", href: "/admin/nuevo-oyente" },
         { icon: MessageCircle, label: "Soporte", href: "/admin/support" },
         { icon: Settings, label: "Configuración", href: "/admin/settings" },
     ];
