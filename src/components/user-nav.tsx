@@ -74,16 +74,12 @@ export function UserNav() {
     if (!user) {
         return (
             <div className="flex items-center gap-4">
-                <Link href="/login" passHref legacyBehavior>
-                    <Button variant="outline" className="border-[#A68363] text-[#A68363] hover:bg-[#F2EDE7] font-semibold rounded-full px-6">
-                        Iniciar sesión
-                    </Button>
-                </Link>
-                <Link href="/register" passHref legacyBehavior>
-                    <Button className="bg-[#A68363] hover:opacity-90 text-white font-semibold rounded-full px-6 shadow-lg shadow-[#A68363]/20">
-                        Regístrate
-                    </Button>
-                </Link>
+                <Button variant="outline" className="border-[#A68363] text-[#A68363] hover:bg-[#F2EDE7] font-semibold rounded-full px-6" asChild>
+                    <Link href="/login">Iniciar sesión</Link>
+                </Button>
+                <Button className="bg-[#A68363] hover:opacity-90 text-white font-semibold rounded-full px-6 shadow-lg shadow-[#A68363]/20" asChild>
+                    <Link href="/register">Regístrate</Link>
+                </Button>
             </div>
         );
     }
