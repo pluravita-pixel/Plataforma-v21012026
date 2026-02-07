@@ -505,7 +505,7 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
                                                 }`}
                                         >
                                             <Clock className="h-3 w-3" />
-                                            {format(new Date(slot.startTime), "HH:mm")}
+                                            {slot.startTime ? format(new Date(slot.startTime), "HH:mm") : "--:--"}
                                         </button>
                                     )))}
                                 </div>
@@ -547,7 +547,7 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
                                             <span className="text-gray-500 font-bold">Sesión con {psychologistName}</span>
                                             <span className="font-bold text-[#4A3C31]">{price.toFixed(2)}€</span>
                                         </div>
-                                        {selectedSlot && (
+                                        {selectedSlot && selectedSlot.startTime && (
                                             <div className="flex justify-between items-center text-sm">
                                                 <span className="text-gray-500 font-bold">Fecha y Hora</span>
                                                 <span className="font-bold text-[#4A3C31]">{format(new Date(selectedSlot.startTime), "d 'de' MMMM, HH:mm", { locale: es })}</span>
