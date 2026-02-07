@@ -36,11 +36,11 @@ export async function getUsuarioDashboardData() {
         ]);
 
         const cleanUser = user ? {
-            id: user.id,
-            email: user.email,
-            fullName: user.fullName,
-            role: user.role,
-            hasCompletedAffinity: user.hasCompletedAffinity,
+            id: user.id || null,
+            email: user.email || null,
+            fullName: user.fullName || null,
+            role: user.role || null,
+            hasCompletedAffinity: !!user.hasCompletedAffinity,
             lastLogin: user.lastLogin ? new Date(user.lastLogin).toISOString() : null,
             createdAt: user.createdAt ? new Date(user.createdAt).toISOString() : null
         } : null;
@@ -57,23 +57,24 @@ export async function getUsuarioDashboardData() {
 
         const oyentesList = coachesResults.map((p: any) => ({
             id: p.id,
-            fullName: p.full_name,
-            rating: p.rating,
-            specialty: p.specialty,
-            price: p.price,
-            image: p.image
+            fullName: p.full_name || "Especialista",
+            rating: p.rating || "5.0",
+            specialty: p.specialty || "Acompañante",
+            price: p.price ? Number(p.price) : 0,
+            image: p.image || null
         }));
 
-        return {
+        // Absolute safe serialization for Next.js 16/React 19
+        return JSON.parse(JSON.stringify({
             user: cleanUser,
             nextAppointment: cleanNextAppt,
             recommendedListeners: oyentesList
-        };
+        }));
     } catch (error: any) {
         if (error.digest === 'DYNAMIC_SERVER_USAGE' || (error.message && error.message.includes('Dynamic server usage'))) {
             throw error;
         }
-        console.error("Error in getUsuarioDashboardData:", error);
+        console.error("Critical error in getUsuarioDashboardData:", error);
         return null;
     }
 }

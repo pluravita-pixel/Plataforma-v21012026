@@ -15,17 +15,32 @@ import { es } from "date-fns/locale";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BookingModal } from "@/components/booking/BookingModal";
+import { useEffect, useState } from "react";
 
 interface PatientDashboardClientProps {
     initialData: any;
 }
 
 export default function PatientDashboardClient({ initialData }: PatientDashboardClientProps) {
-    if (!initialData) return <div className="p-8">No se encontraron datos del usuario.</div>;
+    const [isMounted, setIsMounted] = useState(false);
     const router = useRouter();
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    if (!initialData) return <div className="p-8">No se encontraron datos del usuario.</div>;
     const { user, nextAppointment, recommendedListeners: recommendedCoaches } = initialData;
 
     if (!user) return <div className="p-8">Sesión de usuario no válida.</div>;
+
+    // Helper to check if appointment is expired (calculated on client to avoid mismatch)
+    const isSessionActive = (dateStr: string) => {
+        if (!isMounted) return true; // Default to active during server render to show button
+        const apptDate = new Date(dateStr);
+        const expiryDate = new Date(apptDate.getTime() + 60 * 60 * 1000);
+        return new Date() < expiryDate;
+    };
 
     return (
         <div className="space-y-10 animate-in fade-in duration-700 pb-20">
@@ -40,7 +55,6 @@ export default function PatientDashboardClient({ initialData }: PatientDashboard
                     <h1 className="text-5xl md:text-6xl font-black tracking-tight mb-4 lowercase first-letter:uppercase">
                         Hola, {user.fullName ? user.fullName.split(' ')[0] : 'Traveler'}
                     </h1>
-
                 </div>
             </div>
 
@@ -61,20 +75,24 @@ export default function PatientDashboardClient({ initialData }: PatientDashboard
 
                             <div className="flex flex-col md:flex-row gap-10 items-center">
                                 <div className="flex flex-col items-center justify-center bg-[#F8F6F4] rounded-[2.5rem] w-32 h-32 shrink-0 border border-[#A68363]/10 shadow-inner">
-                                    <p className="text-sm font-black text-[#A68363] uppercase tracking-widest">{format(new Date(nextAppointment.date), "MMM", { locale: es })}</p>
-                                    <p className="text-4xl font-black text-[#4A3C31]">{format(new Date(nextAppointment.date), "dd")}</p>
+                                    <p className="text-sm font-black text-[#A68363] uppercase tracking-widest">
+                                        {nextAppointment.date ? format(new Date(nextAppointment.date), "MMM", { locale: es }) : "---"}
+                                    </p>
+                                    <p className="text-4xl font-black text-[#4A3C31]">
+                                        {nextAppointment.date ? format(new Date(nextAppointment.date), "dd") : "--"}
+                                    </p>
                                 </div>
 
                                 <div className="flex-1 text-center md:text-left space-y-2">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-wider mb-2">
                                         <Clock className="h-3 w-3" />
-                                        Confirmada a las {format(new Date(nextAppointment.date), "HH:mm")} hrs
+                                        Confirmada {nextAppointment.date ? `a las ${format(new Date(nextAppointment.date), "HH:mm")} hrs` : ""}
                                     </div>
                                     <h3 className="text-3xl font-black text-[#4A3C31]">Sesión con {nextAppointment.oyente?.fullName || "Oyente"}</h3>
                                     <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Acompañamiento Psicoterapéutico Online</p>
                                 </div>
 
-                                {new Date() < new Date(new Date(nextAppointment.date).getTime() + 60 * 60 * 1000) ? (
+                                {isSessionActive(nextAppointment.date) ? (
                                     <Button
                                         onClick={() => router.push(`/session/${nextAppointment.id}`)}
                                         className="w-full md:w-auto bg-[#4A3C31] hover:bg-black text-white font-black uppercase tracking-widest text-xs rounded-2xl px-10 h-16 shadow-xl shadow-[#4A3C31]/20 transition-all hover:-translate-y-1 active:scale-95"

@@ -22,13 +22,20 @@ export default function PatientAppointmentsPage() {
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [appointmentToCancel, setAppointmentToCancel] = useState<any>(null);
     const [isCancelling, setIsCancelling] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
+        setIsMounted(true);
         async function loadData() {
             setIsLoading(true);
-            const data = await getAllUserAppointments();
-            setAllAppointments(data);
-            setIsLoading(false);
+            try {
+                const data = await getAllUserAppointments();
+                setAllAppointments(Array.isArray(data) ? data : []);
+            } catch (error) {
+                console.error("Failed to load appointments:", error);
+            } finally {
+                setIsLoading(false);
+            }
         }
         loadData();
     }, []);
@@ -36,16 +43,27 @@ export default function PatientAppointmentsPage() {
     const handleCancel = async () => {
         if (!appointmentToCancel) return;
         setIsCancelling(true);
-        const result = await cancelAppointment(appointmentToCancel.id);
-        setIsCancelling(false);
-
-        if (result.error) {
-            toast.error(result.error);
-        } else {
-            toast.success(result.message || "Cita cancelada con éxito.");
-            setAllAppointments(prev => prev.filter(a => a.id !== appointmentToCancel.id));
+        try {
+            const result = await cancelAppointment(appointmentToCancel.id);
+            if (result.error) {
+                toast.error(result.error);
+            } else {
+                toast.success(result.message || "Cita cancelada con éxito.");
+                setAllAppointments(prev => prev.filter(a => a.id !== appointmentToCancel.id));
+            }
+        } catch (error) {
+            toast.error("Error al cancelar la cita");
+        } finally {
+            setIsCancelling(false);
+            setShowCancelModal(false);
         }
-        setShowCancelModal(false);
+    };
+
+    const isSessionActive = (dateStr: string) => {
+        if (!isMounted) return true;
+        const apptDate = new Date(dateStr);
+        const expiryDate = new Date(apptDate.getTime() + 60 * 60 * 1000);
+        return new Date() < expiryDate;
     };
 
     return (
@@ -72,12 +90,16 @@ export default function PatientAppointmentsPage() {
                                     {/* Date/Time Section */}
                                     <div className="bg-[#4A3C31] text-white p-8 md:w-64 flex flex-col justify-center items-center text-center">
                                         <p className="text-xs font-black uppercase tracking-[0.2em] opacity-60 mb-2">Fecha</p>
-                                        <p className="text-3xl font-black mb-1">{format(new Date(appointment.date), "dd")}</p>
-                                        <p className="text-sm font-bold uppercase mb-4">{format(new Date(appointment.date), "MMMM", { locale: es })}</p>
+                                        <p className="text-3xl font-black mb-1">
+                                            {appointment.date ? format(new Date(appointment.date), "dd") : "--"}
+                                        </p>
+                                        <p className="text-sm font-bold uppercase mb-4">
+                                            {appointment.date ? format(new Date(appointment.date), "MMMM", { locale: es }) : "---"}
+                                        </p>
                                         <div className="h-px w-12 bg-white/20 mb-4"></div>
                                         <div className="flex items-center gap-2 font-bold text-lg">
                                             <Clock className="h-4 w-4 opacity-60" />
-                                            {format(new Date(appointment.date), "HH:mm")}
+                                            {appointment.date ? format(new Date(appointment.date), "HH:mm") : "--:--"}
                                         </div>
                                     </div>
 
@@ -103,7 +125,7 @@ export default function PatientAppointmentsPage() {
                                         </div>
 
                                         <div className="flex flex-col sm:flex-row gap-3">
-                                            {new Date() < new Date(new Date(appointment.date).getTime() + 60 * 60 * 1000) ? (
+                                            {isSessionActive(appointment.date) ? (
                                                 <Button
                                                     onClick={() => router.push(`/session/${appointment.id}`)}
                                                     className="bg-[#4A3C31] hover:bg-black text-white font-black uppercase tracking-tighter rounded-2xl px-8 h-14 shadow-xl shadow-[#4A3C31]/20 transition-all hover:-translate-y-1 active:scale-95"
