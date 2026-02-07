@@ -29,18 +29,36 @@ export default function PatientDashboardClient({ initialData }: PatientDashboard
         setIsMounted(true);
     }, []);
 
-    if (!initialData) return <div className="p-8">No se encontraron datos del usuario.</div>;
-    const { user, nextAppointment, recommendedListeners: recommendedCoaches } = initialData;
+    // Extract data with safe fallbacks
+    const user = initialData?.user;
+    const nextAppointment = initialData?.nextAppointment;
+    const recommendedCoaches = initialData?.recommendedListeners;
 
-    if (!user) return <div className="p-8">Sesión de usuario no válida.</div>;
-
-    // Helper to check if appointment is expired (calculated on client to avoid mismatch)
-    const isSessionActive = (dateStr: string) => {
-        if (!isMounted) return true; // Default to active during server render to show button
+    // Helper to check if appointment is active
+    const isSessionActive = (dateStr: string | null | undefined) => {
+        if (!isMounted || !dateStr) return true;
         const apptDate = new Date(dateStr);
         const expiryDate = new Date(apptDate.getTime() + 60 * 60 * 1000);
         return new Date() < expiryDate;
     };
+
+    if (!isMounted) {
+        return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="animate-spin h-12 w-12 border-4 border-[#A68363] border-t-transparent rounded-full" />
+        </div>;
+    }
+
+    if (!initialData || !user) {
+        return (
+            <div className="p-12 text-center space-y-4">
+                <h1 className="text-2xl font-black text-[#4A3C31]">SESIÓN NO VÁLIDA</h1>
+                <p className="text-gray-400">No se pudieron cargar los datos de tu sesión. Por favor, intenta iniciar sesión de nuevo.</p>
+                <Button onClick={() => router.push("/login")} className="bg-[#A68363] hover:bg-black text-white rounded-xl px-10">
+                    Ir al Inicio de Sesión
+                </Button>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-10 animate-in fade-in duration-700 pb-20">

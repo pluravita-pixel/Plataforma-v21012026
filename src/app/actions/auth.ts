@@ -32,19 +32,32 @@ export async function login(prevState: any, formData: FormData) {
             });
 
             try {
-                const usersResult = await client`
+                let usersResult = await client`
                     UPDATE users 
                     SET last_login = NOW() 
                     WHERE id = ${data.user.id}::uuid 
                     RETURNING role, has_pending_application as "hasPendingApplication"
                 `;
 
-                const user = usersResult[0];
+                let user = usersResult[0];
 
                 if (!user) {
-                    console.error("Usuario autenticado pero no encontrado en tabla users DB");
-                    redirectPath = "/usuario/dashboard";
-                } else {
+                    console.warn("Usuario autenticado pero no encontrado en tabla users. Creando registro básico...");
+                    try {
+                        const fullName = data.user.user_metadata?.full_name || 'Usuario';
+                        const userEmail = data.user.email || '';
+                        await client`
+                            INSERT INTO users (id, email, full_name, role)
+                            VALUES (${data.user.id}::uuid, ${userEmail}::text, ${fullName}::text, 'usuario')
+                            ON CONFLICT (id) DO UPDATE SET last_login = NOW()
+                        `;
+                        user = { role: 'usuario', hasPendingApplication: false };
+                    } catch (insErr) {
+                        console.error("Error al crear registro de usuario faltante:", insErr);
+                    }
+                }
+
+                if (user) {
                     if (user.role === 'oyente' || user.role === 'psychologist' || user.role === 'coach') {
                         await client`UPDATE oyentes SET last_login = NOW() WHERE user_id = ${data.user.id}::uuid`;
                         redirectPath = "/oyente/dashboard";
@@ -65,6 +78,8 @@ export async function login(prevState: any, formData: FormData) {
                             redirectPath = "/usuario/dashboard";
                         }
                     }
+                } else {
+                    redirectPath = "/usuario/dashboard";
                 }
             } catch (dbError) {
                 console.error("Error crítico de base de datos al login:", dbError);
@@ -72,6 +87,7 @@ export async function login(prevState: any, formData: FormData) {
             }
         }
     } catch (err) {
+        if (err instanceof Error && err.message.includes("NEXT_REDIRECT")) throw err;
         console.error("Error inesperado en login:", err);
         authError = "Error del sistema al iniciar sesión";
     }
@@ -199,15 +215,31 @@ export async function logout() {
 
 export async function getCurrentUser() {
     try {
-        const cookieStore = await cookies();
-        const sessionId = cookieStore.get("session_id")?.value;
-        if (!sessionId) return null;
-
         const supabase = await createClient();
-        const { data: { user }, error } = await supabase.auth.getUser(sessionId);
+        const { data: { user }, error } = await supabase.auth.getUser();
 
-        if (error || !user) return null;
+        if (error || !user) {
+            const cookieStore = await cookies();
+            const sessionId = cookieStore.get("session_id")?.value;
+            if (!sessionId) return null;
 
+            const { data: { user: fallbackUser }, error: fallbackError } = await supabase.auth.getUser(sessionId);
+            if (fallbackError || !fallbackUser) return null;
+            return await fetchUserData(fallbackUser.id);
+        }
+
+        return await fetchUserData(user.id);
+    } catch (e: any) {
+        if (e.digest === 'DYNAMIC_SERVER_USAGE' || (e.message && e.message.includes('Dynamic server usage'))) {
+            throw e;
+        }
+        console.error("Error getting current user:", e);
+        return null;
+    }
+}
+
+async function fetchUserData(userId: string) {
+    try {
         const result = await client`
             SELECT 
                 id, 
@@ -219,27 +251,48 @@ export async function getCurrentUser() {
                 has_completed_affinity as "hasCompletedAffinity",
                 created_at as "createdAt"
             FROM users 
-            WHERE id = ${user.id}::uuid
+            WHERE id = ${userId}::uuid
             LIMIT 1
         `;
 
-        if (result.length === 0) return null;
-
-        return {
-            id: result[0].id,
-            email: result[0].email,
-            fullName: result[0].fullName,
-            phone: result[0].phone,
-            role: result[0].role,
-            lastLogin: result[0].lastLogin,
-            hasCompletedAffinity: result[0].hasCompletedAffinity,
-            createdAt: result[0].createdAt
-        };
-    } catch (e: any) {
-        if (e.digest === 'DYNAMIC_SERVER_USAGE' || (e.message && e.message.includes('Dynamic server usage'))) {
-            throw e;
+        if (result.length > 0) {
+            return {
+                id: result[0].id,
+                email: result[0].email,
+                fullName: result[0].fullName,
+                phone: result[0].phone,
+                role: result[0].role,
+                lastLogin: result[0].lastLogin,
+                hasCompletedAffinity: result[0].hasCompletedAffinity,
+                createdAt: result[0].createdAt
+            };
         }
-        console.error("Error getting current user:", e);
+
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user && user.id === userId) {
+            const fullName = user.user_metadata?.full_name || user.user_metadata?.name || 'Usuario';
+            const userEmail = user.email || '';
+            await client`
+                INSERT INTO users (id, email, full_name, role)
+                VALUES (${user.id}::uuid, ${userEmail}::text, ${fullName}::text, 'usuario')
+                ON CONFLICT (id) DO NOTHING
+            `;
+
+            return {
+                id: user.id,
+                email: user.email,
+                fullName: fullName,
+                role: 'usuario',
+                hasCompletedAffinity: false,
+                createdAt: new Date()
+            };
+        }
+
+        return null;
+    } catch (err) {
+        console.error("Error fetching user data from DB:", err);
         return null;
     }
 }

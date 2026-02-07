@@ -12,7 +12,9 @@ import type { User } from "@/db/schema"
 import { BookingModal } from "@/components/booking/BookingModal"
 import { Logo } from "@/components/logo";
 
-export default function AffinityResultsPage() {
+import { Suspense } from "react"
+
+function AffinityResultsContent() {
     const [copied, setCopied] = useState(false)
     const [psychologists, setPsychologists] = useState<any[]>([])
     const [currentUser, setCurrentUser] = useState<any>(null)
@@ -42,8 +44,6 @@ export default function AffinityResultsPage() {
         <div className="min-h-screen bg-[#F9F5F0] flex flex-col">
             <title>Resultados de Afinidad | pluravita</title>
 
-
-
             <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-12 md:py-16">
                 {/* Hero Section */}
                 <div className="grid lg:grid-cols-2 gap-12 items-center mb-24">
@@ -60,8 +60,6 @@ export default function AffinityResultsPage() {
                                 className="object-cover"
                             />
                         </div>
-                        {/* Decorative floating element */}
-                        <div className="absolute -bottom-6 -right-6 bg-white p-6 rounded-2xl shadow-xl border border-[#F2EDE7] max-w-[200px] hidden md:block" />
                     </motion.div>
 
                     <motion.div
@@ -263,5 +261,15 @@ export default function AffinityResultsPage() {
                 </div>
             </footer>
         </div>
+    )
+}
+
+export default function AffinityResultsPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-[#F9F5F0] flex items-center justify-center">
+            <div className="w-12 h-12 border-4 border-[#A68363] border-t-transparent rounded-full animate-spin" />
+        </div>}>
+            <AffinityResultsContent />
+        </Suspense>
     )
 }
