@@ -169,7 +169,7 @@ export function SettingsClient({ currentUser }: SettingsClientProps) {
                                     <Input
                                         id="email"
                                         type="email"
-                                        placeholder="ejemplo@terapify.com"
+                                        placeholder="ejemplo@pluravita.com"
                                         value={adminEmail}
                                         onChange={(e) => setAdminEmail(e.target.value)}
                                         className="h-14 pl-12 rounded-2xl border-gray-100 bg-gray-50 focus:bg-white focus:ring-blue-600/20 focus:border-blue-600 transition-all text-sm font-medium"
