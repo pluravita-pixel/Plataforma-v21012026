@@ -12,8 +12,13 @@ import {
     Filter,
     Download,
     CheckCircle2,
-    XCircle
+    XCircle,
+    Trash2,
+    AlertTriangle
 } from "lucide-react";
+import { useTransition } from "react";
+import { toast } from "sonner";
+import { deleteUser } from "@/app/actions/admin";
 import {
     Dialog,
     DialogContent,
@@ -43,6 +48,27 @@ export function UsersListClient({ users }: { users: UserData[] }) {
     const [roleFilter, setRoleFilter] = useState<string>("all");
     const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
     const [showAffinityModal, setShowAffinityModal] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [confirmText, setConfirmText] = useState("");
+    const [isPending, startTransition] = useTransition();
+
+    const handleDeleteUser = () => {
+        if (!selectedUser) return;
+
+        startTransition(async () => {
+            const result = await deleteUser(selectedUser.id);
+            if (result.success) {
+                toast.success("Usuario eliminado correctamente");
+                setIsDeleteDialogOpen(false);
+                setConfirmText("");
+                setSelectedUser(null);
+                // Forzar recarga puesto que los datos vienen de servidor
+                window.location.reload();
+            } else {
+                toast.error(result.error || "Error al eliminar usuario");
+            }
+        });
+    };
 
     const filteredUsers = users.filter(user => {
         const matchesSearch =
@@ -190,6 +216,18 @@ export function UsersListClient({ users }: { users: UserData[] }) {
                                             <Eye className="h-4 w-4 mr-2" />
                                             Ver detalles
                                         </Button>
+                                        <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={() => {
+                                                setSelectedUser(user);
+                                                setIsDeleteDialogOpen(true);
+                                            }}
+                                            className="rounded-xl ml-2"
+                                            disabled={user.role === 'admin'}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
                                     </td>
                                 </tr>
                             ))}
@@ -269,6 +307,61 @@ export function UsersListClient({ users }: { users: UserData[] }) {
                             )}
                         </div>
                     )}
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete Confirmation Modal */}
+            <Dialog open={isDeleteDialogOpen} onOpenChange={(open) => {
+                if (!open && !isPending) {
+                    setIsDeleteDialogOpen(false);
+                    setConfirmText("");
+                    setSelectedUser(null);
+                }
+            }}>
+                <DialogContent className="max-w-md bg-white border-2 border-red-100 rounded-3xl p-0 overflow-hidden shadow-2xl">
+                    <div className="bg-red-50 p-8 text-red-600 border-b border-red-100 flex flex-col items-center text-center">
+                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                            <AlertTriangle className="h-8 w-8" />
+                        </div>
+                        <h2 className="text-2xl font-black uppercase tracking-tight leading-none">Acción Crítica</h2>
+                    </div>
+                    <div className="p-8 space-y-6">
+                        <p className="text-sm font-bold text-gray-600 leading-relaxed text-center">
+                            ESTÁS A PUNTO DE ELIMINAR COMPLETAMENTE EL USUARIO <span className="text-black font-black">"{selectedUser?.full_name || selectedUser?.email}"</span>.
+                            ESTO BORRARÁ SUS DATOS Y ACCESO DE FORMA PERMANENTE.
+                        </p>
+
+                        <div className="space-y-4">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 block text-center">
+                                ESCRIBE <span className="text-red-600">ELIMINAR</span> PARA CONFIRMAR:
+                            </label>
+                            <Input
+                                value={confirmText}
+                                onChange={(e) => setConfirmText(e.target.value.toUpperCase())}
+                                placeholder="Escribe aquí..."
+                                className="h-12 border-2 border-black rounded-xl text-center font-black uppercase tracking-widest focus:ring-0"
+                                disabled={isPending}
+                            />
+                        </div>
+                    </div>
+                    <div className="p-6 bg-gray-50 border-t border-gray-100 flex gap-3">
+                        <Button
+                            variant="outline"
+                            onClick={() => setIsDeleteDialogOpen(false)}
+                            className="flex-1 h-12 rounded-xl font-bold uppercase tracking-widest transition-all"
+                            disabled={isPending}
+                        >
+                            CANCELAR
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={handleDeleteUser}
+                            disabled={confirmText !== "ELIMINAR" || isPending}
+                            className="flex-1 h-12 rounded-xl bg-red-600 text-white font-bold uppercase tracking-widest transition-all disabled:opacity-30"
+                        >
+                            {isPending ? "BORRANDO..." : "SÍ, ELIMINAR"}
+                        </Button>
+                    </div>
                 </DialogContent>
             </Dialog>
         </div>

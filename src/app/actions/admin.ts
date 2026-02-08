@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { users, oyentes, appointments, supportTickets, availabilitySlots, withdrawals } from "@/db/schema";
+import { users, oyentes, appointments, supportTickets, availabilitySlots, withdrawals, oyenteSolicitudes } from "@/db/schema";
 import { eq, count, desc, sql, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "./auth";
@@ -235,5 +235,45 @@ export async function deleteOyente(oyenteId: string) {
     } catch (error: any) {
         console.error("Error deleting oyente:", error);
         return { error: "No se pudo eliminar al oyente. Asegúrate de que no tenga dependencias críticas." };
+    }
+}
+export async function deleteUser(userId: string) {
+    await ensureAdmin();
+    try {
+        // 1. Si el usuario es un oyente, eliminar el perfil de oyente y sus dependencias (citas, slots, etc)
+        const psychResult = await db.select()
+            .from(oyentes)
+            .where(eq(oyentes.userId, userId))
+            .limit(1);
+
+        const psych = psychResult[0];
+        if (psych) {
+            const oyenteId = psych.id;
+            await db.delete(availabilitySlots).where(eq(availabilitySlots.oyenteId, oyenteId));
+            await db.delete(withdrawals).where(eq(withdrawals.oyenteId, oyenteId));
+            // Eliminar citas relacionadas al oyente
+            await db.delete(appointments).where(eq(appointments.oyenteId, oyenteId));
+            await db.delete(oyentes).where(eq(oyentes.id, oyenteId));
+        }
+
+        // 2. Eliminar citas donde el usuario fue paciente/cliente
+        await db.delete(appointments).where(eq(appointments.usuarioId, userId));
+
+        // 3. Eliminar tickets de soporte
+        await db.delete(supportTickets).where(eq(supportTickets.userId, userId));
+
+        // 4. Eliminar solicitudes de oyente
+        await db.delete(oyenteSolicitudes).where(eq(oyenteSolicitudes.userId, userId));
+
+        // 5. Eliminar el usuario de la tabla principal
+        await db.delete(users).where(eq(users.id, userId));
+
+        revalidatePath("/admin/usuarios");
+        revalidatePath("/admin/oyentes");
+        revalidatePath("/admin/dashboard");
+        return { success: true, message: "Usuario eliminado correctamente" };
+    } catch (error: any) {
+        console.error("Error deleting user:", error);
+        return { error: "No se pudo eliminar el usuario. Error técnico: " + error.message };
     }
 }

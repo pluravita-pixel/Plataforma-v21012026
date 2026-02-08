@@ -13,6 +13,8 @@ export async function GET(request: NextRequest) {
         const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
         if (!error && data.session && data.user) {
+            console.log("OAuth Callback: Sesión obtenida para", data.user.email);
+
             // Establecer Cookie de Sesión manual para compatibilidad con el resto de la app
             const cookieStore = await cookies();
             cookieStore.set("session_id", data.session.access_token, {
@@ -24,59 +26,37 @@ export async function GET(request: NextRequest) {
             });
 
             try {
-                // Verificar si el usuario ya existe en nuestra base de datos
-                const existingUser = await client`
-                    SELECT id, role, has_pending_application as "hasPendingApplication"
-                    FROM users 
-                    WHERE id = ${data.user.id}::uuid 
-                    LIMIT 1
+                // Sincronizar usuario con nuestra base de datos (Lógica unificada)
+                const metadata = data.user.user_metadata;
+                const fullName = metadata?.full_name ||
+                    metadata?.name ||
+                    (metadata?.given_name && metadata?.family_name ? `${metadata.given_name} ${metadata.family_name}` : null) ||
+                    metadata?.given_name ||
+                    data.user.email?.split('@')[0] ||
+                    'Usuario';
+
+                const userEmail = data.user.email || '';
+
+                const syncResult = await client`
+                    INSERT INTO users (id, email, full_name, role, last_login)
+                    VALUES (${data.user.id}::uuid, ${userEmail}::text, ${fullName}::text, 'usuario', NOW())
+                    ON CONFLICT (id) DO UPDATE 
+                    SET last_login = NOW(),
+                        email = EXCLUDED.email,
+                        full_name = COALESCE(users.full_name, EXCLUDED.full_name)
+                    RETURNING role, has_pending_application as "hasPendingApplication";
                 `;
 
-                let userRole = 'usuario';
-                let hasPendingApp = false;
+                const userInDb = syncResult[0];
+                const userRole = userInDb?.role || 'usuario';
+                const hasPendingApp = userInDb?.hasPendingApplication || false;
 
-                if (existingUser.length === 0) {
-                    // Usuario nuevo - crear en la base de datos
-                    const metadata = data.user.user_metadata;
-                    const fullName = metadata?.full_name ||
-                        metadata?.name ||
-                        (metadata?.given_name && metadata?.family_name ? `${metadata.given_name} ${metadata.family_name}` : null) ||
-                        metadata?.given_name ||
-                        data.user.email?.split('@')[0] ||
-                        'Usuario';
-
-                    const userEmail = data.user.email || '';
-
-                    await client`
-                        INSERT INTO users (id, email, full_name, role, last_login)
-                        VALUES (
-                            ${data.user.id}::uuid, 
-                            ${userEmail}::text, 
-                            ${fullName}::text, 
-                            'usuario', 
-                            NOW()
-                        )
-                        ON CONFLICT (id) DO UPDATE 
-                        SET last_login = NOW()
-                    `;
-
-                    userRole = 'usuario';
-                } else {
-                    // Usuario existente - actualizar last_login
-                    await client`
-                        UPDATE users 
-                        SET last_login = NOW() 
-                        WHERE id = ${data.user.id}::uuid
-                    `;
-
-                    userRole = existingUser[0].role;
-                    hasPendingApp = existingUser[0].hasPendingApplication;
-                }
+                console.log(`Usuario sincronizado: ${userEmail}, Rol: ${userRole}`);
 
                 // Redirigir según el rol
                 if (userRole === 'admin') {
                     return NextResponse.redirect(`${requestUrl.origin}/admin/dashboard`);
-                } else if (userRole === 'oyente' || userRole === 'psychologist' || userRole === 'coach') {
+                } else if (['oyente', 'psychologist', 'coach'].includes(userRole)) {
                     // Actualizar last_login en tabla oyentes también
                     await client`
                         UPDATE oyentes 
@@ -92,10 +72,12 @@ export async function GET(request: NextRequest) {
                 return NextResponse.redirect(`${requestUrl.origin}/usuario/dashboard`);
 
             } catch (dbError) {
-                console.error("Error en callback de Google OAuth:", dbError);
-                // En caso de error, redirigir a dashboard de usuario por defecto
+                console.error("Error en DB durante callback de OAuth:", dbError);
+                // En caso de error de DB, intentamos al menos llevarlo al dashboard
                 return NextResponse.redirect(`${requestUrl.origin}/usuario/dashboard`);
             }
+        } else if (error) {
+            console.error("Error intercambiando código por sesión:", error.message);
         }
     }
 

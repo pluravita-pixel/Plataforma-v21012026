@@ -1,7 +1,7 @@
 "use server";
 
 import { client } from "@/db";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -95,12 +95,17 @@ export async function register(prevState: any, formData: FormData) {
             return { error: "Este correo electrónico ya está registrado. Por favor, inicia sesión." };
         }
 
+        const headersList = await headers();
+        const host = headersList.get("host");
+        const protocol = host?.includes('localhost') || host?.includes('127.0.0.1') ? 'http' : 'https';
+        const dynamicOrigin = `${protocol}://${host}`;
+
         const supabase = await createClient();
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: {
-                emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+                emailRedirectTo: `${dynamicOrigin}/auth/callback`,
                 data: { full_name: fullName, is_oyente_application: isOyenteApplication }
             }
         });
@@ -113,6 +118,7 @@ export async function register(prevState: any, formData: FormData) {
         }
 
         if (data.user) {
+            console.log("Registro exitoso en Supabase:", data.user.email);
             await syncUser(data.user);
 
             if (isOyenteApplication) {
@@ -130,7 +136,9 @@ export async function register(prevState: any, formData: FormData) {
                     secure: process.env.NODE_ENV === "production",
                     maxAge: data.session.expires_in,
                     path: "/",
+                    sameSite: "lax",
                 });
+                console.log("Cookie de sesión establecida tras registro");
                 redirect(isOyenteApplication ? "/registro-oyente" : "/usuario/dashboard");
             }
             return { success: "Registro exitoso. Revisa tu email para confirmar tu cuenta." };
@@ -199,8 +207,13 @@ async function fetchUserData(userId: string) {
 
 export async function signInWithGoogle() {
     const supabase = await createClient();
-    const origin = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const redirectTo = `${origin.replace(/\/$/, "")}/auth/callback`;
+    const headersList = await headers();
+    const host = headersList.get("host");
+    const protocol = host?.includes('localhost') || host?.includes('127.0.0.1') ? 'http' : 'https';
+    const origin = `${protocol}://${host}`;
+    const redirectTo = `${origin}/auth/callback`;
+
+    console.log(`Iniciando OAuth con Google. RedirectTo: ${redirectTo}`);
 
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -209,8 +222,15 @@ export async function signInWithGoogle() {
             queryParams: { access_type: 'offline', prompt: 'consent' },
         },
     });
-    if (error) throw error;
-    if (data.url) redirect(data.url);
+
+    if (error) {
+        console.error("Error en signInWithOAuth:", error.message);
+        throw error;
+    }
+    if (data.url) {
+        console.log("Redirigiendo a Google:", data.url);
+        redirect(data.url);
+    }
 }
 
 export async function checkUserExists(email: string) {
@@ -239,8 +259,13 @@ export async function markTestAsCompleted() {
 export async function resetPassword(prevState: any, formData: FormData) {
     const email = formData.get("email") as string;
     const supabase = await createClient();
+    const headersList = await headers();
+    const host = headersList.get("host");
+    const protocol = host?.includes('localhost') || host?.includes('127.0.0.1') ? 'http' : 'https';
+    const origin = `${protocol}://${host}`;
+
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,
+        redirectTo: `${origin}/reset-password`,
     });
     if (error) return { error: error.message };
     return { success: "Se ha enviado un enlace a tu correo." };
