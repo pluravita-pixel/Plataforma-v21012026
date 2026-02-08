@@ -1,6 +1,6 @@
 "use server";
 
-import { db } from "@/db";
+import { db, client } from "@/db";
 import { users, oyentes, appointments, supportTickets, availabilitySlots, withdrawals, oyenteSolicitudes } from "@/db/schema";
 import { eq, count, desc, sql, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -275,5 +275,29 @@ export async function deleteUser(userId: string) {
     } catch (error: any) {
         console.error("Error deleting user:", error);
         return { error: "No se pudo eliminar el usuario. Error técnico: " + error.message };
+    }
+}
+
+export async function getUserAffinityTest(userId: string) {
+    await ensureAdmin();
+    try {
+        const result = await client`
+            SELECT responses, created_at
+            FROM affinity_tests
+            WHERE user_id = ${userId}::uuid
+            ORDER BY created_at DESC
+            LIMIT 1
+        `;
+
+        if (result.length > 0) {
+            return {
+                responses: result[0].responses,
+                createdAt: result[0].created_at
+            };
+        }
+        return null;
+    } catch (error) {
+        console.error("Error getting affinity test:", error);
+        return null;
     }
 }

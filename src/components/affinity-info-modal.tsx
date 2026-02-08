@@ -24,29 +24,29 @@ export function AffinityInfoModal({ isOpen, onOpenChange }: AffinityInfoModalPro
 
                     <div className="text-center mb-10">
                         <DialogTitle className="text-2xl sm:text-3xl font-bold text-[#1F2937] leading-tight mb-6">
-                            Ir a terapia no debería de ser complicado
+                            Encontrar a alguien que te escuche no debería ser complicado
                         </DialogTitle>
                         <p className="text-gray-500 text-sm leading-relaxed px-2">
-                            En pluravita puedes comenzar tu proceso de coaching 100% en línea, de forma fácil, segura y profesional.
+                            En pluravita puedes comenzar tu proceso de acompañamiento 100% en línea, de forma fácil, segura y humana.
                         </p>
                     </div>
 
                     <div className="space-y-8 mb-10">
                         <div className="flex gap-4 items-start">
-                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
-                                <Search className="h-5 w-5 text-[#0077FF]" />
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#F2EDE7] flex items-center justify-center">
+                                <Search className="h-5 w-5 text-[#A68363]" />
                             </div>
                             <div className="space-y-1">
-                                <h4 className="font-bold text-[#1F2937]">Encuentra tu coach ideal</h4>
+                                <h4 className="font-bold text-[#1F2937]">Encuentra a tu oyente ideal</h4>
                                 <p className="text-xs text-gray-500 leading-relaxed">
-                                    Responde nuestro test de afinidad y te mostraremos una selección de coaches que se ajusten a tus necesidades.
+                                    Responde nuestro test de afinidad y te mostraremos una selección de oyentes que se ajusten a tus necesidades.
                                 </p>
                             </div>
                         </div>
 
                         <div className="flex gap-4 items-start">
-                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center">
-                                <Calendar className="h-5 w-5 text-indigo-500" />
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#FFF5EB] flex items-center justify-center">
+                                <Calendar className="h-5 w-5 text-[#A68363]" />
                             </div>
                             <div className="space-y-1">
                                 <h4 className="font-bold text-[#1F2937]">Agenda en minutos</h4>
@@ -57,13 +57,13 @@ export function AffinityInfoModal({ isOpen, onOpenChange }: AffinityInfoModalPro
                         </div>
 
                         <div className="flex gap-4 items-start">
-                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
-                                <Heart className="h-5 w-5 text-[#0077FF] fill-[#0077FF]" />
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#F2EDE7] flex items-center justify-center">
+                                <Heart className="h-5 w-5 text-[#A68363] fill-[#A68363]" />
                             </div>
                             <div className="space-y-1">
                                 <h4 className="font-bold text-[#1F2937]">Conéctate y comienza tu proceso</h4>
                                 <p className="text-xs text-gray-500 leading-relaxed">
-                                    El día de tu cita, solo ingresa a tu cuenta de pluravita y conéctate por videollamada con tu coach de manera fácil y privada.
+                                    El día de tu cita, solo ingresa a tu cuenta de pluravita y conéctate por videollamada con tu oyente de manera fácil y privada.
                                 </p>
                             </div>
                         </div>
@@ -72,7 +72,7 @@ export function AffinityInfoModal({ isOpen, onOpenChange }: AffinityInfoModalPro
                     <div className="flex flex-col gap-3">
                         <Button
                             onClick={() => onOpenChange(false)}
-                            className="w-full bg-[#0077FF] hover:bg-[#0066CC] text-white font-bold py-6 rounded-lg text-lg shadow-lg shadow-blue-500/30"
+                            className="w-full bg-[#A68363] hover:bg-[#8C6B4D] text-white font-bold py-6 rounded-lg text-lg shadow-lg shadow-[#A68363]/30"
                             asChild
                         >
                             <Link href="/affinity-test">Comenzar test de afinidad</Link>

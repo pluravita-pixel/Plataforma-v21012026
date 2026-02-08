@@ -149,7 +149,7 @@ function AffinityResultsContent() {
                         <h2 className="text-2xl md:text-3xl font-extrabold text-[#4A3C31] flex items-center gap-3">
                             Coaches recomendados <span className="animate-bounce">👇</span>
                         </h2>
-                        <Link href={currentUser ? "/patient/search" : "/register"} className="text-[#A68363] font-bold text-sm hover:underline">
+                        <Link href={currentUser ? "/usuario/search" : "/register"} className="text-[#A68363] font-bold text-sm hover:underline">
                             Ver todos los coaches
                         </Link>
                     </div>

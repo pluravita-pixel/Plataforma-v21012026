@@ -291,12 +291,61 @@ export function UsersListClient({ users }: { users: UserData[] }) {
                                             : "Fecha desconocida"}
                                     </p>
                                     <div className="space-y-3">
-                                        {Object.entries(selectedUser.responses as Record<string, any>).map(([key, value]) => (
-                                            <div key={key} className="bg-white p-4 rounded-xl">
-                                                <p className="text-xs font-bold text-gray-500 uppercase mb-1">{key}</p>
-                                                <p className="text-sm text-gray-900">{JSON.stringify(value)}</p>
-                                            </div>
-                                        ))}
+                                        {(() => {
+                                            const questionLabels: Record<string, string> = {
+                                                therapy_type: "¿Cómo te gustaría que fuera este camino?",
+                                                first_time: "¿Ya habías probado algo parecido antes?",
+                                                gender: "¿Con qué género te identificas?",
+                                                practical_exercises: "¿Te gustaría recibir ideas para aplicar en tu día a día?",
+                                                focus_area: "¿En qué te gustaría enfocarte más?",
+                                                therapist_gender: "¿Prefieres que tu oyente sea hombre o mujer?",
+                                                age: "¿Qué edad tienes?"
+                                            };
+
+                                            const answerLabels: Record<string, Record<string, string>> = {
+                                                therapy_type: { individual: "Para mí (individual)", couple: "Con mi pareja" },
+                                                first_time: { yes: "Es mi primera vez", no: "Sí, ya he tenido procesos similares" },
+                                                gender: {
+                                                    woman: "Mujer",
+                                                    man: "Hombre",
+                                                    nonbinary: "No binario",
+                                                    other: "Otro",
+                                                    prefer_not_to_say: "Prefiero no decir"
+                                                },
+                                                practical_exercises: {
+                                                    totally: "¡Sí! Me encanta pasar a la acción",
+                                                    no: "Prefiero solo conversar por ahora",
+                                                    maybe: "Lo vemos según avance el proceso"
+                                                },
+                                                focus_area: {
+                                                    goals: "Mis metas y crecimiento personal",
+                                                    balance: "Mi equilibrio mental y emocional",
+                                                    relationships: "Mis relaciones con los demás",
+                                                    self_knowledge: "Simplemente conocerme mejor"
+                                                },
+                                                therapist_gender: {
+                                                    woman: "Mujer",
+                                                    man: "Hombre",
+                                                    indifferent: "Me es totalmente igual"
+                                                }
+                                            };
+
+                                            return Object.entries(selectedUser.responses as Record<string, any>).map(([key, value]) => {
+                                                const question = questionLabels[key] || key;
+                                                let answer = value;
+
+                                                if (answerLabels[key] && answerLabels[key][value]) {
+                                                    answer = answerLabels[key][value];
+                                                }
+
+                                                return (
+                                                    <div key={key} className="bg-white p-4 rounded-xl">
+                                                        <p className="text-xs font-bold text-gray-500 uppercase mb-2">{question}</p>
+                                                        <p className="text-sm text-gray-900 font-semibold">{answer}</p>
+                                                    </div>
+                                                );
+                                            });
+                                        })()}
                                     </div>
                                 </div>
                             ) : (

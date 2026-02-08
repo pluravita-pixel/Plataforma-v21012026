@@ -126,7 +126,7 @@ export default function AffinityTestPage() {
         setIsSearching(true)
 
         try {
-            await markTestAsCompleted()
+            await markTestAsCompleted(answers)
         } catch (error) {
             console.error("Error updating test status:", error)
         }

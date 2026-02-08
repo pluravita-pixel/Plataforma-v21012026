@@ -249,11 +249,26 @@ export async function updateProfile(fullName: string) {
     return { success: "Actualizado" };
 }
 
-export async function markTestAsCompleted() {
+export async function markTestAsCompleted(responses?: Record<string, any>) {
     const user = await getCurrentUser();
     if (!user) return { error: "No autorizado" };
-    await client`UPDATE users SET has_completed_affinity = true WHERE id = ${user.id}::uuid`;
-    return { success: true };
+
+    try {
+        // Guardar las respuestas del test si se proporcionan
+        if (responses && Object.keys(responses).length > 0) {
+            await client`
+                INSERT INTO affinity_tests (user_id, responses)
+                VALUES (${user.id}::uuid, ${JSON.stringify(responses)}::jsonb)
+            `;
+        }
+
+        // Marcar el test como completado
+        await client`UPDATE users SET has_completed_affinity = true WHERE id = ${user.id}::uuid`;
+        return { success: true };
+    } catch (error) {
+        console.error("Error saving affinity test:", error);
+        return { error: "Error al guardar el test" };
+    }
 }
 
 export async function resetPassword(prevState: any, formData: FormData) {
