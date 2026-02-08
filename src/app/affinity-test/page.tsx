@@ -126,7 +126,16 @@ export default function AffinityTestPage() {
         setIsSearching(true)
 
         try {
-            await markTestAsCompleted(answers)
+            const { data: { user } } = await supabase.auth.getUser()
+
+            if (user) {
+                // Usuario autenticado: guardar en BD
+                await markTestAsCompleted(answers)
+            } else {
+                // Usuario NO autenticado: guardar en localStorage
+                localStorage.setItem('affinity_test_answers', JSON.stringify(answers))
+                localStorage.setItem('affinity_test_completed', 'true')
+            }
         } catch (error) {
             console.error("Error updating test status:", error)
         }

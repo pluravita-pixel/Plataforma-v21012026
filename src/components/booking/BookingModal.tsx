@@ -151,7 +151,7 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
                         // We allow them to continue to step 2 as "identified but not auth'd"
                     } else {
                         // 2. Attempt Registration ONLY if doesn't exist
-                        const { error } = await supabase.auth.signUp({
+                        const { data, error } = await supabase.auth.signUp({
                             email: formData.email,
                             password: formData.password,
                             options: {
@@ -170,6 +170,19 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
                             }
                         } else {
                             toast.success("Cuenta creada. Por favor verifica tu email luego.");
+
+                            // Sincronizar respuestas del test de afinidad si existen en localStorage
+                            const affinityAnswers = localStorage.getItem('affinity_test_answers');
+                            if (affinityAnswers && data.user) {
+                                try {
+                                    const { markTestAsCompleted } = await import("@/app/actions/auth");
+                                    await markTestAsCompleted(JSON.parse(affinityAnswers));
+                                    localStorage.removeItem('affinity_test_answers');
+                                    localStorage.removeItem('affinity_test_completed');
+                                } catch (syncError) {
+                                    console.error("Error syncing affinity test:", syncError);
+                                }
+                            }
                         }
                     }
                 } catch (err) {
@@ -408,7 +421,7 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
                                                 value={formData.password}
                                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                             />
-                                            <p className="text-[10px] text-gray-400">Se creará una cuenta para que puedas gestionar tus citas.</p>
+                                            <p className="text-[10px] text-gray-400">✨ Crea tu cuenta gratis en 30 segundos para reservar</p>
                                         </div>
 
                                         <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-100 mt-4">
