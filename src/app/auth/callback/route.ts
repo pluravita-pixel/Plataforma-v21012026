@@ -37,8 +37,11 @@ export async function GET(request: NextRequest) {
 
                 if (existingUser.length === 0) {
                     // Usuario nuevo - crear en la base de datos
-                    const fullName = data.user.user_metadata?.full_name ||
-                        data.user.user_metadata?.name ||
+                    const metadata = data.user.user_metadata;
+                    const fullName = metadata?.full_name ||
+                        metadata?.name ||
+                        (metadata?.given_name && metadata?.family_name ? `${metadata.given_name} ${metadata.family_name}` : null) ||
+                        metadata?.given_name ||
                         data.user.email?.split('@')[0] ||
                         'Usuario';
 
