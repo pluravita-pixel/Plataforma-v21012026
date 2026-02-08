@@ -61,12 +61,23 @@ export function UsersListClient({ users }: { users: UserData[] }) {
     };
 
     const getRoleBadge = (role: string) => {
+        const normalizedRole = role.toLowerCase();
         const colors: Record<string, string> = {
             admin: "bg-purple-100 text-purple-700",
             oyente: "bg-blue-100 text-blue-700",
+            psychologist: "bg-blue-100 text-blue-700",
+            coach: "bg-blue-100 text-blue-700",
             usuario: "bg-green-100 text-green-700",
+            patient: "bg-green-100 text-green-700",
         };
-        return colors[role] || "bg-gray-100 text-gray-700";
+        return colors[normalizedRole] || "bg-gray-100 text-gray-700";
+    };
+
+    const getRoleLabel = (role: string) => {
+        const normalizedRole = role.toLowerCase();
+        if (['oyente', 'psychologist', 'coach'].includes(normalizedRole)) return 'OYENTE';
+        if (['usuario', 'patient'].includes(normalizedRole)) return 'USUARIO';
+        return role.toUpperCase();
     };
 
     return (
@@ -140,7 +151,7 @@ export function UsersListClient({ users }: { users: UserData[] }) {
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${getRoleBadge(user.role)}`}>
-                                            {user.role === 'oyente' ? 'OYENTE' : user.role.toUpperCase()}
+                                            {getRoleLabel(user.role)}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">

@@ -39,7 +39,7 @@ export default async function AppointmentPage({ params }: { params: Promise<{ id
         reason: app.reason,
         status: app.status,
         price: app.price,
-        psychologistNotes: app.oyente_notas,
+        oyenteNotas: app.oyente_notas,
         improvementTips: app.improvement_tips,
         usuario: {
             fullName: app.is_anonymous ? (app.usuario_nombre || "Usuario Anónimo") : app.u_full_name,
@@ -48,5 +48,5 @@ export default async function AppointmentPage({ params }: { params: Promise<{ id
         files
     };
 
-    return <AppointmentDetailsClient appointment={appointment} coachId={user.id} />;
+    return <AppointmentDetailsClient appointment={appointment} oyenteId={user.id} />;
 }

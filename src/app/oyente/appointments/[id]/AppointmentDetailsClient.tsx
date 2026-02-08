@@ -25,12 +25,12 @@ import { Input } from "@/components/ui/input";
 
 interface AppointmentDetailsClientProps {
     appointment: any;
-    coachId: string;
+    oyenteId: string;
 }
 
-export default function AppointmentDetailsClient({ appointment, coachId }: AppointmentDetailsClientProps) {
+export default function AppointmentDetailsClient({ appointment, oyenteId }: AppointmentDetailsClientProps) {
     const router = useRouter();
-    const [notes, setNotes] = useState(appointment.psychologistNotes || "");
+    const [notes, setNotes] = useState(appointment.oyenteNotas || "");
     const [tips, setTips] = useState(appointment.improvementTips || "");
     const [meetingLink, setMeetingLink] = useState(appointment.meetingLink || "");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -74,7 +74,7 @@ export default function AppointmentDetailsClient({ appointment, coachId }: Appoi
     return (
         <div className="max-w-4xl mx-auto space-y-8 pb-20">
             <Link
-                href="/psychologist/dashboard"
+                href="/oyente/dashboard"
                 className="inline-flex items-center text-sm font-bold text-gray-500 hover:text-[#A68363] transition-colors"
             >
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -209,7 +209,7 @@ export default function AppointmentDetailsClient({ appointment, coachId }: Appoi
                 <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
                     <FileUploader
                         appointmentId={appointment.id}
-                        uploaderId={coachId}
+                        uploaderId={oyenteId}
                         existingFiles={appointment.files || []}
                     />
                 </div>

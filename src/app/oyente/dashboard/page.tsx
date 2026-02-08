@@ -21,7 +21,7 @@ import {
     getWeeklyAppointments
 } from "@/app/actions/oyentes";
 
-async function getPsychologistData() {
+async function getOyenteData() {
     const user = await getCurrentUser();
 
     if (!user || user.role !== 'oyente') return null;
@@ -44,8 +44,8 @@ async function getPsychologistData() {
     };
 }
 
-export default async function PsychologistDashboard() {
-    const data = await getPsychologistData();
+export default async function OyenteDashboard() {
+    const data = await getOyenteData();
 
     // Safe render for loading state or no data
     if (!data) return <div className="p-8">Cargando dashboard...</div>;
@@ -87,7 +87,7 @@ export default async function PsychologistDashboard() {
                 <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-xl font-black text-[#4A3C31]">Agenda de esta Semana</h2>
-                        <Link href="/psychologist/calendar" className="text-sm font-bold text-[#A68363] hover:text-[#8C6B4D] transition-colors">
+                        <Link href="/oyente/calendar" className="text-sm font-bold text-[#A68363] hover:text-[#8C6B4D] transition-colors">
                             Ver calendario
                         </Link>
                     </div>
@@ -115,7 +115,7 @@ export default async function PsychologistDashboard() {
                                         Entrar
                                     </Link>
                                     <Link
-                                        href={`/psychologist/appointments/${app.id}`}
+                                        href={`/oyente/appointments/${app.id}`}
                                         className="bg-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-sm text-[#4A3C31] hover:bg-gray-50 transition-all border border-gray-100"
                                     >
                                         Detalles
@@ -137,7 +137,7 @@ export default async function PsychologistDashboard() {
                 <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-xl font-black text-[#4A3C31]">Historial Reciente</h2>
-                        <Link href="/psychologist/patients" className="text-sm font-bold text-[#A68363] hover:text-[#8C6B4D] transition-colors">
+                        <Link href="/oyente/usuarios" className="text-sm font-bold text-[#A68363] hover:text-[#8C6B4D] transition-colors">
                             Mis usuarios
                         </Link>
                     </div>

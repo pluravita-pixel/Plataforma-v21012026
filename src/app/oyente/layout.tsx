@@ -23,7 +23,7 @@ import { LogoutButton } from "@/components/logout-button";
 import { UserNav } from "@/components/user-nav";
 import { cn } from "@/lib/utils";
 
-export default function PsychologistLayout({
+export default function OyenteLayout({
     children,
 }: {
     children: React.ReactNode;
@@ -32,12 +32,12 @@ export default function PsychologistLayout({
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const navItems = [
-        { icon: LayoutDashboard, label: "Panel de Oyente", href: "/psychologist/dashboard" },
-        { icon: Users, label: "Mis Usuarios", href: "/psychologist/patients" },
-        { icon: Calendar, label: "Calendario", href: "/psychologist/calendar" },
-        { icon: Wallet, label: "Saldo y Pagos", href: "/psychologist/balance" },
-        { icon: UserCircle, label: "Editar Perfil", href: "/psychologist/profile" },
-        { icon: Settings, label: "Configuración", href: "/psychologist/settings" },
+        { icon: LayoutDashboard, label: "Panel de Oyente", href: "/oyente/dashboard" },
+        { icon: Users, label: "Mis Usuarios", href: "/oyente/usuarios" },
+        { icon: Calendar, label: "Calendario", href: "/oyente/calendar" },
+        { icon: Wallet, label: "Saldo y Pagos", href: "/oyente/balance" },
+        { icon: UserCircle, label: "Editar Perfil", href: "/oyente/profile" },
+        { icon: Settings, label: "Configuración", href: "/oyente/settings" },
     ];
 
     return (

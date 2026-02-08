@@ -13,7 +13,8 @@ export async function updateUserAccount(userId: string, data: {
         await db.update(users)
             .set(data)
             .where(eq(users.id, userId));
-        revalidatePath("/psychologist/settings");
+        revalidatePath("/oyente/settings");
+        revalidatePath("/usuario/settings");
         return { success: true };
     } catch (error) {
         console.error("Error updating user account:", error);

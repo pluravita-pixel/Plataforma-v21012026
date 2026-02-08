@@ -34,7 +34,7 @@ import { Input } from "@/components/ui/input";
 interface Appointment {
     id: string;
     date: Date;
-    patientName: string;
+    usuarioNombre: string;
     status: string;
 }
 
@@ -381,7 +381,7 @@ export function CalendarClient({
                                                 {/* 1. APPOINTMENT CARD */}
                                                 {appointment && appointment.status !== 'cancelled' && (
                                                     <Link
-                                                        href={`/psychologist/appointments/${appointment.id}`}
+                                                        href={`/oyente/appointments/${appointment.id}`}
                                                         className="w-full h-full bg-white border-l-[3px] border-[#A68363] rounded-r-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all p-3 flex flex-col justify-center relative z-20 group/card"
                                                     >
                                                         <div className="flex items-center gap-2 mb-1">
@@ -392,7 +392,7 @@ export function CalendarClient({
                                                                 Confirmada
                                                             </span>
                                                         </div>
-                                                        <p className="text-xs font-bold truncate ml-1 text-[#4A3C31]">{appointment.patientName}</p>
+                                                        <p className="text-xs font-bold truncate ml-1 text-[#4A3C31]">{appointment.usuarioNombre}</p>
                                                     </Link>
                                                 )}
 

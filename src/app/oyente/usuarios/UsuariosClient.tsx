@@ -27,7 +27,7 @@ interface User {
     isAnonymous?: boolean;
 }
 
-export function PatientsClient({ initialPatients, psychologistId }: { initialPatients: User[], psychologistId: string }) {
+export function UsuariosClient({ initialPatients, oyenteId }: { initialPatients: User[], oyenteId: string }) {
     const [searchTerm, setSearchTerm] = useState("");
     const [activeMenu, setActiveMenu] = useState<string | null>(null);
     const [showCancelModal, setShowCancelModal] = useState<string | null>(null); // Stores appointmentId to cancel
@@ -42,7 +42,7 @@ export function PatientsClient({ initialPatients, psychologistId }: { initialPat
     const handleCancel = async () => {
         if (!showCancelModal) return;
         setIsCancelling(true);
-        const res = await cancelAppointmentByOyente(showCancelModal, psychologistId); // We need psychologistId here. Pass it as prop.
+        const res = await cancelAppointmentByOyente(showCancelModal, oyenteId); // We need oyenteId here. Pass it as prop.
         setIsCancelling(false);
         if (res.success) {
             alert(res.success); // Simple alert for now, or toast
@@ -134,7 +134,7 @@ export function PatientsClient({ initialPatients, psychologistId }: { initialPat
                                                             <div className="px-4 py-3 border-b border-gray-50 mb-1">
                                                                 <p className="text-xs font-bold text-gray-400">Acciones</p>
                                                             </div>
-                                                            <Link href={`/psychologist/patients/${user.id}`} className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-[#FAF8F5] hover:text-[#4A3C31] font-medium transition-colors">
+                                                            <Link href={`/oyente/usuarios/${user.id}`} className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-[#FAF8F5] hover:text-[#4A3C31] font-medium transition-colors">
                                                                 Ver expediente
                                                             </Link>
                                                             {user.nextAppointmentId && (
