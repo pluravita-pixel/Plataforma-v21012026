@@ -73,16 +73,20 @@ function AffinityResultsContent() {
                                 Tus resultados están listos
                             </h1>
                             <p className="text-lg text-[#6B6B6B] font-medium max-w-lg">
-                                Utiliza el cupón <span className="text-[#A68363] font-bold">MATCH-40</span> y obtén 40% de descuento en tu primera sesión de coaching en línea en pluravita.
+                                Utiliza el cupón <span className="text-[#A68363] font-bold">PRIMERA25</span> y obtén 25% de descuento en tu primera sesión de coaching en línea en pluravita.
                             </p>
                         </div>
 
                         {/* Coupon Box */}
                         <div className="flex flex-col sm:flex-row gap-4 max-w-md">
                             <div className="flex-1 bg-white border-2 border-dashed border-[#A68363]/30 rounded-xl px-6 py-4 flex items-center justify-between group hover:border-[#A68363]/50 transition-colors">
-                                <span className="text-xl font-black text-[#4A3C31] tracking-wider uppercase">MATCH-40</span>
+                                <span className="text-xl font-black text-[#4A3C31] tracking-wider uppercase">PRIMERA25</span>
                                 <Button
-                                    onClick={copyCoupon}
+                                    onClick={() => {
+                                        navigator.clipboard.writeText("PRIMERA25")
+                                        setCopied(true)
+                                        setTimeout(() => setCopied(false), 2000)
+                                    }}
                                     variant="ghost"
                                     className="text-[#A68363] hover:bg-[#F2EDE7] transition-colors gap-2"
                                 >

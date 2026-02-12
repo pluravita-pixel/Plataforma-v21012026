@@ -11,7 +11,8 @@ import {
     Eye,
     Copy,
     Check,
-    X
+    X,
+    Info
 } from "lucide-react";
 import Image from "next/image";
 import { updateOyenteSettings } from "@/app/actions/oyentes";
@@ -170,8 +171,8 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
         }
 
         const priceNum = parseFloat(profile.price);
-        if (isNaN(priceNum) || priceNum < 10 || priceNum > 305) {
-            toast.error("El precio debe estar entre 10€ y 305€");
+        if (isNaN(priceNum) || priceNum < 35 || priceNum > 305) {
+            toast.error("El precio debe estar entre 35€ y 305€");
             return;
         }
 
@@ -344,18 +345,25 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-600">Precio por sesión (€) *</label>
+                                        <label className="text-sm font-medium text-gray-600">Precio Base por sesión (€) *</label>
                                         <div className="relative">
                                             <Tag className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                                             <input
                                                 type="number"
-                                                min="10"
+                                                min="35"
                                                 max="305"
-                                                className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all"
+                                                className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all font-bold text-[#4A3C31]"
                                                 value={profile.price}
                                                 onChange={(e) => setProfile({ ...profile, price: e.target.value })}
                                             />
                                         </div>
+                                        <div className="flex items-center gap-2 text-xs font-bold text-[#A68363] bg-[#A68363]/10 px-3 py-2 rounded-lg">
+                                            <Info className="h-3 w-3" />
+                                            <span>
+                                                Precio Final (con +21% IVA): €{(Number(profile.price || 0) * 1.21).toFixed(2)}
+                                            </span>
+                                        </div>
+                                        <p className="text-[10px] text-gray-400">El precio mínimo base es de 35€.</p>
                                     </div>
                                 </div>
                                 <div className="space-y-2">

@@ -142,8 +142,25 @@ export async function saveRecurringSchedule(oyenteId: string, template: { dayOfW
     await verifyOyente(oyenteId);
 
     try {
-        const slotsToAdd = [];
+        const slotsToAdd: any[] = [];
         const now = new Date();
+        const fourWeeksLater = new Date(now);
+        fourWeeksLater.setDate(now.getDate() + 28);
+        fourWeeksLater.setHours(23, 59, 59, 999);
+
+        // Fetch existing slots to prevent duplicates
+        const existingSlots = await db
+            .select({ startTime: availabilitySlots.startTime })
+            .from(availabilitySlots)
+            .where(
+                and(
+                    eq(availabilitySlots.oyenteId, oyenteId),
+                    gte(availabilitySlots.startTime, now),
+                    lte(availabilitySlots.endTime, fourWeeksLater)
+                )
+            );
+
+        const existingStartTimes = new Set(existingSlots.map(s => s.startTime.getTime()));
 
         // Loop for 4 weeks
         for (let week = 0; week < 4; week++) {
@@ -153,6 +170,7 @@ export async function saveRecurringSchedule(oyenteId: string, template: { dayOfW
                 d.setDate(now.getDate() + (week * 7) + ((dayLimit.dayOfWeek + 7 - now.getDay()) % 7));
                 d.setHours(0, 0, 0, 0);
 
+                // Ensure strict future dates or today later
                 if (d < new Date(new Date().setHours(0, 0, 0, 0))) continue;
 
                 for (const hour of dayLimit.hours) {
@@ -160,6 +178,9 @@ export async function saveRecurringSchedule(oyenteId: string, template: { dayOfW
                     start.setHours(hour, 0, 0, 0);
                     const end = new Date(start);
                     end.setHours(hour + 1, 0, 0, 0);
+
+                    // Skip if slot already exists
+                    if (existingStartTimes.has(start.getTime())) continue;
 
                     slotsToAdd.push({
                         oyenteId,

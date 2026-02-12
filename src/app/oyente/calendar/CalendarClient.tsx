@@ -145,27 +145,38 @@ export function CalendarClient({
     }
 
     // --- Recurring Schedule Template Logic ---
-    const [template, setTemplate] = useState([
-        { dayOfWeek: 1, active: true, start: "09:00", end: "18:00" },
-        { dayOfWeek: 2, active: true, start: "09:00", end: "18:00" },
-        { dayOfWeek: 3, active: true, start: "09:00", end: "18:00" },
-        { dayOfWeek: 4, active: true, start: "09:00", end: "18:00" },
-        { dayOfWeek: 5, active: true, start: "09:00", end: "18:00" },
-        { dayOfWeek: 6, active: false, start: "10:00", end: "14:00" },
-        { dayOfWeek: 0, active: false, start: "10:00", end: "14:00" },
-    ]);
+    const [recurringGrid, setRecurringGrid] = useState<Record<number, number[]>>({});
+
+    const toggleRecurringSlot = (dayOfWeek: number, hour: number) => {
+        setRecurringGrid(prev => {
+            const currentHours = prev[dayOfWeek] || [];
+            if (currentHours.includes(hour)) {
+                return {
+                    ...prev,
+                    [dayOfWeek]: currentHours.filter(h => h !== hour)
+                };
+            } else {
+                return {
+                    ...prev,
+                    [dayOfWeek]: [...currentHours, hour].sort((a, b) => a - b)
+                };
+            }
+        });
+    };
 
     const handleApplyRecurring = async () => {
         setIsGenerating(true);
-        const activeDays = template.filter(t => t.active).map(t => {
-            const startHour = parseInt(t.start.split(":")[0]);
-            const endHour = parseInt(t.end.split(":")[0]);
-            const hours = [];
-            for (let h = startHour; h < endHour; h++) {
-                hours.push(h);
-            }
-            return { dayOfWeek: t.dayOfWeek, hours };
-        });
+
+        const activeDays = Object.entries(recurringGrid).map(([dayOfWeekStr, hours]) => ({
+            dayOfWeek: parseInt(dayOfWeekStr),
+            hours: hours
+        })).filter(d => d.hours.length > 0);
+
+        if (activeDays.length === 0) {
+            toast.error("Selecciona al menos un horario");
+            setIsGenerating(false);
+            return;
+        }
 
         const result = await saveRecurringSchedule(oyenteId, activeDays);
         setIsGenerating(false);
@@ -468,67 +479,53 @@ export function CalendarClient({
                     </div>
 
                     <div className="p-8 space-y-6">
-                        <div className="space-y-4">
-                            {template.map((day, idx) => (
-                                <div key={idx} className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border transition-all ${day.active ? 'bg-[#F2EDE7]/30 border-[#A68363]/20' : 'bg-gray-50 border-gray-100 opacity-60'}`}>
-                                    <div className="flex items-center gap-4 mb-4 sm:mb-0">
-                                        <Switch
-                                            checked={day.active}
-                                            onCheckedChange={(val) => {
-                                                const newTemplate = [...template];
-                                                newTemplate[idx].active = val;
-                                                setTemplate(newTemplate);
-                                            }}
-                                        />
-                                        <div>
-                                            <p className="font-bold text-[#4A3C31] capitalize">
-                                                {new Date(2024, 0, day.dayOfWeek === 0 ? 7 : day.dayOfWeek).toLocaleDateString('es-ES', { weekday: 'long' })}
-                                            </p>
-                                            <p className="text-[10px] uppercase font-black tracking-widest text-[#A68363]">
-                                                {day.active ? 'Activo' : 'Inactivo'}
-                                            </p>
-                                        </div>
+                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-inner max-h-[500px] overflow-auto">
+                            <div className="grid grid-cols-[auto_repeat(7,1fr)] gap-2 min-w-[600px]">
+                                {/* Header Row */}
+                                <div className="h-8"></div>
+                                {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((d, i) => (
+                                    <div key={d} className="text-center text-[10px] font-black uppercase text-gray-400">
+                                        {d}
                                     </div>
+                                ))}
 
-                                    {day.active && (
-                                        <div className="flex items-center gap-3 bg-white p-2 rounded-xl border border-gray-100 shadow-sm">
-                                            <div className="flex flex-col">
-                                                <Label className="text-[9px] uppercase font-black text-gray-400 mb-1 ml-1">Inicio</Label>
-                                                <Input
-                                                    type="time"
-                                                    value={day.start}
-                                                    onChange={(e) => {
-                                                        const newTemplate = [...template];
-                                                        newTemplate[idx].start = e.target.value;
-                                                        setTemplate(newTemplate);
-                                                    }}
-                                                    className="h-9 w-28 border-none bg-transparent font-bold text-[#4A3C31] focus-visible:ring-0"
-                                                />
+                                {/* Grid Body */}
+                                {Array.from({ length: 15 }).map((_, i) => {
+                                    const hour = i + 8; // 8:00 to 22:00
+                                    return (
+                                        <div key={hour} className="contents group/row">
+                                            {/* Time Label */}
+                                            <div className="text-[10px] font-bold text-gray-300 -mt-1.5 text-right pr-2">
+                                                {hour}:00
                                             </div>
-                                            <div className="w-px h-6 bg-gray-100"></div>
-                                            <div className="flex flex-col">
-                                                <Label className="text-[9px] uppercase font-black text-gray-400 mb-1 ml-1">Fin</Label>
-                                                <Input
-                                                    type="time"
-                                                    value={day.end}
-                                                    onChange={(e) => {
-                                                        const newTemplate = [...template];
-                                                        newTemplate[idx].end = e.target.value;
-                                                        setTemplate(newTemplate);
-                                                    }}
-                                                    className="h-9 w-28 border-none bg-transparent font-bold text-[#4A3C31] focus-visible:ring-0"
-                                                />
-                                            </div>
+
+                                            {/* Cells */}
+                                            {[1, 2, 3, 4, 5, 6, 0].map((dayOfWeek) => {
+                                                const isActive = recurringGrid[dayOfWeek]?.includes(hour);
+                                                return (
+                                                    <button
+                                                        key={`${dayOfWeek}-${hour}`}
+                                                        onClick={() => toggleRecurringSlot(dayOfWeek, hour)}
+                                                        className={`h-8 rounded-lg border transition-all duration-200 ${isActive
+                                                            ? "bg-[#4A3C31] border-[#4A3C31] shadow-md shadow-[#4A3C31]/20 scale-95"
+                                                            : "bg-gray-50 border-transparent hover:bg-gray-100 hover:scale-105"
+                                                            }`}
+                                                        title={`${hour}:00 - ${hour + 1}:00`}
+                                                    >
+                                                        {isActive && <CheckUser className="h-3 w-3 text-white mx-auto" />}
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
-                                    )}
-                                </div>
-                            ))}
+                                    );
+                                })}
+                            </div>
                         </div>
 
                         <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100 flex gap-3">
                             <Plus className="h-5 w-5 text-amber-600 flex-shrink-0" />
                             <p className="text-xs text-amber-800 leading-relaxed font-medium">
-                                <b>Nota:</b> Al aplicar este horario, se generarán nuevos huecos de disponibilidad en los días seleccionados. Esto no borrará las citas que ya tengas confirmadas.
+                                <b>Nota:</b> Selecciona las horas exactas que quieres habilitar para cada día. Se aplicará a las próximas 4 semanas.
                             </p>
                         </div>
                     </div>

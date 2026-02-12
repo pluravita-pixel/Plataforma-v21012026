@@ -245,9 +245,9 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
         setIsLoading(true);
 
         try {
-            const finalPriceCalc = appliedDiscount
+            const finalPriceCalc = (appliedDiscount
                 ? price * (1 - appliedDiscount.percent / 100)
-                : price;
+                : price) * 1.21; // Inc. VAT
 
             // Determine Name to save
             const anonymousId = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -557,27 +557,35 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
                                 <div className="space-y-4 mb-6">
                                     <div className="bg-gray-50 p-5 rounded-[1.5rem] space-y-3 border border-gray-100">
                                         <div className="flex justify-between items-center text-sm">
-                                            <span className="text-gray-500 font-bold">Sesión con {psychologistName}</span>
-                                            <span className="font-bold text-[#4A3C31]">{price.toFixed(2)}€</span>
+                                            <span className="text-gray-500 font-bold">Base (sin IVA)</span>
+                                            <span className="font-medium text-gray-700">{price.toFixed(2)}€</span>
                                         </div>
-                                        {selectedSlot && selectedSlot.startTime && (
-                                            <div className="flex justify-between items-center text-sm">
-                                                <span className="text-gray-500 font-bold">Fecha y Hora</span>
-                                                <span className="font-bold text-[#4A3C31]">{format(new Date(selectedSlot.startTime), "d 'de' MMMM, HH:mm", { locale: es })}</span>
-                                            </div>
-                                        )}
                                         {appliedDiscount && (
                                             <div className="flex justify-between items-center text-sm text-green-700 bg-green-50 p-3 rounded-xl border border-green-100">
                                                 <span className="font-bold flex items-center gap-2">
                                                     <CheckCircle2 className="h-4 w-4" />
-                                                    Cupón {appliedDiscount.code}
+                                                    Cupón {appliedDiscount.code} (-{appliedDiscount.percent}%)
                                                 </span>
-                                                <span className="font-bold">-{appliedDiscount.percent}%</span>
+                                                <span className="font-bold">-{((price * appliedDiscount.percent) / 100).toFixed(2)}€</span>
+                                            </div>
+                                        )}
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-gray-500 font-bold">IVA (21%)</span>
+                                            <span className="font-medium text-gray-700">
+                                                {((price * (appliedDiscount ? (1 - appliedDiscount.percent / 100) : 1)) * 0.21).toFixed(2)}€
+                                            </span>
+                                        </div>
+                                        {selectedSlot && selectedSlot.startTime && (
+                                            <div className="flex justify-between items-center text-sm border-t border-dashed border-gray-200 pt-2">
+                                                <span className="text-gray-400 font-medium text-xs">Fecha</span>
+                                                <span className="font-medium text-gray-500 text-xs">{format(new Date(selectedSlot.startTime), "d MMM, HH:mm", { locale: es })}</span>
                                             </div>
                                         )}
                                         <div className="border-t border-gray-200/50 pt-4 flex justify-between items-center">
-                                            <span className="font-black text-[#4A3C31] uppercase tracking-wider text-xs">Total</span>
-                                            <span className="font-black text-[#A68363] text-3xl">{finalPrice.toFixed(2)}€</span>
+                                            <span className="font-black text-[#4A3C31] uppercase tracking-wider text-xs">Total a Pagar</span>
+                                            <span className="font-black text-[#A68363] text-3xl">
+                                                {(price * (appliedDiscount ? (1 - appliedDiscount.percent / 100) : 1) * 1.21).toFixed(2)}€
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -586,7 +594,7 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
                                     <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-start gap-3">
                                         <Lock className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
                                         <p className="text-xs text-blue-700">
-                                            {finalPrice === 0
+                                            {(price * (appliedDiscount ? (1 - appliedDiscount.percent / 100) : 1) * 1.21) === 0
                                                 ? "Esta sesión es gratuita. Pulsa el botón para confirmar tu reserva."
                                                 : "Elige tu método de pago para completar la reserva."}
                                         </p>
@@ -600,12 +608,12 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
                                         >
                                             {isLoading ? (
                                                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                            ) : finalPrice === 0 ? (
+                                            ) : (price * (appliedDiscount ? (1 - appliedDiscount.percent / 100) : 1) * 1.21) === 0 ? (
                                                 "Confirmar Reserva Gratuita"
                                             ) : (
                                                 <>
                                                     <CreditCard className="h-5 w-5 group-hover:scale-110 transition-transform" />
-                                                    Pagar →
+                                                    Pagar {(price * (appliedDiscount ? (1 - appliedDiscount.percent / 100) : 1) * 1.21).toFixed(2)}€ →
                                                 </>
                                             )}
                                         </Button>

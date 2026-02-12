@@ -138,14 +138,16 @@ export default function LandingPage() {
                         <div className="absolute -top-6 -left-6 w-24 h-24 bg-[#A68363]/10 rounded-full blur-xl" />
                         <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-[#4A3C31]/5 rounded-3xl blur-xl" />
 
-                        <div className="relative bg-white p-4 rounded-3xl shadow-2xl w-full max-w-3xl mx-auto z-10">
-                            <div className="aspect-[16/9] relative bg-black rounded-2xl overflow-hidden group shadow-inner">
-                                <iframe
-                                    src="https://www.youtube.com/embed/a6AtqACERTo?autoplay=0&mute=0&controls=1&loop=1&playlist=a6AtqACERTo&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1"
-                                    className="w-full h-full absolute inset-0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                ></iframe>
+                        <div className="relative bg-white p-4 rounded-3xl shadow-2xl w-full max-w-3xl mx-auto z-10 transform hover:scale-[1.01] transition-transform duration-300">
+                            <div className="aspect-[16/9] relative bg-gradient-to-br from-[#F2EDE7] to-[#FFF5EB] rounded-2xl overflow-hidden group shadow-inner">
+                                <Image
+                                    src="/images/login-illustration.png"
+                                    alt="Conexión empática en línea"
+                                    fill
+                                    className="object-cover"
+                                    priority
+                                />
+                                <div className="absolute inset-0 bg-[#A68363]/10 mix-blend-overlay" />
                             </div>
                         </div>
                     </div>
