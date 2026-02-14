@@ -34,7 +34,6 @@ export default function AdminLayout({
         { icon: Users, label: "Usuarios", href: "/admin/usuarios" },
         { icon: Users, label: "Oyentes", href: "/admin/oyentes" },
         { icon: ShieldCheck, label: "Solicitudes", href: "/admin/oyentes-pendientes" },
-        { icon: UserPlus, label: "Añadir Oyente", href: "/admin/nuevo-oyente" },
         { icon: MessageCircle, label: "Soporte", href: "/admin/support" },
         { icon: Settings, label: "Configuración", href: "/admin/settings" },
     ];
