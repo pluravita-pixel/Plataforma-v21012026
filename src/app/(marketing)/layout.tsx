@@ -162,21 +162,21 @@ export default function MarketingLayout({
             {/* Footer */}
             <footer className="bg-white border-t border-gray-100 py-12">
                 <div className="container mx-auto px-6 md:px-12 lg:px-20">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-                        <div className="flex items-center">
+                    <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-8 text-center md:text-left">
+                        <div className="flex justify-center md:justify-start">
                             <Logo className="w-40 h-12 opacity-80" />
                         </div>
 
                         {/* Center Content */}
-                        <div className="text-center max-w-md">
-                            <h3 className="font-bold text-[#4A3C31] mb-3">Sobre nosotros</h3>
-                            <p className="text-sm text-[#6B6B6B] leading-relaxed">
+                        <div className="text-center max-w-sm mx-auto">
+                            <h3 className="font-bold text-[#4A3C31] mb-2 uppercase tracking-widest text-xs">Sobre nosotros</h3>
+                            <p className="text-xs text-[#6B6B6B] leading-relaxed">
                                 pluravita es una plataforma de oyentes en línea. Ayudamos a las personas a encontrar a su oyente ideal y a comenzar su proceso en línea de forma fácil, segura y privada.
                             </p>
                         </div>
 
-                        {/* Social Icons */}
-                        {/* Social Icons removed */}
+                        {/* Right Spacer for balance */}
+                        <div className="hidden md:block"></div>
                     </div>
 
                     <div className="mt-12 pt-8 border-t border-gray-50 text-center text-xs text-gray-400">

@@ -193,17 +193,6 @@ export default function LandingPage() {
                                 </VibeButton>
                             </div>
 
-                            {/* Trust badges/text like Terapify */}
-                            <div className="flex items-center gap-4 text-xs font-bold text-[#8C8C8C] uppercase tracking-wider bg-white/50 backdrop-blur-sm p-3 rounded-2xl w-fit">
-                                <div className="flex -space-x-2">
-                                    {[1, 2, 3].map(i => (
-                                        <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-[#F2EDE7] overflow-hidden relative">
-                                            <Image src={`/images/team.png`} alt="User" fill sizes="32px" className="object-cover" />
-                                        </div>
-                                    ))}
-                                </div>
-                                <span>+10,000 personas ya se sienten mejor</span>
-                            </div>
                         </div>
 
                         {/* Right Side: Illustration with Decorative Circles */}
