@@ -58,6 +58,27 @@ export async function createCheckoutSession(appointmentId: string, returnUrl?: s
             WHERE id = ${appointmentId}
         `;
 
+        // 🚨 MVP NOTIFICATION: Detectar intentos de compra en perfiles de prueba
+        const oyenteEmail = await client`
+            SELECT email FROM oyentes WHERE id = ${appointment.oyente_id} LIMIT 1
+        `;
+
+        if (oyenteEmail[0]?.email?.includes('.mvp@pluravita.test')) {
+            console.log('\n🔔 ═══════════════════════════════════════════════════════');
+            console.log('🎯 ALERTA MVP: ¡Alguien ha intentado comprar una sesión!');
+            console.log('═══════════════════════════════════════════════════════');
+            console.log(`👤 Oyente: ${appointment.oyente_name}`);
+            console.log(`💰 Precio: ${appointment.price}€ (IVA incluido)`);
+            console.log(`📅 Fecha: ${new Date(appointment.date).toLocaleString('es-ES')}`);
+            console.log(`📧 Usuario: ${appointment.usuario_nombre || 'Anónimo'}`);
+            console.log(`🆔 ID Cita: ${appointmentId}`);
+            console.log(`🔗 Session Stripe: ${session.id}`);
+            console.log('═══════════════════════════════════════════════════════\n');
+
+            // TODO: Aquí puedes añadir envío de email, webhook, o notificación push
+            // Por ahora solo se registra en los logs del servidor
+        }
+
         return { url: session.url };
     } catch (error: any) {
         console.error("Error creating stripe session:", error);
