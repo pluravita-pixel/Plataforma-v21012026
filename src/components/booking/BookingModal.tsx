@@ -32,12 +32,14 @@ interface BookingModalProps {
     currentUser: any | null;
     customTrigger?: React.ReactNode;
     defaultOpen?: boolean;
+    initialSlotId?: string;
+    initialSlot?: Slot | null;
 }
 
-export function BookingModal({ listenerId, listenerName, price, currentUser, customTrigger, defaultOpen = false }: BookingModalProps) {
+export function BookingModal({ listenerId, listenerName, price, currentUser, customTrigger, defaultOpen = false, initialSlotId, initialSlot: propInitialSlot }: BookingModalProps) {
     const supabase = createClient();
     const router = useRouter();
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(initialSlotId || propInitialSlot ? 1 : 1);
     const [isOpen, setIsOpen] = useState(defaultOpen);
     const [isCanceledReturn, setIsCanceledReturn] = useState(false);
     const searchParams = useSearchParams();
@@ -50,7 +52,7 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
     // Calendar State
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [availableSlots, setAvailableSlots] = useState<Slot[]>([]);
-    const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
+    const [selectedSlot, setSelectedSlot] = useState<Slot | null>(propInitialSlot || null);
     const [isMounted, setIsMounted] = useState(false);
 
     // Discount Logic
@@ -80,6 +82,11 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         setSelectedDate(tomorrow);
+
+        // If we have an initialSlotId but no object, we might need to fetch it (or we just hope parent passed object)
+        if (propInitialSlot) {
+            setSelectedSlot(propInitialSlot);
+        }
 
         // Check for canceled payment return
         const isCanceled = searchParams.get("canceled") === "true";
@@ -112,7 +119,7 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
                 console.error("Error recovering booking state:", e);
             }
         }
-    }, [searchParams, listenerId]);
+    }, [searchParams, listenerId, propInitialSlot]);
 
     // --- Fetch Slots ---
     useEffect(() => {
@@ -191,7 +198,13 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
                     setIsLoading(false);
                 }
             }
-            setStep(2);
+
+            // If we have a preselected slot, go straight to payment (step 3)
+            if (selectedSlot) {
+                setStep(3);
+            } else {
+                setStep(2);
+            }
 
         } else if (step === 2) {
             if (!selectedSlot) {
@@ -478,7 +491,7 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
                                     disabled={isLoading}
                                     className="w-full mt-4 bg-[#4A3C31] hover:bg-[#3A2E26] text-white rounded-xl h-12 font-bold shadow-lg"
                                 >
-                                    {isLoading ? "Creando cuenta..." : "Continuar"}
+                                    {isLoading ? "Creando cuenta..." : (selectedSlot ? "Reservar y Pagar" : "Continuar")}
                                 </Button>
                             </motion.div>
                         )}
