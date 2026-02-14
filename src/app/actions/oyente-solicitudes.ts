@@ -4,6 +4,7 @@ import { client } from "@/db";
 import { getCurrentUser } from "./auth";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { createAdminClient } from "@/lib/supabase/server";
 
 export async function submitOyenteApplication(prevState: any, formData: FormData) {
     const user = await getCurrentUser();
@@ -76,6 +77,10 @@ export async function handleOyenteApplication(applicationId: string, action: 'ac
             await client`
                 DELETE FROM support_tickets WHERE user_id = ${application.user_id}::uuid AND subject = 'Nueva solicitud de Oyente'
             `;
+
+            // Eliminar de Supabase Auth
+            const supabaseAdmin = await createAdminClient();
+            await supabaseAdmin.auth.admin.deleteUser(application.user_id);
 
             await client`
                 DELETE FROM users WHERE id = ${application.user_id}::uuid

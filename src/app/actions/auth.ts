@@ -82,7 +82,11 @@ export async function register(prevState: any, formData: FormData) {
     const isOyenteApplication = formData.get("role") === "oyente" || formData.get("role") === "coach";
 
     try {
-        const existingInDb = await client`SELECT id, role, has_pending_application as "hasPendingApplication" FROM users WHERE email = ${email} LIMIT 1`;
+        // 1. Verificar si ya existe en la tabla de usuarios de la DB
+        const existingInDb = await client`
+            SELECT id, role, has_pending_application as "hasPendingApplication" 
+            FROM users WHERE email = ${email} LIMIT 1
+        `;
 
         if (existingInDb.length > 0) {
             const user = existingInDb[0];
@@ -93,6 +97,14 @@ export async function register(prevState: any, formData: FormData) {
                 return { error: "Ya tienes una cuenta de usuario. Por favor, inicia sesión y completa tu perfil de Oyente." };
             }
             return { error: "Este correo electrónico ya está registrado. Por favor, inicia sesión." };
+        }
+
+        // 2. Verificar si hay una solicitud de oyente huérfana (sin usuario en DB)
+        const orphanApp = await client`
+            SELECT id FROM oyente_solicitudes WHERE email = ${email} LIMIT 1
+        `;
+        if (orphanApp.length > 0) {
+            return { error: "Ya existe una solicitud pendiente asociada a este correo. Por favor, contacta con soporte." };
         }
 
         const headersList = await headers();

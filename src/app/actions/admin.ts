@@ -5,6 +5,7 @@ import { users, oyentes, appointments, supportTickets, availabilitySlots, withdr
 import { eq, count, desc, sql, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "./auth";
+import { createAdminClient } from "@/lib/supabase/server";
 
 async function ensureAdmin() {
     const user = await getCurrentUser();
@@ -265,7 +266,17 @@ export async function deleteUser(userId: string) {
         // 4. Eliminar solicitudes de oyente
         await db.delete(oyenteSolicitudes).where(eq(oyenteSolicitudes.userId, userId));
 
-        // 5. Eliminar el usuario de la tabla principal
+        // 5. Eliminar el usuario de Supabase Auth (usando el cliente admin)
+        const supabaseAdmin = await createAdminClient();
+        const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(userId);
+
+        if (authError) {
+            console.error("Error deleting from Supabase Auth:", authError);
+            // Opcional: Podrías decidir si fallar aquí o continuar. 
+            // Si el usuario ya no existe en Auth, lanzará un error que podemos ignorar o loguear.
+        }
+
+        // 6. Eliminar el usuario de la tabla principal de la DB
         await db.delete(users).where(eq(users.id, userId));
 
         revalidatePath("/admin/usuarios");

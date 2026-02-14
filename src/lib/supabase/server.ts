@@ -35,3 +35,28 @@ export async function createClient() {
         }
     );
 }
+
+export async function createAdminClient() {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !supabaseServiceRoleKey) {
+        console.error("Supabase Admin environment variables are missing!");
+        throw new Error("Supabase Admin environment variables are missing. Please check your .env file.");
+    }
+
+    return createServerClient(
+        supabaseUrl,
+        supabaseServiceRoleKey,
+        {
+            cookies: {
+                getAll() {
+                    return [];
+                },
+                setAll() {
+                    // No cookies for admin client
+                },
+            },
+        }
+    );
+}
