@@ -93,9 +93,9 @@ export function SupportClient({ tickets: initialTickets }: SupportClientProps) {
         <div className="h-[calc(100vh-16rem)] flex bg-white neo-border neo-shadow-lg overflow-hidden animate-fade-in-up">
             {/* Sidebar / List */}
             <div className="w-96 border-r-4 border-black flex flex-col bg-gray-50">
-                <div className="p-8 border-b-4 border-black bg-white">
-                    <div className="flex items-center gap-4 mb-8">
-                        <MessageSquare className="h-8 w-8 text-black" />
+                <div className="p-6 border-b-4 border-black bg-white">
+                    <div className="flex items-center gap-4 mb-6">
+                        <MessageSquare className="h-6 w-6 text-black" />
                         <h2 className="text-xl font-black uppercase tracking-tighter text-black">Tickets</h2>
                     </div>
 
@@ -118,7 +118,7 @@ export function SupportClient({ tickets: initialTickets }: SupportClientProps) {
                         <div
                             key={ticket.id}
                             onClick={() => handleSelect(ticket.id)}
-                            className={`p-6 cursor-pointer transition-all relative group ${selectedId === ticket.id ? 'bg-white' : 'hover:bg-white/50'
+                            className={`p-4 cursor-pointer transition-all relative group ${selectedId === ticket.id ? 'bg-white' : 'hover:bg-white/50'
                                 }`}
                         >
                             {!ticket.isRead && (
@@ -139,9 +139,9 @@ export function SupportClient({ tickets: initialTickets }: SupportClientProps) {
                         </div>
                     ))}
                     {filteredTickets.length === 0 && (
-                        <div className="p-16 text-center flex flex-col items-center gap-4 mt-10">
-                            <div className="w-16 h-16 neo-border bg-white flex items-center justify-center">
-                                <LifeBuoy className="h-8 w-8 text-black opacity-20" />
+                        <div className="p-8 text-center flex flex-col items-center gap-4 mt-4">
+                            <div className="w-12 h-12 neo-border bg-white flex items-center justify-center">
+                                <LifeBuoy className="h-6 w-6 text-black opacity-20" />
                             </div>
                             <p className="text-[10px] font-black uppercase tracking-widest text-black/40">Sin tickets</p>
                         </div>
@@ -194,7 +194,7 @@ export function SupportClient({ tickets: initialTickets }: SupportClientProps) {
                                 <div className="w-12 h-12 neo-border bg-white flex items-center justify-center shrink-0 neo-shadow-sm">
                                     <User className="h-6 w-6 text-black" />
                                 </div>
-                                <div className="space-y-3 max-w-2xl">
+                                <div className="space-y-3 max-w-4xl">
                                     <div className="bg-white p-8 neo-border neo-shadow-sm">
                                         <p className="text-lg font-bold text-black leading-tight uppercase tracking-tight whitespace-pre-wrap">
                                             {selectedTicket.message}
@@ -210,7 +210,7 @@ export function SupportClient({ tickets: initialTickets }: SupportClientProps) {
                                     <div className="w-12 h-12 neo-border bg-black flex items-center justify-center shrink-0 neo-shadow-sm">
                                         <ShieldCheck className="h-6 w-6 text-white" />
                                     </div>
-                                    <div className="space-y-3 text-right max-w-2xl">
+                                    <div className="space-y-3 text-right max-w-4xl">
                                         <div className="bg-gray-100 p-8 neo-border neo-shadow-sm">
                                             <p className="text-lg font-black text-black leading-tight uppercase tracking-tight whitespace-pre-wrap">
                                                 {selectedTicket.adminResponse}
@@ -224,18 +224,18 @@ export function SupportClient({ tickets: initialTickets }: SupportClientProps) {
 
                         {/* Reply Input Area */}
                         {selectedTicket.status === 'open' && (
-                            <div className="p-10 border-t-4 border-black bg-white">
+                            <div className="p-6 border-t-4 border-black bg-white">
                                 <div className="relative group">
                                     <textarea
                                         placeholder="ESCRIBE TU RESPUESTA..."
                                         value={replyText}
                                         onChange={(e) => setReplyText(e.target.value)}
-                                        className="w-full min-h-[150px] p-8 neo-border bg-gray-50 text-base font-black uppercase tracking-tight focus:bg-white focus:outline-none transition-all resize-none pr-48"
+                                        className="w-full min-h-[100px] p-6 neo-border bg-gray-50 text-base font-black uppercase tracking-tight focus:bg-white focus:outline-none transition-all resize-none pr-48"
                                     />
                                     <button
                                         onClick={() => handleReply(selectedId!)}
                                         disabled={isSubmitting || !replyText.trim()}
-                                        className="absolute bottom-6 right-6 neo-btn-black h-14"
+                                        className="absolute bottom-4 right-4 neo-btn-black h-12"
                                     >
                                         {isSubmitting ? "ENVIANDO..." : (
                                             <span className="flex items-center gap-3">
