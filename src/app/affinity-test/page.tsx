@@ -126,23 +126,27 @@ export default function AffinityTestPage() {
         setIsSearching(true)
 
         try {
-            const { data: { user } } = await supabase.auth.getUser()
+            // Initiate both parallel for speed
+            const authPromise = supabase.auth.getUser()
 
-            if (user) {
-                // Usuario autenticado: guardar en BD
-                await markTestAsCompleted(answers)
-            } else {
-                // Usuario NO autenticado: guardar en localStorage
+            if (typeof window !== 'undefined') {
                 localStorage.setItem('affinity_test_answers', JSON.stringify(answers))
                 localStorage.setItem('affinity_test_completed', 'true')
+            }
+
+            const { data: { user } } = await authPromise
+
+            if (user) {
+                await markTestAsCompleted(answers)
             }
         } catch (error) {
             console.error("Error updating test status:", error)
         }
 
+        // Reduced from 3500 to 2000 for better perceived speed while keeping the "AI search" feeel
         setTimeout(() => {
             router.push("/affinity-results")
-        }, 3500)
+        }, 2200)
     }
 
     const handleOptionSelect = (optionId: string) => {

@@ -150,14 +150,15 @@ export default function LandingPage() {
     return (
         <div className="flex flex-col bg-[#F9F5F0]">
             {/* Hero Section - Redesigned to be cleaner and more balanced (Terapify style) */}
-            <section className="relative w-full py-12 md:py-24 lg:py-32 overflow-hidden bg-[#F2EDE7]">
+            <section className="relative w-full py-12 md:py-24 lg:py-32 overflow-hidden bg-[#F2EDE7] min-h-[600px]">
                 {/* Background Video (Subtle) */}
-                <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
+                <div className="absolute inset-0 z-0 opacity-20 pointer-events-none bg-[#F2EDE7]">
                     <video
                         autoPlay
                         muted
                         loop
                         playsInline
+                        poster="/images/hero-illustration.jpg"
                         className="w-full h-full object-cover"
                     >
                         <source src="/videos/hero-background.mp4" type="video/mp4" />
@@ -196,8 +197,8 @@ export default function LandingPage() {
                             <div className="flex items-center gap-4 text-xs font-bold text-[#8C8C8C] uppercase tracking-wider bg-white/50 backdrop-blur-sm p-3 rounded-2xl w-fit">
                                 <div className="flex -space-x-2">
                                     {[1, 2, 3].map(i => (
-                                        <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-gray-200 overflow-hidden">
-                                            <Image src={`/images/team.png`} alt="User" width={32} height={32} className="object-cover" />
+                                        <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-[#F2EDE7] overflow-hidden relative">
+                                            <Image src={`/images/team.png`} alt="User" fill sizes="32px" className="object-cover" />
                                         </div>
                                     ))}
                                 </div>
@@ -207,15 +208,16 @@ export default function LandingPage() {
 
                         {/* Right Side: Illustration with Decorative Circles */}
                         <div className="relative hidden lg:block animate-float">
-                            {/* Decorative background shapes */}
-                            <div className="absolute -top-10 -right-10 w-64 h-64 bg-[#FAD2E1] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
-                            <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-[#BDE0FE] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-700" />
+                            {/* Decorative background shapes - Reduced complexity for performance */}
+                            <div className="absolute -top-10 -right-10 w-64 h-64 bg-[#FAD2E1] rounded-full mix-blend-multiply filter blur-3xl opacity-20" />
+                            <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-[#BDE0FE] rounded-full mix-blend-multiply filter blur-3xl opacity-20" />
 
-                            <div className="relative z-20 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white aspect-square max-w-[500px] ml-auto">
+                            <div className="relative z-20 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white aspect-square max-w-[500px] ml-auto bg-white">
                                 <Image
                                     src="/images/login-illustration.png"
                                     alt="Pluravita Illustration"
                                     fill
+                                    sizes="(max-width: 1024px) 100vw, 500px"
                                     className="object-cover"
                                     priority
                                 />

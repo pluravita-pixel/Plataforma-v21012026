@@ -52,12 +52,14 @@ function AffinityResultsContent() {
                         animate={{ opacity: 1, x: 0 }}
                         className="relative"
                     >
-                        <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl">
+                        <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl bg-white">
                             <Image
                                 src="/images/affinity-results.jpg"
                                 alt="Resultados listos"
                                 fill
+                                sizes="(max-width: 1024px) 100vw, 600px"
                                 className="object-cover"
+                                priority
                             />
                         </div>
                     </motion.div>
@@ -172,24 +174,22 @@ function AffinityResultsContent() {
                                     whileInView={{ opacity: 1, scale: 1 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: i * 0.1 }}
-                                    className="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-xl group hover:border-[#A68363]/30 transition-all"
+                                    className="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-xl group hover:border-[#A68363]/30 transition-all h-full flex flex-col"
                                 >
                                     {/* Img & Affinity Score Overlay */}
-                                    <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
+                                    <div className="relative aspect-[16/10] overflow-hidden bg-[#F2EDE7]">
                                         {psych.image ? (
                                             <Image
                                                 src={psych.image}
                                                 alt={psych.fullName}
                                                 fill
+                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                                 className="object-cover group-hover:scale-105 transition-transform duration-500"
                                             />
                                         ) : (
-                                            <Image
-                                                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${psych.email || psych.fullName}`}
-                                                alt={psych.fullName}
-                                                fill
-                                                className="object-cover group-hover:scale-105 transition-transform duration-500 p-4"
-                                            />
+                                            <div className="w-full h-full flex items-center justify-center bg-[#F2EDE7] text-[#A68363]">
+                                                <UserCircle className="w-16 h-16 opacity-50" />
+                                            </div>
                                         )}
                                         <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
                                             <div className="h-2 w-2 rounded-full bg-emerald-500" />
