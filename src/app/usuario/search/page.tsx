@@ -14,7 +14,7 @@ import { useSearchParams } from "next/navigation";
 
 import { Suspense } from "react";
 
-function PatientSearchContent() {
+function UsuarioSearchContent() {
     const searchParams = useSearchParams();
     const refId = searchParams.get("ref");
 
@@ -148,14 +148,14 @@ function PatientSearchContent() {
     );
 }
 
-export default function PatientSearchPage() {
+export default function UsuarioSearchPage() {
     return (
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-[400px]">
                 <div className="animate-spin h-16 w-16 neo-border border-b-transparent"></div>
             </div>
         }>
-            <PatientSearchContent />
+            <UsuarioSearchContent />
         </Suspense>
     );
 }

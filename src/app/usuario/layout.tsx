@@ -22,7 +22,7 @@ import { LogoutButton } from "@/components/logout-button";
 import { UserNav } from "@/components/user-nav";
 import { cn } from "@/lib/utils";
 
-export default function PatientLayout({
+export default function UsuarioLayout({
     children,
 }: {
     children: React.ReactNode;
@@ -33,7 +33,7 @@ export default function PatientLayout({
 
     const navItems = [
         { icon: LayoutDashboard, label: "Inicio", href: "/usuario/dashboard" },
-        { icon: Search, label: "Buscar Oyente", href: "/usuario/search" },
+        { icon: Search, label: "Buscar", href: "/usuario/search" },
         { icon: Calendar, label: "Mis Citas", href: "/usuario/appointments" },
         { icon: UserCircle, label: "Mi Cuenta", href: "/usuario/profile" },
     ];
@@ -79,7 +79,9 @@ export default function PatientLayout({
 
                 <nav className="flex-1 px-3 py-4 space-y-2">
                     {navItems.map((item) => {
-                        const isActive = pathname === item.href;
+                        const isActive = item.href === "/usuario/dashboard"
+                            ? pathname === item.href
+                            : pathname?.startsWith(item.href);
                         return (
                             <Link
                                 key={item.href}

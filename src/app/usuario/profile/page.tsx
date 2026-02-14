@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { getCurrentUser } from "@/app/actions/auth";
 import { updateUsuarioProfile } from "@/app/actions/usuarios";
 
-export default function PatientProfilePage() {
+export default function UsuarioProfilePage() {
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);

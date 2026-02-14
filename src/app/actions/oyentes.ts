@@ -52,6 +52,8 @@ const mapOyente = (p: any) => p ? ({
     createdAt: p.created_at,
     refCode: p.ref_code,
     meetingLink: p.meeting_link,
+    benefits: p.benefits,
+    experience: p.experience,
 }) : null;
 
 export async function refreshOyenteStats(oyenteId: string) {
@@ -175,6 +177,9 @@ export async function updateOyenteSettings(userId: string, data: {
     languages?: string[];
     meetingLink?: string;
     studies?: string;
+    benefits?: string[];
+    experience?: string;
+    fullName?: string;
 }) {
     try {
         const user = await ensureOyente();
@@ -210,6 +215,9 @@ export async function updateOyenteSettings(userId: string, data: {
         if (data.languages !== undefined) updateObj.languages = data.languages;
         if (data.meetingLink !== undefined) updateObj.meeting_link = data.meetingLink;
         if (data.studies !== undefined) updateObj.studies = data.studies;
+        if (data.benefits !== undefined) updateObj.benefits = data.benefits;
+        if (data.experience !== undefined) updateObj.experience = data.experience;
+        if (data.fullName !== undefined) updateObj.full_name = data.fullName;
 
         // Ensure referral code
         const current = await client`SELECT ref_code FROM oyentes WHERE user_id = ${userId}`;

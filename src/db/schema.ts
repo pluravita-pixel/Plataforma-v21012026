@@ -50,6 +50,10 @@ export const oyentes = pgTable("oyentes", {
   price: decimal("price", { precision: 10, scale: 2 }).default("35.00"),
   tags: text("tags").array(), // For experience tags
   meetingLink: text("meeting_link"), // Fixed link for Zoom / Google Meet
+  refCode: text("ref_code"), // Added for referral system
+  studies: text("studies"), // Academic studies / Formation
+  experience: text("experience"), // Professional experience description
+  benefits: text("benefits").array(), // "Why choose me" highlights
   createdAt: timestamp("created_at").defaultNow().notNull(),
   lastLogin: timestamp("last_login"), // Specifically requested for this table too
 });

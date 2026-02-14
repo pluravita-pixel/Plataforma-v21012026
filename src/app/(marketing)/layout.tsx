@@ -34,7 +34,7 @@ export default function MarketingLayout({
     const handleCoachesLinkClick = (e: React.MouseEvent) => {
         if (hasCompletedTest) {
             e.preventDefault();
-            router.push("/patient/search");
+            router.push("/usuario/search");
         }
     };
 

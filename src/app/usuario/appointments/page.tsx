@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { getAllUserAppointments, cancelAppointment } from "@/app/actions/usuarios";
 
-export default function PatientAppointmentsPage() {
+export default function UsuarioAppointmentsPage() {
     const router = useRouter();
     const [allAppointments, setAllAppointments] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);

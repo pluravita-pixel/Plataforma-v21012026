@@ -99,28 +99,31 @@ export function ListenerProfileModal({ listener: psychologist, isOpen, onClose, 
 
                                 <div>
                                     <h3 className="text-lg font-black text-[#4A3C31] mb-4">Sobre mí</h3>
-                                    <p className="text-gray-500 leading-relaxed font-medium text-sm md:text-base">
+                                    <p className="text-gray-500 leading-relaxed font-medium text-sm md:text-base mb-6">
                                         {psychologist.description || "Este especialista aún no ha añadido una descripción detallada."}
                                     </p>
+
+                                    {psychologist.studies && (
+                                        <div className="mb-6">
+                                            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Formación</h4>
+                                            <p className="text-sm font-bold text-[#4A3C31]">{psychologist.studies}</p>
+                                        </div>
+                                    )}
                                 </div>
 
-                                <div className="bg-amber-50 p-6 rounded-[2rem] border border-amber-100">
-                                    <h4 className="font-bold text-[#A68363] mb-2 text-sm uppercase tracking-wider">¿Por qué elegirme?</h4>
-                                    <ul className="space-y-2">
-                                        <li className="flex items-start gap-2 text-sm text-amber-900 font-medium">
-                                            <CheckCircle2 className="h-4 w-4 text-[#A68363] mt-0.5 shrink-0" />
-                                            Experiencia comprobada en tratamiento de ansiedad.
-                                        </li>
-                                        <li className="flex items-start gap-2 text-sm text-amber-900 font-medium">
-                                            <CheckCircle2 className="h-4 w-4 text-[#A68363] mt-0.5 shrink-0" />
-                                            Enfoque personalizado y empático.
-                                        </li>
-                                        <li className="flex items-start gap-2 text-sm text-amber-900 font-medium">
-                                            <CheckCircle2 className="h-4 w-4 text-[#A68363] mt-0.5 shrink-0" />
-                                            Disponibilidad flexible para sesiones online.
-                                        </li>
-                                    </ul>
-                                </div>
+                                {psychologist.benefits && psychologist.benefits.length > 0 && (
+                                    <div className="bg-amber-50 p-6 rounded-[2rem] border border-amber-100">
+                                        <h4 className="font-bold text-[#A68363] mb-4 text-sm uppercase tracking-wider">¿Por qué elegirme?</h4>
+                                        <ul className="space-y-3">
+                                            {psychologist.benefits.map((benefit: string, idx: number) => (
+                                                <li key={idx} className="flex items-start gap-2 text-sm text-amber-900 font-medium">
+                                                    <CheckCircle2 className="h-4 w-4 text-[#A68363] mt-0.5 shrink-0" />
+                                                    {benefit}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </>

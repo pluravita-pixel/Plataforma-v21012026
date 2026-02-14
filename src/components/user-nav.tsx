@@ -97,7 +97,7 @@ export function UserNav() {
                         <div className="hidden sm:block text-left">
                             <p className="text-xs font-bold text-gray-900 line-clamp-1">{user.fullName || "Usuario"}</p>
                             <p className="text-[10px] text-gray-500 line-clamp-1 uppercase tracking-wider">
-                                {user.role === 'oyente' ? 'OYENTE' : user.role}
+                                {user.role === 'oyente' ? 'OYENTE' : (user.role === 'admin' ? 'ADMIN' : 'USUARIO')}
                             </p>
                         </div>
                         <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />

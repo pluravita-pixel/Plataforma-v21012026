@@ -34,7 +34,7 @@ interface BookingModalProps {
     defaultOpen?: boolean;
 }
 
-export function BookingModal({ listenerId: psychologistId, listenerName: psychologistName, price, currentUser, customTrigger, defaultOpen = false }: BookingModalProps) {
+export function BookingModal({ listenerId, listenerName, price, currentUser, customTrigger, defaultOpen = false }: BookingModalProps) {
     const supabase = createClient();
     const router = useRouter();
     const [step, setStep] = useState(1);
@@ -83,9 +83,9 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
 
         // Check for canceled payment return
         const isCanceled = searchParams.get("canceled") === "true";
-        const storedPsychId = localStorage.getItem("last_psych_id");
+        const storedPsychId = localStorage.getItem("last_oyente_id");
 
-        if (isCanceled && storedPsychId === psychologistId) {
+        if (isCanceled && storedPsychId === listenerId) {
             try {
                 const savedData = localStorage.getItem("booking_form_data");
                 const savedSlot = localStorage.getItem("booking_selected_slot");
@@ -112,7 +112,7 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
                 console.error("Error recovering booking state:", e);
             }
         }
-    }, [searchParams, psychologistId]);
+    }, [searchParams, listenerId]);
 
     // --- Fetch Slots ---
     useEffect(() => {
@@ -123,12 +123,12 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
                 const end = new Date(selectedDate);
                 end.setHours(23, 59, 59, 999);
 
-                const slots = await getAvailabilitySlots(psychologistId, start, end);
+                const slots = await getAvailabilitySlots(listenerId, start, end);
                 setAvailableSlots(slots);
             };
             fetchSlots();
         }
-    }, [selectedDate, isOpen, step, psychologistId]);
+    }, [selectedDate, isOpen, step, listenerId]);
 
     // --- Actions ---
 
@@ -257,7 +257,7 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
             const result = await createPendingAppointment({
                 usuarioNombre: patientName,
                 usuarioEmail: formData.email,
-                oyenteId: psychologistId,
+                oyenteId: listenerId,
                 slotId: selectedSlot.id,
                 startTime: selectedSlot.startTime,
                 discountCodeId: appliedDiscount?.id,
@@ -283,7 +283,7 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
             // Save state for recovery
             localStorage.setItem("booking_form_data", JSON.stringify(formData));
             localStorage.setItem("booking_selected_slot", JSON.stringify(selectedSlot));
-            localStorage.setItem("last_psych_id", psychologistId);
+            localStorage.setItem("last_oyente_id", listenerId);
 
             const stripeResult = await createCheckoutSession(result.appointmentId, returnUrl);
 
@@ -341,7 +341,7 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
                 <div className="bg-[#A68363] p-6 text-white relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10" />
                     <DialogTitle className="text-2xl font-black relative z-10">
-                        {step === 4 ? "¡Reserva Confirmada!" : `Reservar con ${psychologistName}`}
+                        {step === 4 ? "¡Reserva Confirmada!" : `Reservar con ${listenerName}`}
                     </DialogTitle>
                     <p className="text-white/80 text-sm mt-1 relative z-10 font-medium">
                         {step === 1 && (currentUser ? "Confirma tus datos" : "Crea tu cuenta")}
@@ -380,7 +380,7 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
                                                 {isAnonymous ? <EyeOff className="h-4 w-4 text-[#A68363]" /> : <Eye className="h-4 w-4 text-gray-400" />}
                                                 <div>
                                                     <p className="text-sm font-bold text-[#4A3C31]">Modo Anónimo</p>
-                                                    <p className="text-[10px] text-gray-400">Ocultar mi nombre real al especialista</p>
+                                                    <p className="text-[10px] text-gray-400">Ocultar mi nombre real al profesional</p>
                                                 </div>
                                             </div>
                                             <Switch
@@ -645,7 +645,7 @@ export function BookingModal({ listenerId: psychologistId, listenerName: psychol
                                 </div>
                                 <h3 className="text-2xl font-black text-[#4A3C31] tracking-tight">¡Cita Reservada!</h3>
                                 <p className="text-gray-500 max-w-[280px] mx-auto text-sm font-medium leading-relaxed">
-                                    Hemos enviado los detalles de tu cita con {psychologistName} a <span className="text-[#4A3C31] font-bold">{formData.email}</span>.
+                                    Hemos enviado los detalles de tu cita con {listenerName} a <span className="text-[#4A3C31] font-bold">{formData.email}</span>.
                                 </p>
                                 <Button
                                     onClick={() => {

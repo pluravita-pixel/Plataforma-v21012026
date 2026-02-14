@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 import { Suspense } from "react";
 
-export default async function PatientDashboard() {
+export default async function UsuarioDashboard() {
     const data = await getUsuarioDashboardData();
 
     if (!data) {

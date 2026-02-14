@@ -12,7 +12,8 @@ import {
     Copy,
     Check,
     X,
-    Info
+    Info,
+    CheckCircle2
 } from "lucide-react";
 import Image from "next/image";
 import { updateOyenteSettings } from "@/app/actions/oyentes";
@@ -34,6 +35,8 @@ interface ProfileClientProps {
         refCode?: string | null;
         meetingLink?: string | null;
         studies?: string | null;
+        benefits?: string[] | null;
+        experience?: string | null;
     };
 }
 
@@ -50,9 +53,16 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
         languages: psychologist.languages || ["Español"],
         tags: psychologist.tags || [],
         meetingLink: psychologist.meetingLink || "",
-        studies: psychologist.studies || ""
+        studies: psychologist.studies || "",
+        benefits: psychologist.benefits || [
+            "Escucha activa y sin juicios.",
+            "Espacio seguro y confidencial.",
+            "Apoyo emocional cercano."
+        ],
+        experience: psychologist.experience || ""
     });
     const [newTag, setNewTag] = useState("");
+    const [newBenefit, setNewBenefit] = useState("");
     const [isSaving, setIsSaving] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const [copied, setCopied] = useState(false);
@@ -64,7 +74,7 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
 
     const publicUrl = psychologist.refCode
         ? `${baseUrl}/api/ref/${psychologist.refCode}`
-        : `${baseUrl}/patient/search?search=${profile.username || 'tu-username'}`;
+        : `${baseUrl}/usuario/search?search=${profile.username || 'tu-username'}`;
 
     const handleCopyUrl = () => {
         navigator.clipboard.writeText(publicUrl);
@@ -101,6 +111,23 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
         setProfile({
             ...profile,
             tags: profile.tags.filter(t => t !== tagToRemove)
+        });
+    };
+
+    const addBenefit = () => {
+        if (newBenefit.trim() && !profile.benefits.includes(newBenefit.trim())) {
+            setProfile({
+                ...profile,
+                benefits: [...profile.benefits, newBenefit.trim()]
+            });
+            setNewBenefit("");
+        }
+    };
+
+    const removeBenefit = (benefitToRemove: string) => {
+        setProfile({
+            ...profile,
+            benefits: profile.benefits.filter(b => b !== benefitToRemove)
         });
     };
 
@@ -187,7 +214,10 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                 tags: profile.tags,
                 image: profile.image || undefined,
                 meetingLink: profile.meetingLink,
-                studies: profile.studies
+                studies: profile.studies,
+                benefits: profile.benefits,
+                experience: profile.experience,
+                fullName: profile.fullName
             });
 
             if (result && 'error' in result) {
@@ -310,145 +340,205 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                             <h2 className="text-xl font-bold text-gray-900 mb-8 border-b border-gray-50 pb-4">Información Profesional</h2>
 
                             <div className="space-y-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-600">Nombre Completo</label>
-                                        <p className="px-4 py-3 text-sm text-gray-800 font-bold bg-gray-50/50 rounded-xl border border-gray-100">
-                                            {profile.fullName}
-                                        </p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-600">Nombre de Usuario *</label>
-                                        <input
-                                            type="text"
-                                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all"
-                                            value={profile.username}
-                                            onChange={(e) => setProfile({ ...profile, username: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
-                                            placeholder=""
-                                        />
-                                        <p className="text-[10px] text-gray-400">Este será tu URL público: pluravita.com/{profile.username || 'tu-username'}</p>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-600">Especialidad *</label>
-                                        <div className="relative">
-                                            <BookOpen className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                            <input
-                                                type="text"
-                                                className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all"
-                                                value={profile.specialty}
-                                                onChange={(e) => setProfile({ ...profile, specialty: e.target.value })}
-                                                placeholder=""
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-600">Precio Base por sesión (€) *</label>
-                                        <div className="relative">
-                                            <Tag className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                            <input
-                                                type="number"
-                                                min="35"
-                                                max="305"
-                                                className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all font-bold text-[#4A3C31]"
-                                                value={profile.price}
-                                                onChange={(e) => setProfile({ ...profile, price: e.target.value })}
-                                            />
-                                        </div>
-                                        <div className="flex items-center gap-2 text-xs font-bold text-[#A68363] bg-[#A68363]/10 px-3 py-2 rounded-lg">
-                                            <Info className="h-3 w-3" />
-                                            <span>
-                                                Precio Final (con +21% IVA): €{(Number(profile.price || 0) * 1.21).toFixed(2)}
-                                            </span>
-                                        </div>
-                                        <p className="text-[10px] text-gray-400">El precio mínimo base es de 35€.</p>
-                                    </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-600">Nombre Público *</label>
+                                    <input
+                                        type="text"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all font-bold"
+                                        value={profile.fullName}
+                                        onChange={(e) => setProfile({ ...profile, fullName: e.target.value })}
+                                        placeholder="Tu nombre completo"
+                                    />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-600">Link de Zoom / Sesión (PMI) *</label>
-                                    <div className="relative">
-                                        <Camera className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                        <input
-                                            type="text"
-                                            className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all font-mono"
-                                            value={profile.meetingLink}
-                                            onChange={(e) => setProfile({ ...profile, meetingLink: e.target.value })}
-                                            placeholder=""
-                                        />
-                                    </div>
-                                    <p className="text-[10px] text-gray-400 italic">Aquí debes poner tu Sala de Reunión Personal habitual de Zoom o Google Meet.</p>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-600">Descripción del perfil *</label>
-                                    <textarea
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all min-h-[150px]"
-                                        value={profile.description}
-                                        onChange={(e) => setProfile({ ...profile, description: e.target.value })}
+                                    <label className="text-sm font-medium text-gray-600">Nombre de Usuario *</label>
+                                    <input
+                                        type="text"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all"
+                                        value={profile.username}
+                                        onChange={(e) => setProfile({ ...profile, username: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
                                         placeholder=""
                                     />
-                                    <p className="text-[10px] text-gray-400">Te recomendamos un mínimo de 300 caracteres para un perfil completo.</p>
+                                    <p className="text-[10px] text-gray-400">Este será tu URL público: pluravita.com/{profile.username || 'tu-username'}</p>
                                 </div>
+                            </div>
 
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-600">Idiomas *</label>
-                                    <div className="flex flex-wrap gap-3">
-                                        {AVAILABLE_LANGUAGES.map((lang) => (
+                                    <label className="text-sm font-medium text-gray-600">Especialidad *</label>
+                                    <div className="relative">
+                                        <BookOpen className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                        <input
+                                            type="text"
+                                            className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all"
+                                            value={profile.specialty}
+                                            onChange={(e) => setProfile({ ...profile, specialty: e.target.value })}
+                                            placeholder=""
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-600">Precio Base por sesión (€) *</label>
+                                    <div className="relative">
+                                        <Tag className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                        <input
+                                            type="number"
+                                            min="35"
+                                            max="305"
+                                            className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all font-bold text-[#4A3C31]"
+                                            value={profile.price}
+                                            onChange={(e) => setProfile({ ...profile, price: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-2 text-xs font-bold text-[#A68363] bg-[#A68363]/10 px-3 py-2 rounded-lg">
+                                        <Info className="h-3 w-3" />
+                                        <span>
+                                            Precio Final (con +21% IVA): €{(Number(profile.price || 0) * 1.21).toFixed(2)}
+                                        </span>
+                                    </div>
+                                    <p className="text-[10px] text-gray-400">El precio mínimo base es de 35€.</p>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-600">Link de Zoom / Sesión (PMI) *</label>
+                                <div className="relative">
+                                    <Camera className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                    <input
+                                        type="text"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all font-mono"
+                                        value={profile.meetingLink}
+                                        onChange={(e) => setProfile({ ...profile, meetingLink: e.target.value })}
+                                        placeholder=""
+                                    />
+                                </div>
+                                <p className="text-[10px] text-gray-400 italic">Aquí debes poner tu Sala de Reunión Personal habitual de Zoom o Google Meet.</p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-600">Estudios y Formación</label>
+                                    <input
+                                        type="text"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all"
+                                        value={profile.studies}
+                                        onChange={(e) => setProfile({ ...profile, studies: e.target.value })}
+                                        placeholder="Ej: Grado en Psicología, Máster en Desarrollo Personal..."
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-600">Experiencia Breve (Resumen)</label>
+                                    <input
+                                        type="text"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all"
+                                        value={profile.experience}
+                                        onChange={(e) => setProfile({ ...profile, experience: e.target.value })}
+                                        placeholder="Ej: 5 años acompañando a personas en crisis..."
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-600">Descripción del perfil *</label>
+                                <textarea
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all min-h-[150px]"
+                                    value={profile.description}
+                                    onChange={(e) => setProfile({ ...profile, description: e.target.value })}
+                                    placeholder=""
+                                />
+                                <p className="text-[10px] text-gray-400">Te recomendamos un mínimo de 300 caracteres para un perfil completo.</p>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-600">¿Por qué elegirme? (Beneficios/Puntos fuertes) *</label>
+                                <div className="space-y-3">
+                                    {profile.benefits.map((benefit, idx) => (
+                                        <div key={idx} className="flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100 group">
+                                            <CheckCircle2 className="h-4 w-4 text-[#A68363] shrink-0" />
+                                            <span className="flex-1 text-sm text-gray-700">{benefit}</span>
                                             <button
-                                                key={lang}
-                                                type="button"
-                                                onClick={() => toggleLanguage(lang)}
-                                                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${profile.languages.includes(lang)
-                                                    ? 'bg-[#A68363] text-white shadow-md'
-                                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                                    }`}
+                                                onClick={() => removeBenefit(benefit)}
+                                                className="p-1 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
                                             >
-                                                {lang}
+                                                <X className="h-4 w-4" />
                                             </button>
-                                        ))}
-                                    </div>
-                                    <p className="text-[10px] text-gray-400">Selecciona todos los idiomas en los que puedes ofrecer sesiones.</p>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-600">Etiquetas de Experiencia</label>
-                                    <div className="flex flex-wrap gap-2 mb-3">
-                                        {profile.tags.map((tag) => (
-                                            <span
-                                                key={tag}
-                                                className="inline-flex items-center gap-1 px-3 py-1 bg-[#A68363]/10 text-[#A68363] rounded-full text-xs font-bold"
-                                            >
-                                                {tag}
-                                                <button
-                                                    onClick={() => removeTag(tag)}
-                                                    className="hover:text-red-500 transition-colors"
-                                                >
-                                                    <X className="h-3 w-3" />
-                                                </button>
-                                            </span>
-                                        ))}
-                                    </div>
+                                        </div>
+                                    ))}
                                     <div className="flex gap-2">
                                         <input
                                             type="text"
                                             className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all"
-                                            placeholder=""
-                                            value={newTag}
-                                            onChange={(e) => setNewTag(e.target.value)}
-                                            onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                                            placeholder="Añade un beneficio o punto fuerte..."
+                                            value={newBenefit}
+                                            onChange={(e) => setNewBenefit(e.target.value)}
+                                            onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addBenefit())}
                                         />
                                         <button
                                             type="button"
-                                            onClick={addTag}
+                                            onClick={addBenefit}
                                             className="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-200 transition-all"
                                         >
                                             Añadir
                                         </button>
                                     </div>
-                                    <p className="text-[10px] text-gray-400">Añade palabras clave sobre tus áreas de especialización.</p>
                                 </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-600">Idiomas *</label>
+                                <div className="flex flex-wrap gap-3">
+                                    {AVAILABLE_LANGUAGES.map((lang) => (
+                                        <button
+                                            key={lang}
+                                            type="button"
+                                            onClick={() => toggleLanguage(lang)}
+                                            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${profile.languages.includes(lang)
+                                                ? 'bg-[#A68363] text-white shadow-md'
+                                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                }`}
+                                        >
+                                            {lang}
+                                        </button>
+                                    ))}
+                                </div>
+                                <p className="text-[10px] text-gray-400">Selecciona todos los idiomas en los que puedes ofrecer sesiones.</p>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-600">Etiquetas de Experiencia</label>
+                                <div className="flex flex-wrap gap-2 mb-3">
+                                    {profile.tags.map((tag) => (
+                                        <span
+                                            key={tag}
+                                            className="inline-flex items-center gap-1 px-3 py-1 bg-[#A68363]/10 text-[#A68363] rounded-full text-xs font-bold"
+                                        >
+                                            {tag}
+                                            <button
+                                                onClick={() => removeTag(tag)}
+                                                className="hover:text-red-500 transition-colors"
+                                            >
+                                                <X className="h-3 w-3" />
+                                            </button>
+                                        </span>
+                                    ))}
+                                </div>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all"
+                                        placeholder=""
+                                        value={newTag}
+                                        onChange={(e) => setNewTag(e.target.value)}
+                                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={addTag}
+                                        className="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-200 transition-all"
+                                    >
+                                        Añadir
+                                    </button>
+                                </div>
+                                <p className="text-[10px] text-gray-400">Añade palabras clave sobre tus áreas de especialización.</p>
                             </div>
                         </div>
                     </div>
@@ -511,20 +601,29 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                                             {profile.description || "Sin descripción"}
                                         </p>
 
+                                        {profile.studies && (
+                                            <div className="mb-4">
+                                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Formación</h4>
+                                                <p className="text-sm text-gray-600">{profile.studies}</p>
+                                            </div>
+                                        )}
+
                                         <button className="w-full md:w-auto px-6 py-3 bg-[#A68363] text-white rounded-xl font-bold hover:opacity-90 transition-all shadow-lg">
                                             Reservar Sesión
                                         </button>
                                     </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-600">Estudios Actuales</label>
-                                    <input
-                                        type="text"
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all"
-                                        value={profile.studies}
-                                        onChange={(e) => setProfile({ ...profile, studies: e.target.value })}
-                                        placeholder="Ej: Grado en Psicología, Máster en Coaching..."
-                                    />
+
+                                <div className="mt-8 bg-amber-50 p-6 rounded-[2rem] border border-amber-100">
+                                    <h4 className="font-bold text-[#A68363] mb-4 text-sm uppercase tracking-wider">¿Por qué elegirme?</h4>
+                                    <ul className="space-y-3">
+                                        {profile.benefits.map((benefit, idx) => (
+                                            <li key={idx} className="flex items-start gap-3 text-sm text-amber-900 font-medium">
+                                                <CheckCircle2 className="h-4 w-4 text-[#A68363] mt-0.5 shrink-0" />
+                                                {benefit}
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
                             </div>
 

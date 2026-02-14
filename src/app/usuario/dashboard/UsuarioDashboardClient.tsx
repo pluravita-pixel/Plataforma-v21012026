@@ -17,11 +17,11 @@ import { useRouter } from "next/navigation";
 import { BookingModal } from "@/components/booking/BookingModal";
 import { useEffect, useState } from "react";
 
-interface PatientDashboardClientProps {
+interface UsuarioDashboardClientProps {
     initialData: any;
 }
 
-export default function PatientDashboardClient({ initialData }: PatientDashboardClientProps) {
+export default function UsuarioDashboardClient({ initialData }: UsuarioDashboardClientProps) {
     const [isMounted, setIsMounted] = useState(false);
     const router = useRouter();
 
