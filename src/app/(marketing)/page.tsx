@@ -119,16 +119,48 @@ export default function LandingPage() {
                         >
                             <source src="/videos/hero-background.mp4" type="video/mp4" />
                         </video>
-                        <Image
-                            src="/images/login-illustration.png"
-                            alt="Pluravita Hero"
-                            fill
-                            className="object-cover z-0 brightness-75 md:brightness-100"
-                            priority
-                        />
+
+                        {/* Repositioned Hero Illustration - Smaller and to the right on Desktop */}
+                        <div className="absolute top-[10%] right-0 w-[40%] h-[50%] z-30 hidden md:block opacity-90 transition-all duration-1000 hover:scale-105">
+                            <Image
+                                src="/images/login-illustration.png"
+                                alt="Pluravita Illustration"
+                                fill
+                                className="object-contain"
+                                priority
+                            />
+                        </div>
+
+                        {/* Uiverse Sun & Clouds Component - Top Right Corner */}
+                        <div className="absolute top-4 right-4 z-40 hidden lg:block scale-[0.6] origin-top-right transition-all">
+                            <div className="uiverse-container">
+                                <div className="uiverse-cloud uiverse-front">
+                                    <span className="uiverse-left-front"></span>
+                                    <span className="uiverse-right-front"></span>
+                                </div>
+                                <span className="uiverse-sun uiverse-sunshine"></span>
+                                <span className="uiverse-sun"></span>
+                                <div className="uiverse-cloud uiverse-back">
+                                    <span className="uiverse-left-back"></span>
+                                    <span className="uiverse-right-back"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Mobile Background Fallback */}
+                        <div className="absolute inset-0 z-0 md:hidden overflow-hidden">
+                            <Image
+                                src="/images/login-illustration.png"
+                                alt="Pluravita Hero Mobile"
+                                fill
+                                className="object-cover brightness-75"
+                                priority
+                            />
+                        </div>
+
                         {/* Gradient Overlays for Readability */}
-                        <div className="absolute inset-0 bg-black/20 z-20 md:bg-black/10" />
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#F2EDE7]/90 via-[#F2EDE7]/40 to-transparent z-20 hidden md:block" />
+                        <div className="absolute inset-0 bg-black/10 z-20 md:bg-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-[#F2EDE7]/95 via-[#F2EDE7]/60 to-transparent z-20 hidden md:block" />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#F9F5F0] via-transparent to-transparent z-20" />
                     </div>
                 </div>
