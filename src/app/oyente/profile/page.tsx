@@ -15,7 +15,7 @@ export default async function ProfilePage() {
     if (!oyente) {
         return (
             <div className="p-8 text-center bg-white rounded-3xl border border-gray-100">
-                <p className="text-gray-500">No se encontraron datos de coach para este usuario.</p>
+                <p className="text-gray-500">No se encontraron datos de oyente para este usuario.</p>
             </div>
         );
     }

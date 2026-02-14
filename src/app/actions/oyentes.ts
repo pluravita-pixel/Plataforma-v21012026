@@ -45,6 +45,7 @@ const mapOyente = (p: any) => p ? ({
     balance: p.balance,
     iban: p.iban,
     payoutName: p.payout_name,
+    payoutCountry: p.payout_country,
     studies: p.studies,
     lastLogin: p.last_login,
     completedSessions: p.completed_sessions,
@@ -167,6 +168,7 @@ export async function updateOyenteSettings(userId: string, data: {
     description?: string;
     iban?: string;
     payoutName?: string;
+    payoutCountry?: string;
     username?: string;
     specialty?: string;
     price?: number | string;
@@ -201,6 +203,7 @@ export async function updateOyenteSettings(userId: string, data: {
         if (data.description !== undefined) updateObj.description = data.description;
         if (data.iban !== undefined) updateObj.iban = data.iban;
         if (data.payoutName !== undefined) updateObj.payout_name = data.payoutName;
+        if (data.payoutCountry !== undefined) updateObj.payout_country = data.payoutCountry;
         if (data.username !== undefined) updateObj.username = data.username;
         if (data.specialty !== undefined) updateObj.specialty = data.specialty;
         if (data.price !== undefined) updateObj.price = data.price;

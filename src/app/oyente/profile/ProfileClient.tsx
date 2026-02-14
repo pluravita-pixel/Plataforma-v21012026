@@ -43,7 +43,7 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
     const [profile, setProfile] = useState({
         fullName: psychologist.fullName,
         description: psychologist.description || "",
-        specialty: psychologist.specialty || "Coach",
+        specialty: psychologist.specialty || "Oyente",
         username: psychologist.username || "",
         image: psychologist.image || "",
         price: psychologist.price || "35.00",

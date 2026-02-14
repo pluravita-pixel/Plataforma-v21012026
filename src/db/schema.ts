@@ -45,6 +45,7 @@ export const oyentes = pgTable("oyentes", {
   description: text("description"),
   iban: text("iban"),
   payoutName: text("payout_name"),
+  payoutCountry: text("payout_country"), // Added for multi-country support
   balance: decimal("balance", { precision: 10, scale: 2 }).default("0.00"),
   price: decimal("price", { precision: 10, scale: 2 }).default("35.00"),
   tags: text("tags").array(), // For experience tags

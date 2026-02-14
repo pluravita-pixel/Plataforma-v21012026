@@ -17,7 +17,7 @@ export default async function CalendarPage() {
     if (!oyente) {
         return (
             <div className="p-8 text-center bg-white rounded-3xl border border-gray-100">
-                <p className="text-gray-500">No se encontraron datos de coach para este usuario.</p>
+                <p className="text-gray-500">No se encontraron datos de oyente para este usuario.</p>
             </div>
         );
     }
@@ -31,7 +31,7 @@ export default async function CalendarPage() {
             initialAppointments={appointments.map(app => ({
                 id: app.id,
                 date: app.date,
-                patientName: app.usuario?.fullName || 'Usuario sin nombre',
+                usuarioNombre: app.usuario?.fullName || 'Usuario sin nombre',
                 status: app.status
             }))}
             initialSlots={slots.map(s => ({

@@ -200,7 +200,7 @@ export function SupportClient({ tickets: initialTickets }: SupportClientProps) {
                                             {selectedTicket.message}
                                         </p>
                                     </div>
-                                    <span className="text-[10px] font-black text-black/30 uppercase tracking-widest ml-1">Coach • {format(new Date(selectedTicket.createdAt), "HH:mm")}</span>
+                                    <span className="text-[10px] font-black text-black/30 uppercase tracking-widest ml-1">Oyente • {format(new Date(selectedTicket.createdAt), "HH:mm")}</span>
                                 </div>
                             </div>
 

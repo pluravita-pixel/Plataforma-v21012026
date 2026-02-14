@@ -36,14 +36,33 @@ interface BalanceClientProps {
         balance: string | null;
         iban: string | null;
         payoutName: string | null;
+        payoutCountry: string | null;
     };
     withdrawals: Withdrawal[];
 }
+
+const COUNTRIES = [
+    { code: "ES", name: "España" },
+    { code: "PT", name: "Portugal" },
+    { code: "FR", name: "Francia" },
+    { code: "IT", name: "Italia" },
+    { code: "DE", name: "Alemania" },
+    { code: "GB", name: "Reino Unido" },
+    { code: "MX", name: "México" },
+    { code: "CO", name: "Colombia" },
+    { code: "AR", name: "Argentina" },
+    { code: "CL", name: "Chile" },
+    { code: "PE", name: "Perú" },
+    { code: "EC", name: "Ecuador" },
+    { code: "US", name: "EE.UU." },
+    { code: "OTHER", name: "Otro País" },
+];
 
 export function BalanceClient({ psychologist, withdrawals }: BalanceClientProps) {
     const [balance, setBalance] = useState(Number(psychologist.balance || 0));
     const [iban, setIban] = useState(psychologist.iban || "");
     const [payoutName, setPayoutName] = useState(psychologist.payoutName || "");
+    const [payoutCountry, setPayoutCountry] = useState(psychologist.payoutCountry || "ES");
     const [isWithdrawing, setIsWithdrawing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -69,17 +88,24 @@ export function BalanceClient({ psychologist, withdrawals }: BalanceClientProps)
 
     const validateIBAN = (value: string) => {
         const cleaned = value.replace(/\s/g, "").toUpperCase();
-        return /^ES\d{22}$/.test(cleaned);
+        if (payoutCountry === "ES") {
+            return /^ES\d{22}$/.test(cleaned);
+        }
+        if (payoutCountry === "OTHER") {
+            return cleaned.length > 5; // Basic validation for other countries
+        }
+        // General check: starts with 2 letters and has at least 15 characters
+        return /^[A-Z]{2}[0-9A-Z]{13,}$/.test(cleaned);
     };
 
     const handleSavePayoutDetails = async () => {
         if (!iban.trim()) {
-            toast.error("Por favor, introduce tu IBAN.");
+            toast.error("Por favor, introduce tu IBAN o número de cuenta.");
             return;
         }
 
-        if (!validateIBAN(iban)) {
-            toast.error("El formato del IBAN no es válido. Debe empezar por ES seguido de 22 dígitos.");
+        if (payoutCountry !== "OTHER" && !validateIBAN(iban)) {
+            toast.error(`El formato del IBAN no parece válido para ${COUNTRIES.find(c => c.code === payoutCountry)?.name}.`);
             return;
         }
 
@@ -91,8 +117,9 @@ export function BalanceClient({ psychologist, withdrawals }: BalanceClientProps)
         setIsSaving(true);
         try {
             await updateOyenteSettings(psychologist.userId, {
-                iban,
-                payoutName
+                iban: iban.toUpperCase(),
+                payoutName,
+                payoutCountry
             });
             toast.success("Detalles de cobro actualizados");
         } catch (error) {
@@ -160,20 +187,34 @@ export function BalanceClient({ psychologist, withdrawals }: BalanceClientProps)
                                 <label className="text-sm font-medium text-gray-600">Nombre del titular</label>
                                 <input
                                     type="text"
-                                    className="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500/20 transition-all"
-                                    placeholder=""
+                                    className="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500/20 transition-all font-bold"
+                                    placeholder="Nombre completo del titular"
                                     value={payoutName}
                                     onChange={(e) => setPayoutName(e.target.value)}
                                 />
                             </div>
-                            <div className="space-y-2 relative">
-                                <label className="text-sm font-medium text-gray-600">IBAN</label>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-600">País del Banco</label>
+                                <select
+                                    className="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500/20 transition-all outline-none font-bold cursor-pointer"
+                                    value={payoutCountry}
+                                    onChange={(e) => setPayoutCountry(e.target.value)}
+                                >
+                                    {COUNTRIES.map(country => (
+                                        <option key={country.code} value={country.code}>
+                                            {country.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="md:col-span-2 space-y-2 relative">
+                                <label className="text-sm font-medium text-gray-600">IBAN / Número de Cuenta</label>
                                 <input
                                     type="text"
-                                    className={`w-full bg-gray-50 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500/20 transition-all uppercase ${!iban ? 'border-orange-300' : 'border-gray-100'}`}
-                                    placeholder=""
+                                    className={`w-full bg-gray-50 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500/20 transition-all uppercase font-mono ${!iban ? 'border-orange-300' : 'border-gray-100'}`}
+                                    placeholder="ES00 0000 0000 0000 0000 0000"
                                     value={iban}
-                                    onChange={(e) => setIban(e.target.value.replace(/\s/g, ""))}
+                                    onChange={(e) => setIban(e.target.value)}
                                 />
                                 {!iban && (
                                     <p className="text-[10px] text-orange-600 font-bold mt-1 animate-pulse">
