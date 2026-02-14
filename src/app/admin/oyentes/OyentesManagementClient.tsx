@@ -53,6 +53,7 @@ interface Listener {
     price?: string | null;
     description?: string | null;
     languages?: string[] | null;
+    tags?: string[] | null;
 }
 
 export function CoachesManagementClient({ coaches: initialListeners }: { coaches: Listener[] }) {
@@ -64,13 +65,19 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
     const [editData, setEditData] = useState<{
         price: string;
         description: string;
+        specialty: string;
         languages: string[];
+        tags: string[];
         newLanguage: string;
+        newTag: string;
     }>({
         price: "",
         description: "",
+        specialty: "",
         languages: [],
-        newLanguage: ""
+        tags: [],
+        newLanguage: "",
+        newTag: ""
     });
     const [confirmText, setConfirmText] = useState("");
     const [isPending, startTransition] = useTransition();
@@ -103,8 +110,11 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
         setEditData({
             price: listener.price || "35.00",
             description: listener.description || "",
+            specialty: listener.specialty || "",
             languages: listener.languages || [],
-            newLanguage: ""
+            tags: listener.tags || [],
+            newLanguage: "",
+            newTag: ""
         });
         setIsEditDialogOpen(true);
     };
@@ -116,14 +126,16 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
             const result = await updateOyenteSettings(selectedListener.userId, {
                 price: editData.price,
                 description: editData.description,
-                languages: editData.languages
+                specialty: editData.specialty,
+                languages: editData.languages,
+                tags: editData.tags
             });
 
             if (result.success) {
                 toast.success("Perfil actualizado correctamente");
                 setListeners(listeners.map(l =>
                     l.id === selectedListener.id
-                        ? { ...l, price: editData.price, description: editData.description, languages: editData.languages }
+                        ? { ...l, price: editData.price, description: editData.description, specialty: editData.specialty, languages: editData.languages, tags: editData.tags }
                         : l
                 ));
                 setIsEditDialogOpen(false);
@@ -148,6 +160,23 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
         setEditData({
             ...editData,
             languages: editData.languages.filter(l => l !== lang)
+        });
+    };
+
+    const addTag = () => {
+        if (editData.newTag.trim() && !editData.tags.includes(editData.newTag.trim())) {
+            setEditData({
+                ...editData,
+                tags: [...editData.tags, editData.newTag.trim()],
+                newTag: ""
+            });
+        }
+    };
+
+    const removeTag = (tag: string) => {
+        setEditData({
+            ...editData,
+            tags: editData.tags.filter(t => t !== tag)
         });
     };
 
@@ -208,14 +237,23 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
                         </div>
 
                         <div className="p-6 space-y-4 flex-1">
-                            {/* Languages Section */}
-                            {listener.languages && listener.languages.length > 0 && (
-                                <div className="flex flex-wrap gap-1 mb-2">
-                                    {listener.languages.map(lang => (
-                                        <span key={lang} className="px-2 py-0.5 bg-gray-100 text-[8px] font-black uppercase border border-black">{lang}</span>
-                                    ))}
-                                </div>
-                            )}
+                            {/* Tags & Languages Section */}
+                            <div className="space-y-3 mb-4">
+                                {listener.tags && listener.tags.length > 0 && (
+                                    <div className="flex flex-wrap gap-1">
+                                        {listener.tags.map(tag => (
+                                            <span key={tag} className="px-2 py-0.5 bg-blue-600 text-white text-[8px] font-black uppercase border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">{tag}</span>
+                                        ))}
+                                    </div>
+                                )}
+                                {listener.languages && listener.languages.length > 0 && (
+                                    <div className="flex flex-wrap gap-1">
+                                        {listener.languages.map(lang => (
+                                            <span key={lang} className="px-2 py-0.5 bg-white text-black text-[8px] font-black uppercase border border-black">{lang}</span>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="bg-gray-50 border-2 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-none group-hover:translate-x-1 group-hover:translate-y-1 transition-all">
@@ -302,15 +340,26 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
                     </div>
                     <div className="p-8 space-y-6">
                         {/* Price */}
-                        <div className="space-y-4">
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Precio de sesión (€)</label>
-                            <Input
-                                value={editData.price}
-                                onChange={(e) => setEditData({ ...editData, price: e.target.value })}
-                                className="h-14 border-4 border-black rounded-none font-black text-lg focus:ring-0"
-                                type="number"
-                                step="0.5"
-                            />
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Especialidad</label>
+                                <Input
+                                    value={editData.specialty}
+                                    onChange={(e) => setEditData({ ...editData, specialty: e.target.value })}
+                                    className="h-14 border-4 border-black rounded-none font-black text-xs focus:ring-0 uppercase"
+                                    placeholder="EJ: PSICOLOGÍA GENERAL"
+                                />
+                            </div>
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Precio de sesión (€)</label>
+                                <Input
+                                    value={editData.price}
+                                    onChange={(e) => setEditData({ ...editData, price: e.target.value })}
+                                    className="h-14 border-4 border-black rounded-none font-black text-lg focus:ring-0"
+                                    type="number"
+                                    step="0.5"
+                                />
+                            </div>
                         </div>
 
                         {/* Description */}
@@ -352,6 +401,42 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
                                 />
                                 <Button
                                     onClick={addLanguage}
+                                    type="button"
+                                    className="h-12 px-6 rounded-none bg-black text-white font-black"
+                                >
+                                    <Plus className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Tags */}
+                        <div className="space-y-4">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
+                                <TrendingUp className="h-3 w-3" /> Etiquetas de Experiencia
+                            </label>
+                            <div className="flex flex-wrap gap-2 mb-4">
+                                {editData.tags.map(tag => (
+                                    <div key={tag} className="bg-blue-600 text-white px-3 py-1.5 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                                        {tag}
+                                        <button onClick={() => removeTag(tag)} className="hover:text-red-200">
+                                            <XIcon className="h-3 w-3" />
+                                        </button>
+                                    </div>
+                                ))}
+                                {editData.tags.length === 0 && (
+                                    <p className="text-xs text-gray-400 font-bold uppercase">No se han añadido etiquetas</p>
+                                )}
+                            </div>
+                            <div className="flex gap-2">
+                                <Input
+                                    value={editData.newTag}
+                                    onChange={(e) => setEditData({ ...editData, newTag: e.target.value })}
+                                    onKeyPress={(e) => e.key === 'Enter' && addTag()}
+                                    placeholder="NUEVA ETIQUETA..."
+                                    className="h-12 border-2 border-black rounded-none font-black uppercase text-xs"
+                                />
+                                <Button
+                                    onClick={addTag}
                                     type="button"
                                     className="h-12 px-6 rounded-none bg-black text-white font-black"
                                 >
@@ -432,6 +517,6 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </div>
+        </div >
     );
 }
