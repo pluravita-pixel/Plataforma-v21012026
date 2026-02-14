@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Star, MessageSquare, Filter, SlidersHorizontal, Sparkles, UserCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Sparkles, UserCircle } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { getOyentes } from "@/app/actions/oyentes";
@@ -32,7 +30,10 @@ function UsuarioSearchContent() {
                     getOyentes(),
                     getCurrentUser()
                 ]);
-                setListeners(psychData);
+
+                // Randomize and take only 3
+                const shuffled = [...psychData].sort(() => 0.5 - Math.random()).slice(0, 3);
+                setListeners(shuffled);
                 setCurrentUser(userData);
 
                 if (refId && psychData) {
@@ -53,16 +54,7 @@ function UsuarioSearchContent() {
 
     return (
         <div className="space-y-12 animate-fade-in-up">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-                <div className="flex-1">
-                    <h1 className="text-5xl md:text-7xl font-black text-black tracking-tighter uppercase mb-4">
-                        Oyentes Disponibles
-                    </h1>
-                    <p className="text-black font-bold text-lg uppercase tracking-tight bg-accent inline-block px-4 py-1 neo-border">
-                        A veces solo necesitamos a alguien que nos escuche
-                    </p>
-                </div>
-            </div>
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 pb-20 mt-12">
                 {loading ? (

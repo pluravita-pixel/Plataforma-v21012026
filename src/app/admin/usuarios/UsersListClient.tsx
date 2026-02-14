@@ -24,6 +24,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -239,6 +240,8 @@ export function UsersListClient({ users }: { users: UserData[] }) {
             {/* Affinity Test Modal */}
             <Dialog open={showAffinityModal} onOpenChange={setShowAffinityModal}>
                 <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] p-0 border-none shadow-2xl bg-white focus:outline-none">
+                    <DialogTitle className="sr-only">Detalles del Usuario y Test de Afinidad</DialogTitle>
+                    <DialogDescription className="sr-only">Información detallada del usuario incluyendo sus respuestas al test de afinidad.</DialogDescription>
                     {selectedUser && (
                         <div className="flex flex-col">
                             {/* Header Section */}
@@ -377,7 +380,8 @@ export function UsersListClient({ users }: { users: UserData[] }) {
                         <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
                             <AlertTriangle className="h-8 w-8" />
                         </div>
-                        <h2 className="text-2xl font-black uppercase tracking-tight leading-none">Acción Crítica</h2>
+                        <DialogTitle className="text-2xl font-black uppercase tracking-tight leading-none">Acción Crítica</DialogTitle>
+                        <DialogDescription className="sr-only">Confirmación para eliminar permanentemente al usuario</DialogDescription>
                     </div>
                     <div className="p-8 space-y-6">
                         <p className="text-sm font-bold text-gray-600 leading-relaxed text-center">

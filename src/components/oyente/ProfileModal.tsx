@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogTitle,
+    DialogDescription
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Languages, Clock, Calendar as CalendarIcon, ChevronRight } from "lucide-react";
 import Image from "next/image";
@@ -53,6 +58,8 @@ export function ListenerProfileModal({ listener: psychologist, isOpen, onClose, 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="sm:max-w-4xl p-0 bg-white overflow-hidden rounded-[2.5rem] border-none shadow-2xl h-[90vh] md:h-auto flex flex-col md:flex-row">
+                <DialogTitle className="sr-only">Perfil del Profesional</DialogTitle>
+                <DialogDescription className="sr-only">Información detallada, especialidad y disponibilidad del oyente.</DialogDescription>
                 {!psychologist ? (
                     <div className="p-20 text-center w-full">Cargando perfil...</div>
                 ) : (
@@ -190,12 +197,7 @@ export function ListenerProfileModal({ listener: psychologist, isOpen, onClose, 
                                         {psychologist.description || "Este especialista aún no ha añadido una descripción detallada."}
                                     </p>
 
-                                    {psychologist.studies && (
-                                        <div className="mb-6">
-                                            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Formación</h4>
-                                            <p className="text-sm font-bold text-[#4A3C31]">{psychologist.studies}</p>
-                                        </div>
-                                    )}
+
                                 </div>
 
                                 {psychologist.benefits && psychologist.benefits.length > 0 && (

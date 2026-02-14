@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -78,10 +78,11 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
     useEffect(() => {
         setIsMounted(true);
 
-        // Initial date
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        setSelectedDate(tomorrow);
+        // Initial date (Enforce 2 days notice)
+        const minDate = new Date();
+        minDate.setDate(minDate.getDate() + 2);
+        minDate.setHours(0, 0, 0, 0);
+        setSelectedDate(minDate);
 
         // If we have an initialSlotId but no object, we might need to fetch it (or we just hope parent passed object)
         if (propInitialSlot) {
@@ -326,15 +327,15 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
         const newDate = new Date(selectedDate);
         newDate.setDate(newDate.getDate() + days);
 
-        // Enforce 24h rule
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(0, 0, 0, 0);
+        // Enforce 2 days rule
+        const minDate = new Date();
+        minDate.setDate(minDate.getDate() + 2);
+        minDate.setHours(0, 0, 0, 0);
 
         const checkDate = new Date(newDate);
         checkDate.setHours(0, 0, 0, 0);
 
-        if (checkDate < tomorrow) return;
+        if (checkDate < minDate) return;
 
         setSelectedDate(newDate);
     };
@@ -349,6 +350,7 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
                 )}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px] p-0 bg-[#FDFCFB] overflow-hidden rounded-3xl border-none shadow-2xl">
+                <DialogDescription className="sr-only">Proceso de reserva de cita con un especialista.</DialogDescription>
 
                 {/* Header */}
                 <div className="bg-[#A68363] p-6 text-white relative overflow-hidden">
@@ -541,7 +543,7 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
                                     <Button
                                         onClick={() => setStep(3)}
                                         disabled={!selectedSlot}
-                                        className="flex-1 bg-[#4A3C31] hover:bg-[#3A2E26] text-white rounded-xl h-12 font-bold disabled:opacity-50 shadow-lg"
+                                        className="flex-1 bg-[#4A3C31] hover:bg-[#3A2E26] text-white rounded-xl h-12 font-bold disabled:opacity-50"
                                     >
                                         Continuar al Pago →
                                     </Button>
@@ -617,7 +619,7 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
                                         <Button
                                             onClick={handleStripePayment}
                                             disabled={isLoading}
-                                            className="w-full bg-[#A68363] hover:bg-[#8C6B4D] text-white rounded-xl h-14 font-extrabold shadow-lg flex items-center justify-center gap-2 group transition-all"
+                                            className="w-full bg-[#A68363] hover:bg-[#8C6B4D] text-white rounded-xl h-14 font-extrabold flex items-center justify-center gap-2 group transition-all"
                                         >
                                             {isLoading ? (
                                                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -625,7 +627,7 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
                                                 "Confirmar Reserva Gratuita"
                                             ) : (
                                                 <>
-                                                    <CreditCard className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                                                    <CreditCard className="h-5 w-5 transition-transform" />
                                                     Pagar {(price * (appliedDiscount ? (1 - appliedDiscount.percent / 100) : 1) * 1.21).toFixed(2)}€ →
                                                 </>
                                             )}

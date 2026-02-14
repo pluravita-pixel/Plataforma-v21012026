@@ -6,6 +6,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogClose,
+    DialogDescription,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Search, Calendar, Heart, X } from "lucide-react"
@@ -20,6 +21,7 @@ export function AffinityInfoModal({ isOpen, onOpenChange }: AffinityInfoModalPro
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden border-none rounded-2xl shadow-2xl">
+                <DialogDescription className="sr-only">Información sobre cómo funciona nuestro proceso de acompañamiento.</DialogDescription>
                 <div className="relative p-8 sm:p-10 bg-white">
 
                     <div className="text-center mb-10">

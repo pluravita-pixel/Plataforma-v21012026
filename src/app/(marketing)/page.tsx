@@ -18,46 +18,21 @@ import { getGlobalStats } from "@/app/actions/stats";
 import { getCurrentUser } from "@/app/actions/auth";
 
 // Premium Vibe Button Component
+// Premium Clean Button Component
 const VibeButton = ({ children, onClick, href, className = "" }: { children: React.ReactNode, onClick?: (e: any) => void, href?: string, className?: string }) => {
-    const content = (
-        <div className="vibe-btn-wrap">
-            <div className="vibe-btn-outline" />
-            <div className="vibe-btn-content">
-                <span className="vibe-btn-text">{children}</span>
-                <div className="vibe-btn-icon">
-                    <div />
-                </div>
-            </div>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 342 208" className="vibe-btn-splash">
-                <path strokeLinecap="round" strokeWidth={3} d="M54.1054 99.7837C54.1054 99.7837 40.0984 90.7874 26.6893 97.6362C13.2802 104.485 1.5 97.6362 1.5 97.6362" />
-                <path strokeLinecap="round" strokeWidth={3} d="M285.273 99.7841C285.273 99.7841 299.28 90.7879 312.689 97.6367C326.098 104.486 340.105 95.4893 340.105 95.4893" />
-                <path strokeLinecap="round" strokeWidth={3} strokeOpacity="0.3" d="M281.133 64.9917C281.133 64.9917 287.96 49.8089 302.934 48.2295C317.908 46.6501 319.712 36.5272 319.712 36.5272" />
-                <path strokeLinecap="round" strokeWidth={3} strokeOpacity="0.3" d="M281.133 138.984C281.133 138.984 287.96 154.167 302.934 155.746C317.908 157.326 319.712 167.449 319.712 167.449" />
-                <path strokeLinecap="round" strokeWidth={3} d="M230.578 57.4476C230.578 57.4476 225.785 41.5051 236.061 30.4998C246.337 19.4945 244.686 12.9998 244.686 12.9998" />
-                <path strokeLinecap="round" strokeWidth={3} d="M230.578 150.528C230.578 150.528 225.785 166.471 236.061 177.476C246.337 188.481 244.686 194.976 244.686 194.976" />
-                <path strokeLinecap="round" strokeWidth={3} strokeOpacity="0.3" d="M170.392 57.0278C170.392 57.0278 173.89 42.1322 169.571 29.54C165.252 16.9478 168.751 2.05227 168.751 2.05227" />
-                <path strokeLinecap="round" strokeWidth={3} strokeOpacity="0.3" d="M170.392 150.948C170.392 150.948 173.89 165.844 169.571 178.436C165.252 191.028 168.751 205.924 168.751 205.924" />
-                <path strokeLinecap="round" strokeWidth={3} d="M112.609 57.4476C112.609 57.4476 117.401 41.5051 107.125 30.4998C96.8492 19.4945 98.5 12.9998 98.5 12.9998" />
-                <path strokeLinecap="round" strokeWidth={3} d="M112.609 150.528C112.609 150.528 117.401 166.471 107.125 177.476C96.8492 188.481 98.5 194.976 98.5 194.976" />
-                <path strokeLinecap="round" strokeWidth={3} strokeOpacity="0.3" d="M62.2941 64.9917C62.2941 64.9917 55.4671 49.8089 40.4932 48.2295C25.5194 46.6501 23.7159 36.5272 23.7159 36.5272" />
-                <path strokeLinecap="round" strokeWidth={3} strokeOpacity="0.3" d="M62.2941 145.984C62.2941 145.984 55.4671 161.167 40.4932 162.746C25.5194 164.326 23.7159 174.449 23.7159 174.449" />
-            </svg>
-        </div>
-    );
+    const baseClasses = "px-10 py-5 bg-[#A68363] text-white rounded-full font-black uppercase tracking-widest text-sm transition-all duration-300 hover:bg-[#8C6F56] inline-flex items-center justify-center gap-3 border-none ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
 
     if (href) {
         return (
-            <Link href={href} onClick={onClick} className={`vibe-btn ${className}`}>
-                <div className="vibe-btn-bg" />
-                {content}
+            <Link href={href} onClick={onClick} className={`${baseClasses} ${className}`}>
+                {children}
             </Link>
         );
     }
 
     return (
-        <button onClick={onClick} className={`vibe-btn ${className}`}>
-            <div className="vibe-btn-bg" />
-            {content}
+        <button onClick={onClick} className={`${baseClasses} ${className}`}>
+            {children}
         </button>
     );
 };
@@ -149,84 +124,33 @@ export default function LandingPage() {
 
     return (
         <div className="flex flex-col bg-[#F9F5F0]">
-            {/* Hero Section - Redesigned to be cleaner and more balanced (Terapify style) */}
-            <section className="relative w-full py-12 md:py-24 lg:py-32 overflow-hidden bg-[#F2EDE7] min-h-[600px]">
-                {/* Background Video (Subtle) */}
-                <div className="absolute inset-0 z-0 opacity-20 pointer-events-none bg-[#F2EDE7]">
-                    <video
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        poster="/images/hero-illustration.jpg"
-                        className="w-full h-full object-cover"
-                    >
-                        <source src="/videos/hero-background.mp4" type="video/mp4" />
-                    </video>
-                </div>
+            {/* Hero Section - Cleaned up as requested */}
+            <section className="relative w-full py-12 md:py-24 lg:py-32 overflow-hidden bg-white min-h-[500px] border-b border-gray-50 flex items-center">
+                {/* No background video or decorative widgets */}
 
                 <div className="container relative z-10 mx-auto px-6 md:px-12 lg:px-20">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                        {/* Left Side: Text Content */}
-                        <div className="space-y-8 animate-fade-in-up">
-                            <div className="space-y-4">
-                                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-[#4A3C31] leading-tight tracking-tight uppercase">
-                                    Encuentra a alguien <br />
-                                    que <span className="text-[#A68363]">te escuche</span> <br />
-                                    de verdad
-                                </h1>
-                                <p className="text-lg md:text-xl text-[#6B6B6B] font-medium leading-relaxed max-w-lg">
-                                    Estamos contigo. En pluravita, conectas con oyentes que entienden tu realidad, sin juicios y desde tu sofá. Un espacio privado y real.
-                                </p>
-                                <div className="text-sm font-bold text-[#A68363] uppercase tracking-widest">
-                                    Desde solo 15€ por sesión
-                                </div>
+                    <div className="flex flex-col items-center text-center space-y-8 animate-fade-in-up">
+                        <div className="space-y-4 max-w-2xl">
+                            <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-[#4A3C31] leading-tight tracking-tight uppercase">
+                                Encuentra a alguien <br />
+                                que <span className="text-[#A68363]">te escuche</span> <br />
+                                de verdad
+                            </h1>
+                            <p className="text-lg md:text-xl text-[#6B6B6B] font-medium leading-relaxed">
+                                Estamos contigo. En pluravita, conectas con oyentes que entienden tu realidad, sin juicios y desde tu sofá. Un espacio privado y real.
+                            </p>
+                            <div className="text-sm font-bold text-[#A68363] uppercase tracking-widest pt-2">
+                                Desde solo 15€ por sesión
                             </div>
-
-                            <div className="flex flex-col sm:flex-row gap-6">
-                                <VibeButton
-                                    href="/affinity-test"
-                                    onClick={handleBrowsingClick}
-                                    className="scale-100"
-                                >
-                                    Ver oyentes
-                                </VibeButton>
-                            </div>
-
                         </div>
 
-                        {/* Right Side: Illustration with Decorative Circles */}
-                        <div className="relative hidden lg:block animate-float">
-                            {/* Decorative background shapes - Reduced complexity for performance */}
-                            <div className="absolute -top-10 -right-10 w-64 h-64 bg-[#FAD2E1] rounded-full mix-blend-multiply filter blur-3xl opacity-20" />
-                            <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-[#BDE0FE] rounded-full mix-blend-multiply filter blur-3xl opacity-20" />
-
-                            <div className="relative z-20 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white aspect-square max-w-[500px] ml-auto bg-white">
-                                <Image
-                                    src="/images/login-illustration.png"
-                                    alt="Pluravita Illustration"
-                                    fill
-                                    sizes="(max-width: 1024px) 100vw, 500px"
-                                    className="object-cover"
-                                    priority
-                                />
-                            </div>
-
-                            {/* Uiverse Sun & Clouds - Repositioned to complement the illustration */}
-                            <div className="absolute -top-10 -right-10 z-30 scale-75 origin-bottom-left">
-                                <div className="uiverse-container">
-                                    <div className="uiverse-cloud uiverse-front">
-                                        <span className="uiverse-left-front"></span>
-                                        <span className="uiverse-right-front"></span>
-                                    </div>
-                                    <span className="uiverse-sun uiverse-sunshine"></span>
-                                    <span className="uiverse-sun"></span>
-                                    <div className="uiverse-cloud uiverse-back">
-                                        <span className="uiverse-left-back"></span>
-                                        <span className="uiverse-right-back"></span>
-                                    </div>
-                                </div>
-                            </div>
+                        <div className="flex flex-col sm:flex-row gap-6">
+                            <VibeButton
+                                href="/affinity-test"
+                                onClick={handleBrowsingClick}
+                            >
+                                Ver oyentes
+                            </VibeButton>
                         </div>
                     </div>
                 </div>

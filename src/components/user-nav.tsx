@@ -20,7 +20,8 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogFooter
+    DialogFooter,
+    DialogDescription
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -186,6 +187,8 @@ export function UserNav() {
             {/* Logout Confirm Dialog */}
             <Dialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
                 <DialogContent className="max-w-[340px] sm:max-w-[360px] rounded-[1.5rem] p-0 overflow-hidden border-none shadow-2xl">
+                    <DialogTitle className="sr-only">Confirmación de cierre de sesión</DialogTitle>
+                    <DialogDescription className="sr-only">Ventana de confirmación para salir de la aplicación de forma segura.</DialogDescription>
                     <div className="logout-card-container">
                         <div className="logout-card-header">
                             <div className="logout-card-image">

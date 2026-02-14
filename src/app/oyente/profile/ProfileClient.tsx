@@ -422,7 +422,7 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                                         className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all"
                                         value={profile.studies}
                                         onChange={(e) => setProfile({ ...profile, studies: e.target.value })}
-                                        placeholder="Ej: Grado en Psicología, Máster en Desarrollo Personal..."
+                                        placeholder="Ej: Acompañamiento emocional, Desarrollo Personal..."
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -432,7 +432,7 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                                         className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all"
                                         value={profile.experience}
                                         onChange={(e) => setProfile({ ...profile, experience: e.target.value })}
-                                        placeholder="Ej: 5 años acompañando a personas en crisis..."
+                                        placeholder="Ej: Acompañando a personas en su crecimiento..."
                                     />
                                 </div>
                             </div>

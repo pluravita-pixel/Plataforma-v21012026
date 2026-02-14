@@ -182,25 +182,7 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
 
     return (
         <div className="space-y-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-black p-8 text-white neo-border">
-                <div>
-                    <h1 className="text-3xl font-black uppercase tracking-tighter italic flex items-center gap-3">
-                        <Users className="h-8 w-8 text-[#A68363]" />
-                        Gestionar Oyentes
-                    </h1>
-                    <p className="text-gray-400 mt-2 font-bold uppercase text-[10px] tracking-[0.2em]">Administración de profesionales y rendimiento</p>
-                </div>
-                <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="BUSCAR OYENTE POR NOMBRE O EMAIL..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="bg-white border-4 border-white text-black font-black uppercase text-xs rounded-none pl-12 pr-6 py-4 w-full md:w-80 shadow-[4px_4px_0px_0px_rgba(166,131,99,1)] focus:outline-none transition-all placeholder:text-gray-300"
-                    />
-                </div>
-            </div>
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredListeners.map((listener) => (
@@ -333,8 +315,8 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
                 <DialogContent className="max-w-2xl bg-white border-4 border-black rounded-none p-0 shadow-[18px_18px_0px_0px_rgba(0,0,0,1)] overflow-y-auto max-h-[90vh]">
                     <div className="bg-[#A68363] p-8 text-black border-b-4 border-black flex justify-between items-center">
                         <div>
-                            <h2 className="text-3xl font-black uppercase italic tracking-tighter leading-none">Editar Perfil</h2>
-                            <p className="text-black font-bold uppercase text-[10px] tracking-[0.2em] mt-2">{selectedListener?.fullName}</p>
+                            <DialogTitle className="text-3xl font-black uppercase italic tracking-tighter leading-none">Editar Perfil</DialogTitle>
+                            <DialogDescription className="text-black font-bold uppercase text-[10px] tracking-[0.2em] mt-2">{selectedListener?.fullName}</DialogDescription>
                         </div>
                         <Edit className="h-8 w-8" />
                     </div>
@@ -347,7 +329,7 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
                                     value={editData.specialty}
                                     onChange={(e) => setEditData({ ...editData, specialty: e.target.value })}
                                     className="h-14 border-4 border-black rounded-none font-black text-xs focus:ring-0 uppercase"
-                                    placeholder="EJ: PSICOLOGÍA GENERAL"
+                                    placeholder="EJ: ACOMPAÑAMIENTO EMOCIONAL"
                                 />
                             </div>
                             <div className="space-y-4">
@@ -475,14 +457,14 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
                 <DialogContent className="max-w-md bg-white border-4 border-black rounded-none p-0 shadow-[18px_18px_0px_0px_rgba(0,0,0,1)]">
                     <div className="bg-red-600 p-8 text-black border-b-4 border-black">
                         <AlertTriangle className="h-12 w-12 mb-4" />
-                        <h2 className="text-3xl font-black uppercase italic tracking-tighter leading-none">Acción Irreversible</h2>
+                        <DialogTitle className="text-3xl font-black uppercase italic tracking-tighter leading-none">Acción Irreversible</DialogTitle>
+                        <DialogDescription className="sr-only">Confirmación para eliminar al oyente</DialogDescription>
                     </div>
                     <div className="p-8 space-y-6">
                         <p className="text-sm font-bold text-gray-600 leading-relaxed uppercase tracking-tight">
                             ESTÁS A PUNTO DE ELIMINAR EL PERFIL PROFESIONAL Y LA CUENTA DE USUARIO DE <span className="text-black font-black">"{selectedListener?.fullName}"</span>.
                             ESTO BORRARÁ SUS DATOS, ESTADÍSTICAS Y ACCESO.
                         </p>
-                        ...
 
                         <div className="space-y-4">
                             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">

@@ -29,57 +29,55 @@ async function seedFakeOyentes() {
     // Primero, crear usuarios base
     const fakeOyentes = [
         {
-            email: "maria.lopez.mvp@pluravita.test",
+            email: "maria.lopez@gmail.com",
             fullName: "María López García",
-            specialty: "Ansiedad y Estrés",
+            specialty: "Escucha Activa y Estrés",
             price: "15.00",
-            description: "Especialista en gestión de ansiedad y técnicas de relajación. Te ayudo a encontrar la calma en momentos difíciles con un enfoque práctico y cercano.",
+            description: "Te ayudo a encontrar la calma en momentos difíciles con un enfoque práctico y cercano. Aquí tienes un espacio seguro para hablar.",
             languages: ["Español", "Catalán"],
-            tags: ["Ansiedad", "Estrés", "Mindfulness"],
-            studies: "Máster en Psicología Clínica - Universidad de Barcelona",
+            tags: ["Apoyo", "Estrés", "Mindfulness"],
+            studies: "Grado en Humanidades",
             benefits: [
-                "Más de 5 años de experiencia en terapia online",
-                "Enfoque práctico y orientado a resultados",
+                "Experiencia en atención online",
+                "Enfoque práctico y cercano",
                 "Sesiones adaptadas a tu ritmo"
             ],
-            experience: "He trabajado con más de 200 personas ayudándolas a superar la ansiedad y recuperar el control de sus vidas.",
-            // Imagen proporcionada por el usuario
-            image: "artifact:/oyente_profile_2_1739496204"
+            experience: "He acompañado a muchas personas en sus procesos personales, ayudándolas a encontrar su propio camino.",
+            image: "/images/oyentes/maria.jpg"
         },
         {
-            email: "carlos.martinez.mvp@pluravita.test",
+            email: "carlos.martinez@gmail.com",
             fullName: "Carlos Martínez Ruiz",
             specialty: "Relaciones y Autoestima",
             price: "20.00",
-            description: "Te acompaño en tu proceso de crecimiento personal y mejora de relaciones. Juntos trabajaremos en fortalecer tu autoestima y confianza.",
+            description: "Te acompaño en tu proceso de crecimiento personal y mejora de relaciones. Juntos trabajaremos en fortalecer tu confianza.",
             languages: ["Español", "Inglés"],
             tags: ["Autoestima", "Relaciones", "Confianza"],
-            studies: "Licenciado en Psicología - Universidad Complutense de Madrid",
+            studies: "Grado en Educación",
             benefits: [
                 "Enfoque empático y sin juicios",
                 "Herramientas prácticas desde la primera sesión",
                 "Disponibilidad flexible de horarios"
             ],
-            experience: "Llevo 7 años ayudando a personas a construir relaciones más sanas y a desarrollar una autoestima sólida.",
-            image: "artifact:/oyente_profile_1_1739496204"
+            experience: "Ayudo a personas a construir relaciones más sanas y a desarrollar una base sólida de confianza propia.",
+            image: "/images/oyentes/carlos.jpg"
         },
         {
-            email: "laura.fernandez.mvp@pluravita.test",
+            email: "laura.fernandez@gmail.com",
             fullName: "Laura Fernández Sánchez",
             specialty: "Bienestar Emocional",
             price: "35.00",
-            description: "Con más de 10 años de experiencia, te ofrezco un espacio seguro para explorar tus emociones y encontrar el equilibrio que buscas.",
+            description: "Te ofrezco un espacio seguro para explorar tus emociones y encontrar el equilibrio que buscas.",
             languages: ["Español", "Francés", "Inglés"],
-            tags: ["Bienestar", "Emociones", "Terapia Cognitiva"],
-            studies: "Doctora en Psicología Clínica - Universidad Autónoma de Madrid",
+            tags: ["Bienestar", "Emociones", "Conexión"],
+            studies: "Grado en Comunicación",
             benefits: [
-                "Más de 10 años de experiencia profesional",
-                "Formación en terapias de tercera generación",
+                "Amplia experiencia en acompañamiento",
                 "Enfoque integral y personalizado",
                 "Seguimiento continuo entre sesiones"
             ],
-            experience: "He acompañado a más de 500 personas en su camino hacia el bienestar emocional, combinando técnicas tradicionales con enfoques innovadores.",
-            image: "artifact:/oyente_profile_4_1739496204"
+            experience: "Acompaño a personas en su camino hacia el bienestar, combinando diferentes enfoques de escucha y empatía.",
+            image: "/images/oyentes/laura.jpg"
         }
     ];
 
