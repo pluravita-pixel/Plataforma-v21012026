@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { getCurrentUser } from "@/app/actions/auth";
 import { getOyenteStatus, getOyenteUsuarios } from "@/app/actions/oyentes";
 import { redirect } from "next/navigation";
-import { PatientsClient } from "./UsuariosClient";
+import { UsuariosClient } from "./UsuariosClient";
 
 export default async function PatientsPage() {
     const user = await getCurrentUser();
@@ -24,8 +24,8 @@ export default async function PatientsPage() {
     const patients = await getOyenteUsuarios(oyente.id);
 
     return (
-        <PatientsClient
-            psychologistId={oyente.id}
+        <UsuariosClient
+            oyenteId={oyente.id}
             initialPatients={patients.map(p => ({
                 id: p.id,
                 fullName: p.fullName,
@@ -35,7 +35,7 @@ export default async function PatientsPage() {
                 status: p.status,
                 nextAppointmentId: p.nextAppointmentId,
                 nextAppDate: p.nextAppDate,
-                isAnonymous: p.isAnonymous // NEW FIELD
+                isAnonymous: p.isAnonymous
             }))}
         />
     );

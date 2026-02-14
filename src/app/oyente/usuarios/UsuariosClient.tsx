@@ -27,6 +27,14 @@ interface User {
     isAnonymous?: boolean;
 }
 
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { Eye, User as UserIcon, Mail, Activity, CheckCircle2, XCircle, Calendar as CalendarIcon } from "lucide-react";
+
 export function UsuariosClient({ initialPatients, oyenteId }: { initialPatients: User[], oyenteId: string }) {
     const [searchTerm, setSearchTerm] = useState("");
     const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -158,7 +166,7 @@ export function UsuariosClient({ initialPatients, oyenteId }: { initialPatients:
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-gray-400 italic font-medium">
+                                    <td colSpan={6} className="px-6 py-12 text-center text-gray-400 italic font-medium">
                                         No hay usuarios registrados actualmente.
                                     </td>
                                 </tr>
@@ -167,6 +175,7 @@ export function UsuariosClient({ initialPatients, oyenteId }: { initialPatients:
                     </table>
                 </div>
             </div>
+
 
             {/* Cancel Modal */}
             {showCancelModal && (

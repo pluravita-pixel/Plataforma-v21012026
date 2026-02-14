@@ -105,53 +105,63 @@ export default function LandingPage() {
     return (
         <div className="flex flex-col">
             {/* Hero Section */}
-            <section className="container mx-auto px-6 md:px-12 lg:px-20 py-12 lg:py-24">
-                <div className="grid lg:grid-cols-12 gap-12 items-center">
+            <section className="relative w-full h-[80vh] md:h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-[#F2EDE7]">
+                {/* Background Resource (Video/Image) */}
+                <div className="absolute inset-0 z-0 select-none pointer-events-none">
+                    <div className="relative w-full h-full">
+                        <video
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            className="absolute inset-0 w-full h-full object-cover z-10 opacity-0 transition-opacity duration-1000"
+                            onCanPlay={(e) => (e.currentTarget.style.opacity = '1')}
+                        >
+                            <source src="/videos/hero-background.mp4" type="video/mp4" />
+                        </video>
+                        <Image
+                            src="/images/login-illustration.png"
+                            alt="Pluravita Hero"
+                            fill
+                            className="object-cover z-0 brightness-75 md:brightness-100"
+                            priority
+                        />
+                        {/* Gradient Overlays for Readability */}
+                        <div className="absolute inset-0 bg-black/20 z-20 md:bg-black/10" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-[#F2EDE7]/90 via-[#F2EDE7]/40 to-transparent z-20 hidden md:block" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#F9F5F0] via-transparent to-transparent z-20" />
+                    </div>
+                </div>
 
-                    {/* Left Content */}
-                    <div className="lg:col-span-5 space-y-8">
-                        <h1 className="text-5xl lg:text-7xl font-bold text-[#4A3C31] leading-tight tracking-tight">
-                            Encuentra a alguien que <br />
-                            <span className="text-[#A68363]">te escuche de verdad</span>
-                        </h1>
+                {/* Content Overlay */}
+                <div className="container relative z-30 mx-auto px-6 md:px-12 lg:px-20 h-full flex flex-col justify-center">
+                    <div className="max-w-4xl space-y-10">
+                        <div className="space-y-4">
+                            <h1 className="text-[clamp(2.5rem,8vw,5.5rem)] md:text-[clamp(4rem,9vw,6.5rem)] font-bold text-[#4A3C31] leading-[1] tracking-tighter uppercase drop-shadow-sm">
+                                <span className="block whitespace-nowrap">Encuentra a alguien que</span>
+                                <span className="block whitespace-nowrap text-[#A68363]">te escuche de verdad</span>
+                            </h1>
 
-                        <p className="text-lg text-[#6B6B6B] leading-relaxed max-w-xl">
-                            Sabemos que a veces el mundo pesa. En pluravita, conectas con oyentes que entienden tu realidad, sin juicios y desde tu sofá. Es un espacio para hablar, privado y tan real como tú. Desde <b>15€</b>.
-                        </p>
+                            <p className="text-xl md:text-2xl text-[#6B6B6B] font-medium leading-relaxed max-w-xl md:bg-white/10 md:backdrop-blur-sm md:p-4 md:rounded-2xl transition-all">
+                                Estamos contigo. En pluravita, conectas con oyentes que entienden tu realidad, sin juicios y desde tu sofá. Un espacio privado y real. Desde <b>15€</b>.
+                            </p>
+                        </div>
 
-                        <div className="flex flex-col sm:flex-row gap-5 pt-4">
+                        <div className="flex flex-col sm:flex-row gap-6 pt-4">
                             <Button
                                 asChild
                                 onClick={handleBrowsingClick}
-                                className="neo-btn-primary h-16 text-lg"
+                                className="neo-btn-primary h-20 px-12 text-xl shadow-2xl transition-transform hover:scale-105"
                             >
                                 <Link href="/affinity-test">Ver oyentes en línea</Link>
                             </Button>
                         </div>
-
-
                     </div>
+                </div>
 
-                    {/* Right Content - Video/Image */}
-                    <div className="lg:col-span-7 relative">
-                        {/* Decorative Elements */}
-                        <div className="absolute -top-6 -left-6 w-24 h-24 bg-[#A68363]/10 rounded-full blur-xl" />
-                        <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-[#4A3C31]/5 rounded-3xl blur-xl" />
-
-                        <div className="relative bg-white p-4 rounded-3xl shadow-2xl w-full max-w-3xl mx-auto z-10 transform hover:scale-[1.01] transition-transform duration-300">
-                            <div className="aspect-[16/9] relative bg-gradient-to-br from-[#F2EDE7] to-[#FFF5EB] rounded-2xl overflow-hidden group shadow-inner">
-                                <Image
-                                    src="/images/login-illustration.png"
-                                    alt="Conexión empática en línea"
-                                    fill
-                                    className="object-cover"
-                                    priority
-                                />
-                                <div className="absolute inset-0 bg-[#A68363]/10 mix-blend-overlay" />
-                            </div>
-                        </div>
-                    </div>
-
+                {/* Scroll Indicator */}
+                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 animate-bounce hidden md:block">
+                    <div className="w-1 h-12 rounded-full bg-gradient-to-b from-[#A68363] to-transparent opacity-50" />
                 </div>
             </section>
 

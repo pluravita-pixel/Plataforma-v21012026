@@ -280,7 +280,7 @@ export async function getOyenteUsuarios(oyenteId: string) {
     await ensureOyente(oyenteId);
     try {
         const results = await client`
-            SELECT a.*, u.full_name, u.email, u.phone, u.role
+            SELECT a.*, u.full_name, u.email, u.phone, u.role, u.has_completed_affinity
             FROM appointments a
             LEFT JOIN users u ON a.usuario_id = u.id
             WHERE a.oyente_id = ${oyenteId}
@@ -315,7 +315,8 @@ export async function getOyenteUsuarios(oyenteId: string) {
                     status: app.status === 'completed' ? 'Activo' : 'En pausa',
                     nextAppointmentId: nextAppId,
                     nextAppDate: app.status === 'scheduled' && appDate >= now ? appDate : null,
-                    isAnonymous: app.is_anonymous
+                    isAnonymous: app.is_anonymous,
+                    hasCompletedAffinity: app.has_completed_affinity
                 });
             } else {
                 if (appDate > existing.lastSession) {

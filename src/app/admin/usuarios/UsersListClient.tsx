@@ -238,122 +238,127 @@ export function UsersListClient({ users }: { users: UserData[] }) {
 
             {/* Affinity Test Modal */}
             <Dialog open={showAffinityModal} onOpenChange={setShowAffinityModal}>
-                <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle className="text-2xl font-bold">
-                            Detalles del Usuario
-                        </DialogTitle>
-                    </DialogHeader>
+                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] p-0 border-none shadow-2xl bg-white focus:outline-none">
                     {selectedUser && (
-                        <div className="space-y-6">
-                            {/* User Info */}
-                            <div className="bg-gray-50 p-6 rounded-2xl space-y-3">
-                                <h3 className="font-bold text-lg text-gray-900">Información Personal</h3>
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                    <div>
-                                        <p className="text-gray-500 font-medium">Nombre</p>
-                                        <p className="text-gray-900 font-bold">{selectedUser.full_name || "No especificado"}</p>
+                        <div className="flex flex-col">
+                            {/* Header Section */}
+                            <div className="bg-black p-8 md:p-10 text-white">
+                                <div className="flex items-center gap-6 mb-8">
+                                    <div className="w-20 h-20 rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center font-black text-3xl">
+                                        {selectedUser.full_name ? selectedUser.full_name[0] : 'U'}
                                     </div>
                                     <div>
-                                        <p className="text-gray-500 font-medium">Email</p>
-                                        <p className="text-gray-900 font-bold">{selectedUser.email}</p>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <h2 className="text-3xl font-black italic tracking-tighter uppercase">{selectedUser.full_name || "Usuario"}</h2>
+                                            <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${getRoleBadge(selectedUser.role)}`}>
+                                                {getRoleLabel(selectedUser.role)}
+                                            </span>
+                                        </div>
+                                        <p className="text-white/60 font-bold uppercase tracking-[0.2em] text-[10px]">{selectedUser.email}</p>
                                     </div>
-                                    <div>
-                                        <p className="text-gray-500 font-medium">Teléfono</p>
-                                        <p className="text-gray-900 font-bold">{selectedUser.phone || "No especificado"}</p>
+                                </div>
+                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <div className="bg-white/5 p-4 rounded-2xl border border-white/10 group hover:bg-white/10 transition-all">
+                                        <p className="text-[10px] uppercase font-black text-white/40 mb-1 tracking-widest">Sesiones</p>
+                                        <p className="text-sm font-bold italic">{selectedUser.sessions_count || 0}</p>
                                     </div>
-                                    <div>
-                                        <p className="text-gray-500 font-medium">Rol</p>
-                                        <p className="text-gray-900 font-bold">{selectedUser.role}</p>
+                                    <div className="bg-white/5 p-4 rounded-2xl border border-white/10 group hover:bg-white/10 transition-all">
+                                        <p className="text-[10px] uppercase font-black text-white/40 mb-1 tracking-widest">Registro</p>
+                                        <p className="text-sm font-bold italic">{new Date(selectedUser.created_at).toLocaleDateString()}</p>
                                     </div>
-                                    <div>
-                                        <p className="text-gray-500 font-medium">Sesiones totales</p>
-                                        <p className="text-gray-900 font-bold">{selectedUser.sessions_count}</p>
+                                    <div className="bg-white/5 p-4 rounded-2xl border border-white/10 group hover:bg-white/10 transition-all">
+                                        <p className="text-[10px] uppercase font-black text-white/40 mb-1 tracking-widest">Teléfono</p>
+                                        <p className="text-sm font-bold italic">{selectedUser.phone || "---"}</p>
                                     </div>
-                                    <div>
-                                        <p className="text-gray-500 font-medium">Último acceso</p>
-                                        <p className="text-gray-900 font-bold">
-                                            {selectedUser.last_login
-                                                ? new Date(selectedUser.last_login).toLocaleDateString('es-ES')
-                                                : "Nunca"}
-                                        </p>
+                                    <div className="bg-white/5 p-4 rounded-2xl border border-white/10 group hover:bg-white/10 transition-all">
+                                        <p className="text-[10px] uppercase font-black text-white/40 mb-1 tracking-widest">Último Acceso</p>
+                                        <p className="text-sm font-bold italic">{selectedUser.last_login ? new Date(selectedUser.last_login).toLocaleDateString() : "NUNCA"}</p>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Affinity Test Results */}
-                            {selectedUser.has_completed_affinity && selectedUser.responses ? (
-                                <div className="bg-blue-50 p-6 rounded-2xl space-y-4">
-                                    <h3 className="font-bold text-lg text-gray-900">Test de Afinidad</h3>
-                                    <p className="text-sm text-gray-600">
-                                        Completado el {selectedUser.affinity_date
-                                            ? new Date(selectedUser.affinity_date).toLocaleDateString('es-ES')
-                                            : "Fecha desconocida"}
-                                    </p>
-                                    <div className="space-y-3">
-                                        {(() => {
-                                            const questionLabels: Record<string, string> = {
-                                                therapy_type: "¿Cómo te gustaría que fuera este camino?",
-                                                first_time: "¿Ya habías probado algo parecido antes?",
-                                                gender: "¿Con qué género te identificas?",
-                                                practical_exercises: "¿Te gustaría recibir ideas para aplicar en tu día a día?",
-                                                focus_area: "¿En qué te gustaría enfocarte más?",
-                                                therapist_gender: "¿Prefieres que tu oyente sea hombre o mujer?",
-                                                age: "¿Qué edad tienes?"
-                                            };
+                            <div className="p-8 md:p-10 space-y-10">
 
-                                            const answerLabels: Record<string, Record<string, string>> = {
-                                                therapy_type: { individual: "Para mí (individual)", couple: "Con mi pareja" },
-                                                first_time: { yes: "Es mi primera vez", no: "Sí, ya he tenido procesos similares" },
-                                                gender: {
-                                                    woman: "Mujer",
-                                                    man: "Hombre",
-                                                    nonbinary: "No binario",
-                                                    other: "Otro",
-                                                    prefer_not_to_say: "Prefiero no decir"
-                                                },
-                                                practical_exercises: {
-                                                    totally: "¡Sí! Me encanta pasar a la acción",
-                                                    no: "Prefiero solo conversar por ahora",
-                                                    maybe: "Lo vemos según avance el proceso"
-                                                },
-                                                focus_area: {
-                                                    goals: "Mis metas y crecimiento personal",
-                                                    balance: "Mi equilibrio mental y emocional",
-                                                    relationships: "Mis relaciones con los demás",
-                                                    self_knowledge: "Simplemente conocerme mejor"
-                                                },
-                                                therapist_gender: {
-                                                    woman: "Mujer",
-                                                    man: "Hombre",
-                                                    indifferent: "Me es totalmente igual"
-                                                }
-                                            };
-
-                                            return Object.entries(selectedUser.responses as Record<string, any>).map(([key, value]) => {
-                                                const question = questionLabels[key] || key;
-                                                let answer = value;
-
-                                                if (answerLabels[key] && answerLabels[key][value]) {
-                                                    answer = answerLabels[key][value];
-                                                }
-
-                                                return (
-                                                    <div key={key} className="bg-white p-4 rounded-xl">
-                                                        <p className="text-xs font-bold text-gray-500 uppercase mb-2">{question}</p>
-                                                        <p className="text-sm text-gray-900 font-semibold">{answer}</p>
-                                                    </div>
-                                                );
-                                            });
-                                        })()}
+                                {/* Affinity Test Results */}
+                                <div>
+                                    <div className="flex items-center justify-between mb-8 border-b-4 border-black pb-4">
+                                        <h3 className="text-xl font-black text-black flex items-center gap-3 italic uppercase tracking-tighter">
+                                            <Activity className="h-6 w-6 text-blue-600" />
+                                            Test de Afinidad
+                                        </h3>
+                                        {selectedUser.affinity_date && (
+                                            <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-3 py-1 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                                                Completado: {new Date(selectedUser.affinity_date).toLocaleDateString('es-ES')}
+                                            </span>
+                                        )}
                                     </div>
+
+                                    {selectedUser.has_completed_affinity && selectedUser.responses ? (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {(() => {
+                                                const questionLabels: Record<string, string> = {
+                                                    therapy_type: "¿Cómo te gustaría que fuera este camino?",
+                                                    first_time: "¿Ya habías probado algo parecido antes?",
+                                                    gender: "¿Con qué género te identificas?",
+                                                    practical_exercises: "¿Te gustaría recibir ideas para aplicar en tu día a día?",
+                                                    focus_area: "¿En qué te gustaría enfocarte más?",
+                                                    therapist_gender: "¿Prefieres que tu oyente sea hombre o mujer?",
+                                                    age: "¿Qué edad tienes?"
+                                                };
+
+                                                const answerLabels: Record<string, Record<string, string>> = {
+                                                    therapy_type: { individual: "Para mí (individual)", couple: "Con mi pareja" },
+                                                    first_time: { yes: "Es mi primera vez", no: "Sí, ya he tenido procesos similares" },
+                                                    gender: {
+                                                        woman: "Mujer",
+                                                        man: "Hombre",
+                                                        nonbinary: "No binario",
+                                                        other: "Otro",
+                                                        prefer_not_to_say: "Prefiero no decir"
+                                                    },
+                                                    practical_exercises: {
+                                                        totally: "¡Sí! Me encanta pasar a la acción",
+                                                        no: "Prefiero solo conversar por ahora",
+                                                        maybe: "Lo vemos según avance el proceso"
+                                                    },
+                                                    focus_area: {
+                                                        goals: "Mis metas y crecimiento personal",
+                                                        balance: "Mi equilibrio mental y emocional",
+                                                        relationships: "Mis relaciones con los demás",
+                                                        self_knowledge: "Simplemente conocerme mejor"
+                                                    },
+                                                    therapist_gender: {
+                                                        woman: "Mujer",
+                                                        man: "Hombre",
+                                                        indifferent: "Me es totalmente igual"
+                                                    }
+                                                };
+
+                                                return Object.entries(selectedUser.responses as Record<string, any>).map(([key, value]) => {
+                                                    const question = questionLabels[key] || key;
+                                                    let answer = value;
+
+                                                    if (answerLabels[key] && answerLabels[key][value]) {
+                                                        answer = answerLabels[key][value];
+                                                    }
+
+                                                    return (
+                                                        <div key={key} className="bg-white p-6 border-2 border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all group">
+                                                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 group-hover:text-blue-500 transition-colors">{question}</p>
+                                                            <p className="text-sm font-bold text-gray-900 uppercase italic tracking-tight">{answer}</p>
+                                                        </div>
+                                                    );
+                                                });
+                                            })()}
+                                        </div>
+                                    ) : (
+                                        <div className="bg-gray-50 p-12 text-center border-4 border-dashed border-gray-100 italic rounded-3xl">
+                                            <XCircle className="h-10 w-10 text-gray-200 mx-auto mb-4" />
+                                            <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">El usuario aún no ha realizado el test de afinidad</p>
+                                        </div>
+                                    )}
                                 </div>
-                            ) : (
-                                <div className="bg-gray-50 p-6 rounded-2xl text-center">
-                                    <XCircle className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                                    <p className="text-gray-600 font-medium">Este usuario aún no ha completado el test de afinidad</p>
-                                </div>
-                            )}
+                            </div>
                         </div>
                     )}
                 </DialogContent>

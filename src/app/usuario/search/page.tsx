@@ -90,7 +90,7 @@ function PatientSearchContent() {
                                         src={listener.image}
                                         alt={listener.fullName}
                                         fill
-                                        className="object-cover"
+                                        className="object-cover object-top"
                                     />
                                 ) : (
                                     <Image

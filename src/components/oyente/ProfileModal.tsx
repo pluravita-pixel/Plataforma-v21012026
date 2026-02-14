@@ -31,7 +31,8 @@ export function ListenerProfileModal({ listener: psychologist, isOpen, onClose, 
                                         src={psychologist.image}
                                         alt={psychologist.fullName}
                                         fill
-                                        className="object-cover rounded-[2rem]"
+                                        priority
+                                        className="object-cover rounded-[2rem] object-top"
                                     />
                                 ) : (
                                     <div className="w-full h-full bg-[#A68363]/10 rounded-[2rem] flex items-center justify-center text-[#A68363] text-5xl font-black">

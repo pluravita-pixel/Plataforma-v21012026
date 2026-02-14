@@ -13,10 +13,16 @@ import {
     UserCircle,
     Mail,
     Phone,
-    Briefcase
+    Briefcase,
+    Edit,
+    Save,
+    Plus,
+    X as XIcon,
+    Languages as LanguagesIcon
 } from "lucide-react";
 import Image from "next/image";
 import { deleteOyente } from "@/app/actions/admin";
+import { updateOyenteSettings } from "@/app/actions/oyentes";
 import { toast } from "sonner";
 import {
     Dialog,
@@ -28,6 +34,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Listener {
     id: string;
@@ -43,6 +50,9 @@ interface Listener {
     balance: string | null;
     rating: string | null;
     createdAt: Date;
+    price?: string | null;
+    description?: string | null;
+    languages?: string[] | null;
 }
 
 export function CoachesManagementClient({ coaches: initialListeners }: { coaches: Listener[] }) {
@@ -50,6 +60,18 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
     const [search, setSearch] = useState("");
     const [selectedListener, setSelectedListener] = useState<Listener | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [editData, setEditData] = useState<{
+        price: string;
+        description: string;
+        languages: string[];
+        newLanguage: string;
+    }>({
+        price: "",
+        description: "",
+        languages: [],
+        newLanguage: ""
+    });
     const [confirmText, setConfirmText] = useState("");
     const [isPending, startTransition] = useTransition();
 
@@ -73,6 +95,59 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
             } else {
                 toast.error(result.error || "Error al eliminar oyente");
             }
+        });
+    };
+
+    const handleOpenEdit = (listener: Listener) => {
+        setSelectedListener(listener);
+        setEditData({
+            price: listener.price || "35.00",
+            description: listener.description || "",
+            languages: listener.languages || [],
+            newLanguage: ""
+        });
+        setIsEditDialogOpen(true);
+    };
+
+    const handleSaveEdit = () => {
+        if (!selectedListener) return;
+
+        startTransition(async () => {
+            const result = await updateOyenteSettings(selectedListener.userId, {
+                price: editData.price,
+                description: editData.description,
+                languages: editData.languages
+            });
+
+            if (result.success) {
+                toast.success("Perfil actualizado correctamente");
+                setListeners(listeners.map(l =>
+                    l.id === selectedListener.id
+                        ? { ...l, price: editData.price, description: editData.description, languages: editData.languages }
+                        : l
+                ));
+                setIsEditDialogOpen(false);
+                setSelectedListener(null);
+            } else {
+                toast.error(result.error || "Error al actualizar perfil");
+            }
+        });
+    };
+
+    const addLanguage = () => {
+        if (editData.newLanguage.trim() && !editData.languages.includes(editData.newLanguage.trim())) {
+            setEditData({
+                ...editData,
+                languages: [...editData.languages, editData.newLanguage.trim()],
+                newLanguage: ""
+            });
+        }
+    };
+
+    const removeLanguage = (lang: string) => {
+        setEditData({
+            ...editData,
+            languages: editData.languages.filter(l => l !== lang)
         });
     };
 
@@ -107,7 +182,7 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
                         <div className="p-6 border-b-4 border-black flex items-start gap-4 bg-gray-50 group-hover:bg-white transition-colors">
                             <div className="relative w-20 h-20 flex-shrink-0 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white overflow-hidden">
                                 {listener.image ? (
-                                    <Image src={listener.image} alt={listener.fullName} fill className="object-cover" />
+                                    <Image src={listener.image} alt={listener.fullName} fill className="object-cover object-top" />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center bg-gray-100 italic font-black text-2xl">
                                         {listener.fullName[0].toUpperCase()}
@@ -126,13 +201,22 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
                                         RATING: {listener.rating || '5.0'}
                                     </div>
                                     <div className="px-3 py-1 border-2 border-black text-black text-[8px] font-black uppercase tracking-tighter italic">
-                                        SINCE: {new Date(listener.createdAt).getFullYear()}
+                                        PRICE: €{listener.price || '35.00'}
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div className="p-6 space-y-4 flex-1">
+                            {/* Languages Section */}
+                            {listener.languages && listener.languages.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mb-2">
+                                    {listener.languages.map(lang => (
+                                        <span key={lang} className="px-2 py-0.5 bg-gray-100 text-[8px] font-black uppercase border border-black">{lang}</span>
+                                    ))}
+                                </div>
+                            )}
+
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="bg-gray-50 border-2 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-none group-hover:translate-x-1 group-hover:translate-y-1 transition-all">
                                     <p className="text-[10px] font-black text-gray-400 uppercase leading-none mb-2">Sesiones</p>
@@ -172,10 +256,16 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
 
                         <div className="p-4 border-t-4 border-black flex gap-2">
                             <Button
+                                className="flex-1 h-12 rounded-none border-2 border-black bg-white text-black font-black uppercase text-xs hover:bg-[#A68363] hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1"
+                                onClick={() => handleOpenEdit(listener)}
+                            >
+                                <Edit className="h-4 w-4 mr-2" /> editar
+                            </Button>
+                            <Button
                                 className="flex-1 h-12 rounded-none border-2 border-black bg-white text-black font-black uppercase text-xs hover:bg-black hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1"
                                 onClick={() => window.open(`/api/ref/${listener.userId}`, '_blank')}
                             >
-                                <UserCircle className="h-4 w-4 mr-2" /> ver perfil
+                                <UserCircle className="h-4 w-4 mr-2" /> perfil
                             </Button>
                             <Button
                                 variant="destructive"
@@ -199,6 +289,96 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
                     </div>
                 )}
             </div>
+
+            {/* Edit Modal */}
+            <Dialog open={isEditDialogOpen} onOpenChange={(open) => !open && !isPending && setIsEditDialogOpen(false)}>
+                <DialogContent className="max-w-2xl bg-white border-4 border-black rounded-none p-0 shadow-[18px_18px_0px_0px_rgba(0,0,0,1)] overflow-y-auto max-h-[90vh]">
+                    <div className="bg-[#A68363] p-8 text-black border-b-4 border-black flex justify-between items-center">
+                        <div>
+                            <h2 className="text-3xl font-black uppercase italic tracking-tighter leading-none">Editar Perfil</h2>
+                            <p className="text-black font-bold uppercase text-[10px] tracking-[0.2em] mt-2">{selectedListener?.fullName}</p>
+                        </div>
+                        <Edit className="h-8 w-8" />
+                    </div>
+                    <div className="p-8 space-y-6">
+                        {/* Price */}
+                        <div className="space-y-4">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Precio de sesión (€)</label>
+                            <Input
+                                value={editData.price}
+                                onChange={(e) => setEditData({ ...editData, price: e.target.value })}
+                                className="h-14 border-4 border-black rounded-none font-black text-lg focus:ring-0"
+                                type="number"
+                                step="0.5"
+                            />
+                        </div>
+
+                        {/* Description */}
+                        <div className="space-y-4">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Descripción del perfil</label>
+                            <Textarea
+                                value={editData.description}
+                                onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+                                className="min-h-[150px] border-4 border-black rounded-none font-bold text-sm focus:ring-0 p-4"
+                                placeholder="Escribe la descripción pública del oyente..."
+                            />
+                        </div>
+
+                        {/* Languages */}
+                        <div className="space-y-4">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
+                                <LanguagesIcon className="h-3 w-3" /> Idiomas que habla
+                            </label>
+                            <div className="flex flex-wrap gap-2 mb-4">
+                                {editData.languages.map(lang => (
+                                    <div key={lang} className="bg-black text-white px-3 py-1.5 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
+                                        {lang}
+                                        <button onClick={() => removeLanguage(lang)} className="hover:text-red-400">
+                                            <XIcon className="h-3 w-3" />
+                                        </button>
+                                    </div>
+                                ))}
+                                {editData.languages.length === 0 && (
+                                    <p className="text-xs text-gray-400 font-bold uppercase">No se han añadido idiomas</p>
+                                )}
+                            </div>
+                            <div className="flex gap-2">
+                                <Input
+                                    value={editData.newLanguage}
+                                    onChange={(e) => setEditData({ ...editData, newLanguage: e.target.value })}
+                                    onKeyPress={(e) => e.key === 'Enter' && addLanguage()}
+                                    placeholder="NUEVO IDIOMA..."
+                                    className="h-12 border-2 border-black rounded-none font-black uppercase text-xs"
+                                />
+                                <Button
+                                    onClick={addLanguage}
+                                    type="button"
+                                    className="h-12 px-6 rounded-none bg-black text-white font-black"
+                                >
+                                    <Plus className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                    <DialogFooter className="p-8 bg-gray-50 border-t-4 border-black flex gap-4">
+                        <Button
+                            variant="outline"
+                            onClick={() => setIsEditDialogOpen(false)}
+                            className="flex-1 h-14 rounded-none border-4 border-black font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1"
+                            disabled={isPending}
+                        >
+                            CANCELAR
+                        </Button>
+                        <Button
+                            onClick={handleSaveEdit}
+                            disabled={isPending}
+                            className="flex-1 h-14 rounded-none border-4 border-black bg-[#A68363] text-black font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 disabled:opacity-30"
+                        >
+                            {isPending ? "GUARDANDO..." : "GUARDAR CAMBIOS"} <Save className="ml-2 h-4 w-4" />
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             <Dialog open={isDeleteDialogOpen} onOpenChange={(open) => {
                 if (!open && !isPending) {
