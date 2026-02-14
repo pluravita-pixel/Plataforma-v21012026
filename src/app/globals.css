@@ -482,3 +482,213 @@
 .logout-card-btn-cancel:hover {
   background-color: #f9fafb;
 }
+
+/* Premium Vibe Button - Beige Wellness Theme */
+.vibe-btn {
+  --vibe-white: #FFFFFF;
+  --vibe-beige-100: #F2EDE7;
+  --vibe-beige-200: #D4B99F;
+  --vibe-beige-300: #A68363;
+  --vibe-beige-400: #8C6F56;
+  --vibe-beige-500: #4A3C31;
+  --vibe-radius: 18px;
+
+  border-radius: var(--vibe-radius);
+  outline: none;
+  cursor: pointer;
+  font-size: 20px;
+  font-family: inherit;
+  background: transparent;
+  letter-spacing: -1px;
+  border: 0;
+  position: relative;
+  width: 280px;
+  height: 80px;
+  transform: rotate(358deg) skewX(2deg);
+  display: inline-block;
+  text-decoration: none;
+  margin: 10px;
+}
+
+.vibe-btn-bg {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  filter: blur(1px);
+}
+
+.vibe-btn-bg::before,
+.vibe-btn-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: calc(var(--vibe-radius) * 1.1);
+  background: var(--vibe-beige-500);
+}
+
+.vibe-btn-bg::before {
+  filter: blur(5px);
+  transition: all 0.3s ease;
+  box-shadow:
+    -5px 4px 0 0 rgba(74, 60, 49, 0.4),
+    -10px 8px 0 0 rgba(74, 60, 49, 0.3),
+    -15px 12px 4px 0 rgba(74, 60, 49, 0.25);
+}
+
+.vibe-btn-wrap {
+  border-radius: inherit;
+  overflow: hidden;
+  height: 100%;
+  transform: translate(6px, -6px);
+  padding: 3px;
+  background: linear-gradient(to bottom,
+      var(--vibe-beige-100) 0%,
+      var(--vibe-beige-400) 100%);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.vibe-btn-outline {
+  position: absolute;
+  overflow: hidden;
+  inset: 0;
+  opacity: 0;
+  outline: none;
+  border-radius: inherit;
+  transition: all 0.4s ease;
+}
+
+.vibe-btn-outline::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  width: 120px;
+  height: 300px;
+  margin: auto;
+  background: linear-gradient(to right,
+      transparent 0%,
+      white 50%,
+      transparent 100%);
+  animation: vibe-spin-ani 3s linear infinite;
+  animation-play-state: paused;
+}
+
+.vibe-btn-content {
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  position: relative;
+  height: 100%;
+  gap: 12px;
+  border-radius: calc(var(--vibe-radius) * 0.85);
+  font-weight: 800;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  background: linear-gradient(to bottom,
+      var(--vibe-beige-200) 0%,
+      var(--vibe-beige-300) 100%);
+  box-shadow:
+    inset -2px 12px 11px -5px var(--vibe-beige-100),
+    inset 1px -3px 11px 0px rgba(0, 0, 0, 0.35);
+}
+
+.vibe-btn-text {
+  color: var(--vibe-white);
+  text-shadow: -1px 1px 2px var(--vibe-beige-500);
+  transition: all 0.3s ease;
+}
+
+.vibe-btn-icon {
+  z-index: 15;
+  display: flex;
+  align-items: center;
+}
+
+.vibe-btn-icon div,
+.vibe-btn-icon div::before,
+.vibe-btn-icon div::after {
+  height: 3px;
+  border-radius: 1px;
+  background-color: var(--vibe-white);
+}
+
+.vibe-btn-icon div {
+  position: relative;
+  width: 24px;
+  box-shadow: -2px 2px 5px var(--vibe-beige-500);
+  transform: scale(0.9);
+  background: linear-gradient(to bottom, var(--vibe-white), var(--vibe-beige-100));
+}
+
+.vibe-btn-icon div::before,
+.vibe-btn-icon div::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  transform-origin: center right;
+  width: 14px;
+  border-radius: 15px;
+  transition: all 0.3s ease;
+}
+
+.vibe-btn-icon div::before {
+  transform: rotate(44deg);
+  top: 1px;
+}
+
+.vibe-btn-icon div::after {
+  bottom: 1px;
+  transform: rotate(316deg);
+}
+
+.vibe-btn-splash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  stroke: var(--vibe-beige-200);
+  transform: translate(-17%, -31%);
+  stroke-dasharray: 60 60;
+  stroke-dashoffset: 60;
+  opacity: 0;
+}
+
+.vibe-btn:hover .vibe-btn-wrap {
+  transform: translate(8px, -8px);
+}
+
+.vibe-btn:hover .vibe-btn-outline {
+  opacity: 1;
+}
+
+.vibe-btn:hover .vibe-btn-outline::before {
+  animation-play-state: running;
+}
+
+.vibe-btn:active .vibe-btn-wrap {
+  transform: translate(3px, -3px);
+}
+
+.vibe-btn:active .vibe-btn-splash {
+  animation: vibe-splash-ani 0.8s cubic-bezier(0.3, 0, 0, 1) forwards 0.05s;
+  opacity: 1;
+}
+
+@keyframes vibe-spin-ani {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes vibe-splash-ani {
+  to {
+    stroke-dasharray: 2 60;
+    stroke-dashoffset: -60;
+  }
+}

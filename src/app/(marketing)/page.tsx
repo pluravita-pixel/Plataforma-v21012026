@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Play, Search as SearchIcon, Calendar as CalendarIcon, Video as VideoIcon } from "lucide-react";
+import { Search as SearchIcon, Calendar as CalendarIcon, Video as VideoIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -16,6 +16,51 @@ import {
 } from "@/components/ui/accordion";
 import { getGlobalStats } from "@/app/actions/stats";
 import { getCurrentUser } from "@/app/actions/auth";
+
+// Premium Vibe Button Component
+const VibeButton = ({ children, onClick, href, className = "" }: { children: React.ReactNode, onClick?: (e: any) => void, href?: string, className?: string }) => {
+    const content = (
+        <div className="vibe-btn-wrap">
+            <div className="vibe-btn-outline" />
+            <div className="vibe-btn-content">
+                <span className="vibe-btn-text">{children}</span>
+                <div className="vibe-btn-icon">
+                    <div />
+                </div>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 342 208" className="vibe-btn-splash">
+                <path strokeLinecap="round" strokeWidth={3} d="M54.1054 99.7837C54.1054 99.7837 40.0984 90.7874 26.6893 97.6362C13.2802 104.485 1.5 97.6362 1.5 97.6362" />
+                <path strokeLinecap="round" strokeWidth={3} d="M285.273 99.7841C285.273 99.7841 299.28 90.7879 312.689 97.6367C326.098 104.486 340.105 95.4893 340.105 95.4893" />
+                <path strokeLinecap="round" strokeWidth={3} strokeOpacity="0.3" d="M281.133 64.9917C281.133 64.9917 287.96 49.8089 302.934 48.2295C317.908 46.6501 319.712 36.5272 319.712 36.5272" />
+                <path strokeLinecap="round" strokeWidth={3} strokeOpacity="0.3" d="M281.133 138.984C281.133 138.984 287.96 154.167 302.934 155.746C317.908 157.326 319.712 167.449 319.712 167.449" />
+                <path strokeLinecap="round" strokeWidth={3} d="M230.578 57.4476C230.578 57.4476 225.785 41.5051 236.061 30.4998C246.337 19.4945 244.686 12.9998 244.686 12.9998" />
+                <path strokeLinecap="round" strokeWidth={3} d="M230.578 150.528C230.578 150.528 225.785 166.471 236.061 177.476C246.337 188.481 244.686 194.976 244.686 194.976" />
+                <path strokeLinecap="round" strokeWidth={3} strokeOpacity="0.3" d="M170.392 57.0278C170.392 57.0278 173.89 42.1322 169.571 29.54C165.252 16.9478 168.751 2.05227 168.751 2.05227" />
+                <path strokeLinecap="round" strokeWidth={3} strokeOpacity="0.3" d="M170.392 150.948C170.392 150.948 173.89 165.844 169.571 178.436C165.252 191.028 168.751 205.924 168.751 205.924" />
+                <path strokeLinecap="round" strokeWidth={3} d="M112.609 57.4476C112.609 57.4476 117.401 41.5051 107.125 30.4998C96.8492 19.4945 98.5 12.9998 98.5 12.9998" />
+                <path strokeLinecap="round" strokeWidth={3} d="M112.609 150.528C112.609 150.528 117.401 166.471 107.125 177.476C96.8492 188.481 98.5 194.976 98.5 194.976" />
+                <path strokeLinecap="round" strokeWidth={3} strokeOpacity="0.3" d="M62.2941 64.9917C62.2941 64.9917 55.4671 49.8089 40.4932 48.2295C25.5194 46.6501 23.7159 36.5272 23.7159 36.5272" />
+                <path strokeLinecap="round" strokeWidth={3} strokeOpacity="0.3" d="M62.2941 145.984C62.2941 145.984 55.4671 161.167 40.4932 162.746C25.5194 164.326 23.7159 174.449 23.7159 174.449" />
+            </svg>
+        </div>
+    );
+
+    if (href) {
+        return (
+            <Link href={href} onClick={onClick} className={`vibe-btn ${className}`}>
+                <div className="vibe-btn-bg" />
+                {content}
+            </Link>
+        );
+    }
+
+    return (
+        <button onClick={onClick} className={`vibe-btn ${className}`}>
+            <div className="vibe-btn-bg" />
+            {content}
+        </button>
+    );
+};
 
 export default function LandingPage() {
     const { openAffinityModal, openTestCompletedModal } = useModals();
@@ -103,100 +148,100 @@ export default function LandingPage() {
     ];
 
     return (
-        <div className="flex flex-col">
-            {/* Hero Section */}
-            <section className="relative w-full h-[80vh] md:h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-[#F2EDE7]">
-                {/* Background Resource (Video/Image) */}
-                <div className="absolute inset-0 z-0 select-none pointer-events-none">
-                    <div className="relative w-full h-full">
-                        <video
-                            autoPlay
-                            muted
-                            loop
-                            playsInline
-                            className="absolute inset-0 w-full h-full object-cover z-10 opacity-0 transition-opacity duration-1000"
-                            onCanPlay={(e) => (e.currentTarget.style.opacity = '1')}
-                        >
-                            <source src="/videos/hero-background.mp4" type="video/mp4" />
-                        </video>
+        <div className="flex flex-col bg-[#F9F5F0]">
+            {/* Hero Section - Redesigned to be cleaner and more balanced (Terapify style) */}
+            <section className="relative w-full py-12 md:py-24 lg:py-32 overflow-hidden bg-[#F2EDE7]">
+                {/* Background Video (Subtle) */}
+                <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
+                    <video
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        className="w-full h-full object-cover"
+                    >
+                        <source src="/videos/hero-background.mp4" type="video/mp4" />
+                    </video>
+                </div>
 
-                        {/* Repositioned Hero Illustration - Smaller and to the right on Desktop */}
-                        <div className="absolute top-[10%] right-0 w-[40%] h-[50%] z-30 hidden md:block opacity-90 transition-all duration-1000 hover:scale-105">
-                            <Image
-                                src="/images/login-illustration.png"
-                                alt="Pluravita Illustration"
-                                fill
-                                className="object-contain"
-                                priority
-                            />
-                        </div>
+                <div className="container relative z-10 mx-auto px-6 md:px-12 lg:px-20">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                        {/* Left Side: Text Content */}
+                        <div className="space-y-8 animate-fade-in-up">
+                            <div className="space-y-4">
+                                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-[#4A3C31] leading-tight tracking-tight uppercase">
+                                    Encuentra a alguien <br />
+                                    que <span className="text-[#A68363]">te escuche</span> <br />
+                                    de verdad
+                                </h1>
+                                <p className="text-lg md:text-xl text-[#6B6B6B] font-medium leading-relaxed max-w-lg">
+                                    Estamos contigo. En pluravita, conectas con oyentes que entienden tu realidad, sin juicios y desde tu sofá. Un espacio privado y real.
+                                </p>
+                                <div className="text-sm font-bold text-[#A68363] uppercase tracking-widest">
+                                    Desde solo 15€ por sesión
+                                </div>
+                            </div>
 
-                        {/* Uiverse Sun & Clouds Component - Top Right Corner */}
-                        <div className="absolute top-4 right-4 z-40 hidden lg:block scale-[0.6] origin-top-right transition-all">
-                            <div className="uiverse-container">
-                                <div className="uiverse-cloud uiverse-front">
-                                    <span className="uiverse-left-front"></span>
-                                    <span className="uiverse-right-front"></span>
+                            <div className="flex flex-col sm:flex-row gap-6">
+                                <VibeButton
+                                    href="/affinity-test"
+                                    onClick={handleBrowsingClick}
+                                    className="scale-100"
+                                >
+                                    Ver oyentes
+                                </VibeButton>
+                            </div>
+
+                            {/* Trust badges/text like Terapify */}
+                            <div className="flex items-center gap-4 text-xs font-bold text-[#8C8C8C] uppercase tracking-wider bg-white/50 backdrop-blur-sm p-3 rounded-2xl w-fit">
+                                <div className="flex -space-x-2">
+                                    {[1, 2, 3].map(i => (
+                                        <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-gray-200 overflow-hidden">
+                                            <Image src={`/images/team.png`} alt="User" width={32} height={32} className="object-cover" />
+                                        </div>
+                                    ))}
                                 </div>
-                                <span className="uiverse-sun uiverse-sunshine"></span>
-                                <span className="uiverse-sun"></span>
-                                <div className="uiverse-cloud uiverse-back">
-                                    <span className="uiverse-left-back"></span>
-                                    <span className="uiverse-right-back"></span>
-                                </div>
+                                <span>+10,000 personas ya se sienten mejor</span>
                             </div>
                         </div>
 
-                        {/* Mobile Background Fallback */}
-                        <div className="absolute inset-0 z-0 md:hidden overflow-hidden">
-                            <Image
-                                src="/images/login-illustration.png"
-                                alt="Pluravita Hero Mobile"
-                                fill
-                                className="object-cover brightness-75"
-                                priority
-                            />
-                        </div>
+                        {/* Right Side: Illustration with Decorative Circles */}
+                        <div className="relative hidden lg:block animate-float">
+                            {/* Decorative background shapes */}
+                            <div className="absolute -top-10 -right-10 w-64 h-64 bg-[#FAD2E1] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+                            <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-[#BDE0FE] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-700" />
 
-                        {/* Gradient Overlays for Readability */}
-                        <div className="absolute inset-0 bg-black/10 z-20 md:bg-transparent" />
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#F2EDE7]/95 via-[#F2EDE7]/60 to-transparent z-20 hidden md:block" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#F9F5F0] via-transparent to-transparent z-20" />
-                    </div>
-                </div>
+                            <div className="relative z-20 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white aspect-square max-w-[500px] ml-auto">
+                                <Image
+                                    src="/images/login-illustration.png"
+                                    alt="Pluravita Illustration"
+                                    fill
+                                    className="object-cover"
+                                    priority
+                                />
+                            </div>
 
-                {/* Content Overlay */}
-                <div className="container relative z-30 mx-auto px-6 md:px-12 lg:px-20 h-full flex flex-col justify-center">
-                    <div className="max-w-4xl space-y-10">
-                        <div className="space-y-4">
-                            <h1 className="text-[clamp(2.5rem,8vw,5.5rem)] md:text-[clamp(4rem,9vw,6.5rem)] font-bold text-[#4A3C31] leading-[1] tracking-tighter uppercase drop-shadow-sm">
-                                <span className="block whitespace-nowrap">Encuentra a alguien que</span>
-                                <span className="block whitespace-nowrap text-[#A68363]">te escuche de verdad</span>
-                            </h1>
-
-                            <p className="text-xl md:text-2xl text-[#6B6B6B] font-medium leading-relaxed max-w-xl md:bg-white/10 md:backdrop-blur-sm md:p-4 md:rounded-2xl transition-all">
-                                Estamos contigo. En pluravita, conectas con oyentes que entienden tu realidad, sin juicios y desde tu sofá. Un espacio privado y real. Desde <b>15€</b>.
-                            </p>
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row gap-6 pt-4">
-                            <Button
-                                asChild
-                                onClick={handleBrowsingClick}
-                                className="neo-btn-primary h-20 px-12 text-xl shadow-2xl transition-transform hover:scale-105"
-                            >
-                                <Link href="/affinity-test">Ver oyentes en línea</Link>
-                            </Button>
+                            {/* Uiverse Sun & Clouds - Repositioned to complement the illustration */}
+                            <div className="absolute -top-10 -right-10 z-30 scale-75 origin-bottom-left">
+                                <div className="uiverse-container">
+                                    <div className="uiverse-cloud uiverse-front">
+                                        <span className="uiverse-left-front"></span>
+                                        <span className="uiverse-right-front"></span>
+                                    </div>
+                                    <span className="uiverse-sun uiverse-sunshine"></span>
+                                    <span className="uiverse-sun"></span>
+                                    <div className="uiverse-cloud uiverse-back">
+                                        <span className="uiverse-left-back"></span>
+                                        <span className="uiverse-right-back"></span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                {/* Scroll Indicator */}
-                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 animate-bounce hidden md:block">
-                    <div className="w-1 h-12 rounded-full bg-gradient-to-b from-[#A68363] to-transparent opacity-50" />
                 </div>
             </section>
 
+            {/* Stats Section */}
             <section className="container mx-auto px-6 md:px-12 lg:px-20 py-16">
                 <div className="grid md:grid-cols-3 gap-8">
                     {landingStats.map((stat, i) => (
@@ -211,61 +256,56 @@ export default function LandingPage() {
 
             {/* How it Works Section */}
             <section className="container mx-auto px-6 md:px-12 lg:px-20 py-20 text-center">
-                <h2 className="text-3xl font-bold text-[#4A3C31] mb-4">¿Cómo empezamos este viaje juntos?</h2>
-                <p className="text-[#6B6B6B] mb-16">Cero complicaciones, solo tres pasos para empezar a soltar lastre.</p>
+                <h2 className="text-3xl font-bold text-[#4A3C31] mb-4 uppercase tracking-tighter">¿Cómo empezamos este viaje juntos?</h2>
+                <p className="text-[#6B6B6B] mb-16 font-medium">Cero complicaciones, solo tres pasos para empezar a soltar lastre.</p>
 
                 <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
                     <div className="flex flex-col items-center space-y-4">
-                        <div className="bg-[#F2EDE7] p-6 rounded-full h-40 w-40 flex items-center justify-center mb-4">
+                        <div className="bg-[#F2EDE7] p-6 rounded-full h-40 w-40 flex items-center justify-center mb-4 neo-shadow-sm transition-transform hover:scale-110">
                             <SearchIcon className="h-20 w-20 text-[#4A3C31]" />
                         </div>
-                        <h3 className="text-xl font-bold text-[#4A3C31]">Busca a tu aliado</h3>
-                        <p className="text-[#6B6B6B] text-sm leading-relaxed">
+                        <h3 className="text-xl font-bold text-[#4A3C31] uppercase">Busca a tu aliado</h3>
+                        <p className="text-[#6B6B6B] text-sm leading-relaxed font-medium">
                             Explora perfiles de personas reales. Mira sus vídeos, siente su vibra y elige a quien te dé más confianza.
                         </p>
                     </div>
                     <div className="flex flex-col items-center space-y-4">
-                        <div className="bg-[#FFF5EB] p-6 rounded-full h-40 w-40 flex items-center justify-center mb-4">
+                        <div className="bg-[#FFF5EB] p-6 rounded-full h-40 w-40 flex items-center justify-center mb-4 neo-shadow-sm transition-transform hover:scale-110">
                             <CalendarIcon className="h-20 w-20 text-gray-700" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-800">Haz hueco en tu agenda</h3>
-                        <p className="text-gray-600 text-sm leading-relaxed">
+                        <h3 className="text-xl font-bold text-[#4A3C31] uppercase">Haz hueco en tu agenda</h3>
+                        <p className="text-gray-600 text-sm leading-relaxed font-medium">
                             Sin llamadas incómodas. Elige el momento que prefieras y reserva en un clic. Así de simple, a tu manera.
                         </p>
                     </div>
                     <div className="flex flex-col items-center space-y-4">
-                        <div className="bg-[#FFF5EB] p-6 rounded-full h-40 w-40 flex items-center justify-center mb-4">
+                        <div className="bg-[#FFF5EB] p-6 rounded-full h-40 w-40 flex items-center justify-center mb-4 neo-shadow-sm transition-transform hover:scale-110">
                             <VideoIcon className="h-20 w-20 text-gray-700" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-800">Suelta lo que llevas dentro</h3>
-                        <p className="text-gray-600 text-sm leading-relaxed">
+                        <h3 className="text-xl font-bold text-[#4A3C31] uppercase">Suelta lo que llevas dentro</h3>
+                        <p className="text-gray-600 text-sm leading-relaxed font-medium">
                             Conéctate desde donde quieras. Ponte cómodx, prepárate un café y simplemente deja que la conversación fluya.
                         </p>
                     </div>
                 </div>
 
-                <div className="mt-16 text-center">
-                    <Button
-                        asChild
+                <div className="mt-16 text-center flex justify-center">
+                    {/* 2. HOW IT WORKS BUTTON */}
+                    <VibeButton
+                        href="/affinity-test"
                         onClick={handleBrowsingClick}
-                        className="neo-btn-primary h-16 scale-110"
+                        className="scale-100"
                     >
-                        <Link href="/affinity-test">Ver oyentes en línea</Link>
-                    </Button>
+                        Ver oyentes
+                    </VibeButton>
                 </div>
             </section>
 
             {/* Guarantee Section */}
-            <section id="trusted-psychologists" className="bg-white py-20 scroll-mt-20">
+            <section id="trusted-psychologists" className="bg-white py-24 scroll-mt-20">
                 <div className="container mx-auto px-6 md:px-12 lg:px-20">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold text-[#4A3C31] mb-2">Queremos que hagas clic</h2>
-                        <p className="text-[#6B6B6B]">Tu primera sesión tiene red de seguridad</p>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
-                        <div className="relative rounded-3xl overflow-hidden shadow-2xl h-[400px]">
-                            {/* Mock Image */}
+                    <div className="grid md:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
+                        <div className="relative rounded-[3rem] overflow-hidden shadow-2xl h-[450px] border-4 border-[#F2EDE7]">
                             <Image
                                 src="/images/hero-illustration.jpg"
                                 alt="Sesión de oyente empática"
@@ -273,75 +313,64 @@ export default function LandingPage() {
                                 className="object-cover"
                             />
                         </div>
-                        <div className="space-y-6">
-                            <p className="text-gray-700">
-                                Lo más importante para nosotros es que te sientas realmente cómodocx desde el segundo uno.
-                            </p>
-                            <p className="text-gray-700">
-                                Si en tu primera cita sientes que no hay química con tu oyente, no te preocupes, lo entendemos perfectamente. <span className="font-bold text-[#4A3C31]">Te regalamos otra sesión</span> con un oyente diferente <span className="font-bold text-[#4A3C31]">sin que pagues ni un euro más</span>.
-                            </p>
-                            <p className="text-[#6B6B6B]">
-                                Estamos aquí para que el camino sea fácil. <span className="font-bold text-[#4A3C31]">Tu tranquilidad y tu proceso son lo que de verdad nos importa.</span>
-                            </p>
-                            <Button
-                                asChild
-                                onClick={handleBrowsingClick}
-                                className="neo-btn-primary h-14"
-                            >
-                                <Link href="/affinity-test">Elegir oyente</Link>
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </section>
+                        <div className="space-y-8">
+                            <div className="space-y-4">
+                                <h2 className="text-4xl font-black text-[#4A3C31] uppercase tracking-tighter">Queremos que hagas clic</h2>
+                                <p className="text-lg font-bold text-[#A68363] uppercase tracking-widest">Tu primera sesión tiene red de seguridad</p>
+                            </div>
 
-            {/* Team Section */}
-            <section className="container mx-auto px-4 py-20">
-                <div className="grid md:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
-                    <div className="space-y-6 order-2 md:order-1">
-                        <h2 className="text-3xl font-bold text-[#4A3C31] leading-tight">
-                            Gente real para problemas reales
-                        </h2>
-                        <div className="space-y-4 text-[#6B6B6B]">
-                            <p>
-                                No somos la típica plataforma corporativa y fría. Somos una comunidad de personas que entienden que la vida puede ser caótica y que a veces solo necesitas a alguien que hable tu mismo idioma.
-                            </p>
-                            <p>
-                                Sin esperas infinitas. Con horarios flexibles de lunes a domingo, <span className="font-bold">podrás hablar con alguien</span> en el momento exacto <span className="font-bold">en que más lo necesites.</span>
-                            </p>
-                        </div>
-                        <div className="pt-4">
-                            <p className="text-[#4A3C31] font-medium mb-6">Tu paz mental no es un lujo, es tu prioridad. ¿Empezamos por aquí?</p>
-                            <Button
-                                onClick={handleAnsweringClick}
-                                className="neo-btn-primary h-16 w-full md:w-auto"
+                            <div className="space-y-4 text-gray-700 font-medium">
+                                <p>
+                                    Lo más importante para nosotros es que te sientas realmente cómodocx desde el segundo uno.
+                                </p>
+                                <p>
+                                    Si en tu primera cita sientes que no hay química con tu oyente, no te preocupes, lo entendemos perfectamente. <span className="font-bold text-[#A68363]">Te regalamos otra sesión</span> con un oyente diferente sin que pagues ni un euro más.
+                                </p>
+                            </div>
+
+                            {/* 3. GUARANTEE BUTTON */}
+                            <VibeButton
+                                href="/affinity-test"
+                                onClick={handleBrowsingClick}
+                                className="scale-100"
                             >
-                                Sí, quiero comenzar
-                            </Button>
+                                Elegir oyente
+                            </VibeButton>
                         </div>
-                    </div>
-                    <div className="relative rounded-3xl overflow-hidden shadow-2xl h-[500px] order-1 md:order-2">
-                        <Image
-                            src="/images/guarantee.jpg"
-                            alt="Sesión por videollamada"
-                            fill
-                            className="object-cover"
-                        />
                     </div>
                 </div>
             </section>
 
             {/* Affinity Test Section */}
-            <section className="bg-white py-20">
-                <div className="container mx-auto px-4">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold text-[#4A3C31]">
-                            Deja que te ayudemos a encontrar <br /> a tu "Match" emocional
-                        </h2>
-                    </div>
+            <section className="bg-[#F2EDE7] py-24">
+                <div className="container mx-auto px-6 md:px-12 lg:px-20">
+                    <div className="grid md:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
+                        <div className="space-y-8 order-2 md:order-1">
+                            <div className="space-y-4">
+                                <h2 className="text-4xl font-black text-[#4A3C31] uppercase tracking-tighter">
+                                    Encuentra a tu <br /> "Match" emocional
+                                </h2>
+                                <p className="text-lg font-bold text-[#A68363] uppercase tracking-widest">Tecnología humana a tu servicio</p>
+                            </div>
 
-                    <div className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
-                        <div className="relative rounded-3xl overflow-hidden shadow-xl h-[400px]">
+                            <div className="space-y-4 text-gray-700 font-medium leading-relaxed">
+                                <p>
+                                    Por eso creamos nuestro Test de Afinidad. No es un examen, <span className="font-bold underline decoration-[#A68363] decoration-2">es una forma de conocerte</span> para recomendarte a alguien que realmente vibre con lo que buscas.
+                                </p>
+                                <p>
+                                    Tómate un minuto, descubre quién es tu oyente ideal y quítate un peso de encima. Fácil, seguro y diseñado para que te sientas cómodx.
+                                </p>
+                            </div>
+
+                            {/* 4. AFFINITY BUTTON */}
+                            <VibeButton
+                                onClick={handleAnsweringClick}
+                                className="scale-100"
+                            >
+                                Responder test
+                            </VibeButton>
+                        </div>
+                        <div className="relative rounded-[3rem] overflow-hidden shadow-2xl h-[450px] order-1 md:order-2 border-4 border-white">
                             <Image
                                 src="/images/team.png"
                                 alt="Crecimiento personal real"
@@ -349,38 +378,24 @@ export default function LandingPage() {
                                 className="object-cover"
                             />
                         </div>
-                        <div className="space-y-6">
-                            <p className="text-gray-700">
-                                Sabemos que elegir a alguien para contarle tus cosas puede dar un poco de parálisis por análisis.
-                            </p>
-                            <p className="text-gray-700">
-                                Por eso creamos nuestro Test de Afinidad. No es un examen, <span className="font-bold">es una forma de conocerte para recomendarte a alguien que realmente vibre con lo que buscas.</span>
-                            </p>
-                            <p className="text-gray-700">
-                                Tómate un minuto, descubre quién es tu oyente ideal y quítate un peso de encima. <span className="font-bold">Fácil, seguro y diseñado para que te sientas cómodx.</span>
-                            </p>
-                            <Button
-                                onClick={handleAnsweringClick}
-                                className="neo-btn-primary h-16 w-full"
-                            >
-                                Responder test
-                            </Button>
-                        </div>
                     </div>
                 </div>
             </section>
 
             {/* FAQ Section */}
-            <section id="faq" className="container mx-auto px-4 py-20 max-w-3xl scroll-mt-20">
-                <h2 className="text-3xl font-bold text-[#1F2937] text-center mb-12">Preguntas frecuentes</h2>
+            <section id="faq" className="container mx-auto px-4 py-24 max-w-3xl scroll-mt-20">
+                <div className="text-center mb-16">
+                    <h2 className="text-4xl font-black text-[#4A3C31] uppercase tracking-tighter">Preguntas frecuentes</h2>
+                    <p className="text-[#8C8C8C] mt-2 font-bold uppercase tracking-widest text-xs">Resolvemos tus dudas en un clic</p>
+                </div>
 
                 <Accordion type="single" collapsible className="w-full space-y-4">
                     {faqs.map((faq, i) => (
-                        <AccordionItem key={i} value={`item-${i}`} className="border rounded-xl px-6 data-[state=open]:border-[#A68363]/50 data-[state=open]:bg-[#A68363]/5">
-                            <AccordionTrigger className="text-left font-medium text-[#4A3C31] hover:text-[#A68363] hover:no-underline py-6">
+                        <AccordionItem key={i} value={`item-${i}`} className="border-none bg-white rounded-3xl px-8 neo-shadow transition-all data-[state=open]:ring-2 ring-[#A68363]/20 overflow-hidden">
+                            <AccordionTrigger className="text-left font-bold text-[#4A3C31] hover:text-[#A68363] hover:no-underline py-6 uppercase tracking-tight text-lg">
                                 {faq.question}
                             </AccordionTrigger>
-                            <AccordionContent className="text-[#6B6B6B] pb-6 leading-relaxed">
+                            <AccordionContent className="text-[#6B6B6B] pb-8 leading-relaxed font-medium text-base">
                                 {faq.answer}
                             </AccordionContent>
                         </AccordionItem>
