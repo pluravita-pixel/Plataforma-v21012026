@@ -266,7 +266,7 @@
   animation: float 5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 
-/* From Uiverse.io by zanina-yassine */ 
+/* From Uiverse.io by zanina-yassine */
 .uiverse-container {
   width: 250px;
   height: 250px;
@@ -374,4 +374,111 @@
   100% {
     transform: translateX(15px);
   }
+}
+
+/* Logout Card Styles (Uiverse inspired) */
+.logout-card-container {
+  overflow: hidden;
+  position: relative;
+  background-color: #ffffff;
+  text-align: left;
+  width: 100%;
+}
+
+.logout-card-header {
+  padding: 0.5rem;
+  background-color: #ffffff;
+}
+
+.logout-card-image {
+  display: flex;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #fee2e2;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 9999px;
+  margin-bottom: 1.25rem;
+}
+
+.logout-card-image svg {
+  color: #dc2626;
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.logout-card-content {
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+.logout-card-title {
+  color: #111827;
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.5rem;
+  text-transform: none;
+  letter-spacing: -0.025em;
+}
+
+.logout-card-message {
+  margin-top: 0.75rem;
+  color: #6b7280;
+  font-size: 0.95rem;
+  line-height: 1.45rem;
+  font-weight: 500;
+  text-transform: none;
+}
+
+.logout-card-actions {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.logout-card-btn-logout {
+  display: inline-flex;
+  padding: 0.875rem 1rem;
+  background-color: #dc2626;
+  color: #ffffff;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 700;
+  justify-content: center;
+  width: 100%;
+  border-radius: 0.75rem;
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.logout-card-btn-logout:hover {
+  background-color: #b91c1c;
+  transform: translateY(-1px);
+}
+
+.logout-card-btn-cancel {
+  display: inline-flex;
+  padding: 0.875rem 1rem;
+  background-color: #ffffff;
+  color: #374151;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 700;
+  justify-content: center;
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.logout-card-btn-cancel:hover {
+  background-color: #f9fafb;
 }

@@ -185,32 +185,42 @@ export function UserNav() {
 
             {/* Logout Confirm Dialog */}
             <Dialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
-                <DialogContent className="sm:max-w-[400px] rounded-[2rem]">
-                    <DialogHeader>
-                        <DialogTitle className="text-xl font-bold text-gray-900 border-none">¿Cerrar sesión?</DialogTitle>
-                        <p className="text-gray-500 font-medium text-sm mt-2">
-                            ¿Estás seguro que quieres cerrar sesión?
-                        </p>
-                    </DialogHeader>
-                    <DialogFooter className="flex gap-3 sm:justify-end mt-4">
-                        <Button
-                            variant="ghost"
-                            onClick={() => setShowLogoutConfirm(false)}
-                            disabled={isPending}
-                            className="rounded-xl font-bold hover:bg-gray-100"
-                        >
-                            Cancelar
-                        </Button>
-                        <Button
-                            variant="destructive"
-                            onClick={handleLogout}
-                            disabled={isPending}
-                            className="rounded-xl font-bold bg-red-600 hover:bg-red-700 shadow-lg shadow-red-200 flex items-center gap-2"
-                        >
-                            {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-                            Aceptar
-                        </Button>
-                    </DialogFooter>
+                <DialogContent className="max-w-[340px] sm:max-w-[360px] rounded-[1.5rem] p-0 overflow-hidden border-none shadow-2xl">
+                    <div className="logout-card-container">
+                        <div className="logout-card-header">
+                            <div className="logout-card-image">
+                                <svg aria-hidden="true" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" strokeLinejoin="round" strokeLinecap="round" />
+                                </svg>
+                            </div>
+                            <div className="logout-card-content">
+                                <span className="logout-card-title">¿Cerrar sesión?</span>
+                                <p className="logout-card-message">
+                                    ¿Estás seguro de que quieres salir? Tendrás que volver a introducir tus credenciales para acceder de nuevo.
+                                </p>
+                            </div>
+                            <div className="logout-card-actions px-4 pb-6">
+                                <button
+                                    className="logout-card-btn-logout"
+                                    onClick={handleLogout}
+                                    disabled={isPending}
+                                >
+                                    {isPending ? (
+                                        <Loader2 className="h-5 w-5 animate-spin" />
+                                    ) : (
+                                        "Cerrar sesión"
+                                    )}
+                                </button>
+                                <button
+                                    className="logout-card-btn-cancel"
+                                    onClick={() => setShowLogoutConfirm(false)}
+                                    disabled={isPending}
+                                >
+                                    Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </DialogContent>
             </Dialog>
         </div>
