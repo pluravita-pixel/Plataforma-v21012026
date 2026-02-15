@@ -129,28 +129,47 @@ export default function LandingPage() {
                 {/* No background video or decorative widgets */}
 
                 <div className="container relative z-10 mx-auto px-6 md:px-12 lg:px-20">
-                    <div className="flex flex-col items-center text-center space-y-8 animate-fade-in-up">
-                        <div className="space-y-4 max-w-2xl">
-                            <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-[#4A3C31] leading-tight tracking-tight uppercase">
-                                Encuentra a alguien <br />
-                                que <span className="text-[#A68363]">te escuche</span> <br />
-                                de verdad
-                            </h1>
-                            <p className="text-lg md:text-xl text-[#6B6B6B] font-medium leading-relaxed">
-                                Estamos contigo. En pluravita, conectas con oyentes que entienden tu realidad, sin juicios y desde tu sofá. Un espacio privado y real.
-                            </p>
-                            <div className="text-sm font-bold text-[#A68363] uppercase tracking-widest pt-2">
-                                Desde solo 15€ por sesión
+                    <div className="grid lg:grid-cols-2 gap-12 items-center">
+                        <div className="flex flex-col items-start text-left space-y-8 animate-fade-in-up">
+                            <div className="space-y-4">
+                                <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-[#4A3C31] leading-[1.1] tracking-tight uppercase">
+                                    Encuentra a alguien <br />
+                                    que <span className="text-[#A68363]">te escuche</span> <br />
+                                    de verdad
+                                </h1>
+                                <p className="text-lg md:text-xl text-[#6B6B6B] font-medium leading-relaxed max-w-xl">
+                                    Estamos contigo. En pluravita, conectas con oyentes que entienden tu realidad, sin juicios y desde tu sofá. Un espacio privado y real.
+                                </p>
+                                <div className="text-sm font-bold text-[#A68363] uppercase tracking-widest pt-2">
+                                    Desde solo 15€ por sesión
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row gap-6">
+                                <VibeButton
+                                    href="/affinity-test"
+                                    onClick={handleBrowsingClick}
+                                >
+                                    Ver oyentes
+                                </VibeButton>
                             </div>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-6">
-                            <VibeButton
-                                href="/affinity-test"
-                                onClick={handleBrowsingClick}
-                            >
-                                Ver oyentes
-                            </VibeButton>
+                        <div className="relative w-full animate-fade-in-right">
+                            <div className="relative w-full aspect-video rounded-[2rem] overflow-hidden shadow-2xl border-4 border-[#F2EDE7] bg-gray-100">
+                                <iframe
+                                    className="absolute top-0 left-0 w-full h-full"
+                                    src="https://www.youtube.com/embed/a6AtqACERTo"
+                                    title="Pluravita Video"
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    referrerPolicy="strict-origin-when-cross-origin"
+                                    allowFullScreen
+                                ></iframe>
+                            </div>
+                            {/* Decorative element to add premium feel */}
+                            <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-[#A68363]/10 rounded-full blur-2xl -z-10"></div>
+                            <div className="absolute -top-6 -left-6 w-32 h-32 bg-[#F2EDE7] rounded-full blur-xl -z-10"></div>
                         </div>
                     </div>
                 </div>
