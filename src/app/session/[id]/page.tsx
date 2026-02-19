@@ -100,7 +100,7 @@ export default async function SessionPage({ params }: SessionPageProps) {
                         <VideoOff className="w-16 h-16 mx-auto text-red-500 mb-6" />
                         <h1 className="text-2xl font-black uppercase italic mb-4">Link no disponible</h1>
                         <p className="text-gray-600 font-bold mb-8 uppercase text-xs tracking-tight">
-                            El oyente aún no ha configurado su link de Zoom/Sesión. Por favor, contacta con soporte o espera a que el profesional lo añada a su perfil.
+                            El psicólogo aún no ha configurado su link de Zoom/Sesión. Por favor, contacta con soporte o espera a que el profesional lo añada a su perfil.
                         </p>
                         <Button asChild className="w-full h-14 rounded-none border-4 border-black bg-black text-white font-black uppercase hover:bg-gray-800 transition-all shadow-[6px_6px_0px_0px_rgba(166,131,99,1)]">
                             <Link href="/">Volver</Link>

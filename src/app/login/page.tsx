@@ -98,7 +98,7 @@ export default function LoginPage() {
                                     Bienvenido de nuevo.
                                 </h2>
                                 <p className="text-lg text-[#6B6B6B] max-w-sm mx-auto leading-relaxed font-medium">
-                                    Continúa tu camino hacia el bienestar con tu oyente de confianza.
+                                    Continúa tu camino hacia el bienestar con tu profesional de confianza.
                                 </p>
                             </motion.div>
                         </div>

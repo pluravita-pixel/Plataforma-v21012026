@@ -58,8 +58,8 @@ export function ListenerProfileModal({ listener: psychologist, isOpen, onClose, 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="sm:max-w-4xl p-0 bg-white overflow-hidden rounded-[2.5rem] border-none shadow-2xl h-[90vh] md:h-auto flex flex-col md:flex-row">
-                <DialogTitle className="sr-only">Perfil del Profesional</DialogTitle>
-                <DialogDescription className="sr-only">Información detallada, especialidad y disponibilidad del oyente.</DialogDescription>
+                <DialogTitle className="sr-only">Perfil del Psicólogo</DialogTitle>
+                <DialogDescription className="sr-only">Información detallada, especialidad y disponibilidad del psicólogo colegiado.</DialogDescription>
                 {!psychologist ? (
                     <div className="p-20 text-center w-full">Cargando perfil...</div>
                 ) : (
@@ -87,9 +87,16 @@ export function ListenerProfileModal({ listener: psychologist, isOpen, onClose, 
                             <h2 className="text-2xl font-black text-[#4A3C31] mb-2 leading-tight">
                                 {psychologist.fullName}
                             </h2>
-                            <p className="text-[#A68363] font-bold uppercase tracking-widest text-xs mb-6">
+                            <p className="text-[#A68363] font-bold uppercase tracking-widest text-xs mb-2">
                                 {psychologist.specialty}
                             </p>
+                            {psychologist.licenseNumber && (
+                                <div className="flex items-center justify-center gap-1 mb-6">
+                                    <span className="px-3 py-1 bg-white/70 rounded-lg text-[10px] font-black text-[#4A3C31] uppercase tracking-wider border border-[#A68363]/20">
+                                        🏫 Nº Colegiado: {psychologist.licenseNumber}
+                                    </span>
+                                </div>
+                            )}
 
                             <div className="flex flex-wrap justify-center gap-2 mb-8">
                                 {psychologist.tags?.map((tag: string) => (
@@ -194,7 +201,7 @@ export function ListenerProfileModal({ listener: psychologist, isOpen, onClose, 
                                 <div>
                                     <h3 className="text-lg font-black text-[#4A3C31] mb-4">Sobre mí</h3>
                                     <p className="text-gray-500 leading-relaxed font-medium text-sm md:text-base mb-6">
-                                        {psychologist.description || "Este especialista aún no ha añadido una descripción detallada."}
+                                        {psychologist.description || "Este psicólogo aún no ha añadido una descripción detallada."}
                                     </p>
 
 

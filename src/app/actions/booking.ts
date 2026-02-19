@@ -49,6 +49,29 @@ export async function getAvailabilitySlots(oyenteId: string, startDate?: Date, e
         )
         .orderBy(availabilitySlots.startTime);
 
+    // Fake Door Test: Si no hay slots reales, devolvemos slots virtuales
+    if (slots.length === 0 && startDate) {
+        const virtualHours = [9, 10, 11, 12, 16, 17, 18];
+        return virtualHours.map(h => {
+            const slotStart = new Date(startDate);
+            slotStart.setHours(h, 0, 0, 0);
+            const slotEnd = new Date(startDate);
+            slotEnd.setHours(h + 1, 0, 0, 0);
+
+            // Solo devolver si es futuro + 48h
+            if (slotStart < start) return null;
+
+            return {
+                id: `virtual-${h}-${slotStart.getTime()}`,
+                oyenteId,
+                startTime: slotStart,
+                endTime: slotEnd,
+                isBooked: false,
+                createdAt: new Date()
+            };
+        }).filter(s => s !== null) as any[];
+    }
+
     return slots;
 }
 
@@ -252,11 +275,24 @@ export async function createPendingAppointment(data: {
             }
         }
 
-        await client`
-            UPDATE availability_slots 
-            SET is_booked = true 
-            WHERE id = ${data.slotId}
-        `;
+        let finalSlotId = data.slotId;
+
+        // Fake Door Test: Si es un slot virtual, lo creamos realmente en la DB
+        if (data.slotId.startsWith('virtual-')) {
+            const newSlot = await client`
+                INSERT INTO availability_slots (oyente_id, start_time, end_time, is_booked)
+                VALUES (${data.oyenteId}, ${new Date(data.startTime).toISOString()}, 
+                        ${new Date(new Date(data.startTime).getTime() + 60 * 60 * 1000).toISOString()}, true)
+                RETURNING id
+            `;
+            finalSlotId = newSlot[0].id;
+        } else {
+            await client`
+                UPDATE availability_slots 
+                SET is_booked = true 
+                WHERE id = ${data.slotId}
+            `;
+        }
 
         const apptResults = await client`
             INSERT INTO appointments (

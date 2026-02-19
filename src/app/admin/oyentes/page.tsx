@@ -25,6 +25,8 @@ export default async function OyentesPage() {
         price: p.price?.toString() || "35.00",
         description: p.description,
         languages: p.languages || [],
+        licenseNumber: p.licenseNumber,
+        isHidden: p.isHidden || false,
     }));
 
     return <CoachesManagementClient coaches={coaches} />;

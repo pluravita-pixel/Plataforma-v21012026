@@ -54,6 +54,8 @@ export const oyentes = pgTable("oyentes", {
   studies: text("studies"), // Academic studies / Formation
   experience: text("experience"), // Professional experience description
   benefits: text("benefits").array(), // "Why choose me" highlights
+  licenseNumber: text("license_number"), // Official psychologist license / colegiado number
+  isHidden: boolean("is_hidden").default(false), // Visibility toggle
   createdAt: timestamp("created_at").defaultNow().notNull(),
   lastLogin: timestamp("last_login"), // Specifically requested for this table too
 });

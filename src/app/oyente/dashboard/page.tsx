@@ -61,7 +61,7 @@ export default async function OyenteDashboard() {
     return (
         <div className="space-y-8 font-sans">
             <div>
-                <h1 className="text-3xl font-black text-[#4A3C31] tracking-tight">¡Hola de nuevo, {data.psych.fullName?.split(' ')[0] || 'Oyente'}!</h1>
+                <h1 className="text-3xl font-black text-[#4A3C31] tracking-tight">¡Hola de nuevo, {data.psych.fullName?.split(' ')[0] || 'Psicólogo'}!</h1>
                 <p className="text-gray-500 mt-2 font-medium">Aquí tienes un resumen de lo que está pasando hoy.</p>
             </div>
 

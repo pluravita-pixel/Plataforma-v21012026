@@ -120,7 +120,7 @@ function RegisterForm() {
                                     transition={{ delay: 0.3, duration: 0.6 }}
                                 >
                                     <h1 className="text-3xl lg:text-4xl font-black text-[#4A3C31] tracking-tight">
-                                        {isCoach ? "Únete como Oyente" : "Crea tu cuenta"}
+                                        {isCoach ? "Únete como Psicólogo" : "Crea tu cuenta"}
                                     </h1>
                                     <p className="text-[#8B6B4E] font-medium text-sm lg:text-base">
                                         {isCoach ? "Registra tus datos para unirte a nuestro equipo." : ""}

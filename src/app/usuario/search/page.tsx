@@ -125,7 +125,7 @@ function UsuarioSearchContent() {
                         <div className="w-24 h-24 bg-[#F2EDE7] rounded-[2rem] flex items-center justify-center mx-auto mb-6 neo-shadow-sm">
                             <Sparkles className="h-10 w-10 text-[#A68363]" />
                         </div>
-                        <h3 className="text-3xl font-black text-[#4A3C31] uppercase tracking-tighter mb-4">No hay oyentes disponibles</h3>
+                        <h3 className="text-3xl font-black text-[#4A3C31] uppercase tracking-tighter mb-4">No hay psicólogos disponibles</h3>
                         <p className="text-[#6B6B6B] font-medium uppercase text-xs tracking-widest max-w-xs mx-auto">Vuelve más tarde para ver nuevos profesionales.</p>
                     </div>
                 )}

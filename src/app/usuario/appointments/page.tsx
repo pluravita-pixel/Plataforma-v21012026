@@ -114,7 +114,7 @@ export default function UsuarioAppointmentsPage() {
                                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
                                                     Confirmada
                                                 </div>
-                                                <p className="text-2xl font-black text-[#4A3C31] mb-1">{appointment.oyente?.fullName || "Oyente"}</p>
+                                                <p className="text-2xl font-black text-[#4A3C31] mb-1">{appointment.oyente?.fullName || "Psicólogo"}</p>
                                                 <p className="text-gray-400 font-bold text-sm uppercase tracking-wider">Sesión Online Individual</p>
                                                 {appointment.reason && (
                                                     <p className="mt-3 text-sm text-gray-500 italic bg-gray-50 p-3 rounded-xl border border-gray-100">
@@ -164,7 +164,7 @@ export default function UsuarioAppointmentsPage() {
                             asChild
                             className="bg-[#A68363] hover:bg-black text-white font-black uppercase tracking-widest text-xs rounded-2xl px-12 h-14 shadow-xl shadow-[#A68363]/20 transition-all hover:-translate-y-1"
                         >
-                            <Link href="/usuario/search">Explorar Oyentes</Link>
+                            <Link href="/usuario/search">Explorar Psicólogos</Link>
                         </Button>
                     </div>
                 )}

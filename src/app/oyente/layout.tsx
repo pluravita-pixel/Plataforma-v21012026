@@ -32,7 +32,7 @@ export default function OyenteLayout({
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const navItems = [
-        { icon: LayoutDashboard, label: "Panel de Oyente", href: "/oyente/dashboard" },
+        { icon: LayoutDashboard, label: "Panel de Psicólogo", href: "/oyente/dashboard" },
         { icon: Users, label: "Mis Usuarios", href: "/oyente/usuarios" },
         { icon: Calendar, label: "Calendario", href: "/oyente/calendar" },
         { icon: Wallet, label: "Saldo y Pagos", href: "/oyente/balance" },
@@ -126,7 +126,7 @@ export default function OyenteLayout({
                         <span className="text-gray-400 text-sm hidden sm:inline">Panel</span>
                         <span className="text-gray-200 hidden sm:inline">/</span>
                         <span className="font-bold text-gray-900 uppercase tracking-widest text-[10px] bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
-                            Oyente
+                            Psicólogo
                         </span>
                     </div>
                     <div className="flex items-center gap-4">

@@ -245,3 +245,20 @@ export async function getUserAffinityTest(userId: string) {
         return null;
     }
 }
+
+export async function toggleOyenteVisibility(oyenteId: string, isHidden: boolean) {
+    await ensureAdmin();
+    try {
+        await client`
+            UPDATE oyentes
+            SET is_hidden = ${isHidden}
+            WHERE id = ${oyenteId}
+        `;
+        revalidatePath("/admin/oyentes");
+        revalidatePath("/usuario/search");
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error toggling oyente visibility:", error);
+        return { error: "Error al actualizar visibilidad." };
+    }
+}

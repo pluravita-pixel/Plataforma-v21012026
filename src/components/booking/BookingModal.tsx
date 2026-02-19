@@ -291,28 +291,20 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
                 return;
             }
 
-            // 2. Create Stripe Checkout Session
-            const returnUrl = typeof window !== 'undefined' ? window.location.origin + window.location.pathname : undefined;
+            // 2. SIMULATED PAYMENT (Fake Door Test)
+            // Instead of redirecting to Stripe, we simulate the process
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate gateway processing
 
-            // Save state for recovery
-            localStorage.setItem("booking_form_data", JSON.stringify(formData));
-            localStorage.setItem("booking_selected_slot", JSON.stringify(selectedSlot));
-            localStorage.setItem("last_oyente_id", listenerId);
+            // 3. Confirm Appointment immediately
+            const confirmResult = await confirmAppointmentPayment(result.appointmentId);
 
-            const stripeResult = await createCheckoutSession(result.appointmentId, returnUrl);
-
-            if (stripeResult.error || !stripeResult.url) {
-                toast.error(stripeResult.error || "Error al conectar con Stripe");
-                setIsLoading(false);
-                return;
-            }
-
-            // 3. Redirect to Stripe
-            window.location.href = stripeResult.url;
+            setStep(4);
+            toast.success("¡Pago procesado con éxito!");
+            setIsLoading(false);
 
         } catch (error) {
-            console.error("Stripe redirect error:", error);
-            toast.error("Error al iniciar el pago");
+            console.error("Booking simulation error:", error);
+            toast.error("Error al procesar la reserva");
             setIsLoading(false);
         }
     };
@@ -356,7 +348,7 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
                 <div className="bg-[#A68363] p-6 text-white relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10" />
                     <DialogTitle className="text-2xl font-black relative z-10">
-                        {step === 4 ? "¡Reserva Confirmada!" : `Reservar con ${listenerName}`}
+                        {step === 4 ? "Tu cita ha sido reservada" : `Reservar con ${listenerName}`}
                     </DialogTitle>
                     <p className="text-white/80 text-sm mt-1 relative z-10 font-medium">
                         {step === 1 && (currentUser ? "Confirma tus datos" : "Crea tu cuenta")}
@@ -493,7 +485,7 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
                                     disabled={isLoading}
                                     className="w-full mt-4 bg-[#4A3C31] hover:bg-[#3A2E26] text-white rounded-xl h-12 font-bold shadow-lg"
                                 >
-                                    {isLoading ? "Creando cuenta..." : (selectedSlot ? "Reservar y Pagar" : "Continuar")}
+                                    {isLoading ? "Procesando..." : (selectedSlot ? "Reservar y Pagar" : "Continuar")}
                                 </Button>
                             </motion.div>
                         )}
@@ -622,13 +614,16 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
                                             className="w-full bg-[#A68363] hover:bg-[#8C6B4D] text-white rounded-xl h-14 font-extrabold flex items-center justify-center gap-2 group transition-all"
                                         >
                                             {isLoading ? (
-                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                                <>
+                                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                                    <span>Procesando Pago Seguro...</span>
+                                                </>
                                             ) : (price * (appliedDiscount ? (1 - appliedDiscount.percent / 100) : 1) * 1.21) === 0 ? (
                                                 "Confirmar Reserva Gratuita"
                                             ) : (
                                                 <>
-                                                    <CreditCard className="h-5 w-5 transition-transform" />
-                                                    Pagar {(price * (appliedDiscount ? (1 - appliedDiscount.percent / 100) : 1) * 1.21).toFixed(2)}€ →
+                                                    <CreditCard className="h-5 w-5 transition-transform group-hover:scale-110" />
+                                                    Pagar {(price * (appliedDiscount ? (1 - appliedDiscount.percent / 100) : 1) * 1.21).toFixed(2)}€ Ahora
                                                 </>
                                             )}
                                         </Button>
@@ -658,7 +653,7 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
                                 <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
                                     <CheckCircle2 className="h-12 w-12 text-green-600" />
                                 </div>
-                                <h3 className="text-2xl font-black text-[#4A3C31] tracking-tight">¡Cita Reservada!</h3>
+                                <h3 className="text-2xl font-black text-[#4A3C31] tracking-tight">Tu cita ha sido reservada</h3>
                                 <p className="text-gray-500 max-w-[280px] mx-auto text-sm font-medium leading-relaxed">
                                     Hemos enviado los detalles de tu cita con {listenerName} a <span className="text-[#4A3C31] font-bold">{formData.email}</span>.
                                 </p>

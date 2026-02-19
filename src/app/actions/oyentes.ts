@@ -54,6 +54,8 @@ const mapOyente = (p: any) => p ? ({
     meetingLink: p.meeting_link,
     benefits: p.benefits,
     experience: p.experience,
+    licenseNumber: p.license_number,
+    isHidden: p.is_hidden,
 }) : null;
 
 export async function refreshOyenteStats(oyenteId: string) {
@@ -114,7 +116,7 @@ export async function getOyenteStatus(userId: string) {
                 INSERT INTO oyentes (
                     user_id, full_name, email, specialty, description, price, image, active_usuarios, total_sessions
                 ) VALUES (
-                    ${user.id}, ${user.full_name || "Oyente"}, ${user.email}, 'General', 'Oyente profesional en Pluravita.', '35.00', '', 0, 0
+                    ${user.id}, ${user.full_name || "Psicólogo"}, ${user.email}, 'General', 'Psicólogo colegiado en Pluravita.', '35.00', '', 0, 0
                 )
                 RETURNING *
             `;
@@ -133,7 +135,7 @@ export async function getOyenteStatus(userId: string) {
 
 export async function getOyentes() {
     try {
-        const results = await client`SELECT * FROM oyentes`;
+        const results = await client`SELECT * FROM oyentes WHERE is_hidden IS NOT TRUE`;
         return results.map(mapOyente).filter((p): p is NonNullable<typeof p> => p !== null);
     } catch (error: any) {
         if (error.digest === 'DYNAMIC_SERVER_USAGE' || (error.message && error.message.includes('Dynamic server usage'))) {
@@ -211,7 +213,13 @@ export async function updateOyenteSettings(userId: string, data: {
         if (data.payoutCountry !== undefined) updateObj.payout_country = data.payoutCountry;
         if (data.username !== undefined) updateObj.username = data.username;
         if (data.specialty !== undefined) updateObj.specialty = data.specialty;
-        if (data.price !== undefined) updateObj.price = data.price;
+        if (data.price !== undefined) {
+            const priceNum = Number(data.price);
+            if (isNaN(priceNum) || priceNum < 0 || priceNum > 30) {
+                return { error: "El precio máximo permitido es de 30€" };
+            }
+            updateObj.price = data.price;
+        }
         if (data.languages !== undefined) updateObj.languages = data.languages;
         if (data.meetingLink !== undefined) updateObj.meeting_link = data.meetingLink;
         if (data.studies !== undefined) updateObj.studies = data.studies;

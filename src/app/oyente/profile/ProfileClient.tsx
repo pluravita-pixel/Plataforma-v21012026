@@ -46,7 +46,7 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
     const [profile, setProfile] = useState({
         fullName: psychologist.fullName,
         description: psychologist.description || "",
-        specialty: psychologist.specialty || "Oyente",
+        specialty: psychologist.specialty || "Psicólogo",
         username: psychologist.username || "",
         image: psychologist.image || "",
         price: psychologist.price || "35.00",
@@ -198,8 +198,8 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
         }
 
         const priceNum = parseFloat(profile.price);
-        if (isNaN(priceNum) || priceNum < 35 || priceNum > 305) {
-            toast.error("El precio debe estar entre 35€ y 305€");
+        if (isNaN(priceNum) || priceNum < 0 || priceNum > 30) {
+            toast.error("El precio debe ser un número entre 0€ y 30€");
             return;
         }
 
@@ -383,11 +383,27 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                                         <Tag className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                                         <input
                                             type="number"
-                                            min="35"
-                                            max="305"
+                                            min="0"
+                                            max="30"
+                                            step="0.50"
+                                            inputMode="numeric"
                                             className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#A68363]/20 transition-all font-bold text-[#4A3C31]"
                                             value={profile.price}
-                                            onChange={(e) => setProfile({ ...profile, price: e.target.value })}
+                                            onChange={(e) => {
+                                                // Solo permitir dígitos, punto decimal y vacío
+                                                const raw = e.target.value.replace(/[^0-9.]/g, '');
+                                                // Clamp al máximo en tiempo real
+                                                const num = parseFloat(raw);
+                                                if (!isNaN(num) && num > 30) return;
+                                                setProfile({ ...profile, price: raw });
+                                            }}
+                                            onKeyDown={(e) => {
+                                                // Bloquear teclas no numéricas (letras, caracteres especiales)
+                                                const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '.'];
+                                                if (!allowed.includes(e.key) && !/^[0-9]$/.test(e.key)) {
+                                                    e.preventDefault();
+                                                }
+                                            }}
                                         />
                                     </div>
                                     <div className="flex items-center gap-2 text-xs font-bold text-[#A68363] bg-[#A68363]/10 px-3 py-2 rounded-lg">
@@ -396,7 +412,7 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
                                             Precio Final (con +21% IVA): €{(Number(profile.price || 0) * 1.21).toFixed(2)}
                                         </span>
                                     </div>
-                                    <p className="text-[10px] text-gray-400">El precio mínimo base es de 35€.</p>
+                                    <p className="text-[10px] text-gray-400">Precio máximo permitido: 30€. Solo valores numéricos.</p>
                                 </div>
                             </div>
                             <div className="space-y-2">

@@ -18,10 +18,12 @@ import {
     Save,
     Plus,
     X as XIcon,
-    Languages as LanguagesIcon
+    Languages as LanguagesIcon,
+    Eye,
+    EyeOff
 } from "lucide-react";
 import Image from "next/image";
-import { deleteOyente } from "@/app/actions/admin";
+import { deleteOyente, toggleOyenteVisibility } from "@/app/actions/admin";
 import { updateOyenteSettings } from "@/app/actions/oyentes";
 import { toast } from "sonner";
 import {
@@ -54,6 +56,7 @@ interface Listener {
     description?: string | null;
     languages?: string[] | null;
     tags?: string[] | null;
+    isHidden?: boolean;
 }
 
 export function CoachesManagementClient({ coaches: initialListeners }: { coaches: Listener[] }) {
@@ -94,13 +97,13 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
         startTransition(async () => {
             const result = await deleteOyente(selectedListener.id);
             if (result.success) {
-                toast.success("Oyente eliminado correctamente");
+                toast.success("Psicólogo eliminado correctamente");
                 setListeners(listeners.filter(l => l.id !== selectedListener.id));
                 setIsDeleteDialogOpen(false);
                 setConfirmText("");
                 setSelectedListener(null);
             } else {
-                toast.error(result.error || "Error al eliminar oyente");
+                toast.error(result.error || "Error al eliminar psicólogo");
             }
         });
     };
@@ -122,6 +125,13 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
     const handleSaveEdit = () => {
         if (!selectedListener) return;
 
+        // Validación de precio frontend (double-check antes del backend)
+        const priceNum = parseFloat(editData.price);
+        if (editData.price !== "" && (isNaN(priceNum) || priceNum < 0 || priceNum > 30)) {
+            toast.error("El precio debe ser un valor numérico entre 0€ y 30€");
+            return;
+        }
+
         startTransition(async () => {
             const result = await updateOyenteSettings(selectedListener.userId, {
                 price: editData.price,
@@ -142,6 +152,23 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
                 setSelectedListener(null);
             } else {
                 toast.error(result.error || "Error al actualizar perfil");
+            }
+        });
+    };
+
+    const handleToggleVisibility = (listener: Listener) => {
+        startTransition(async () => {
+            const newVisibility = !listener.isHidden;
+            const result = await toggleOyenteVisibility(listener.id, newVisibility);
+            if (result.success) {
+                toast.success(newVisibility ? "Perfil ocultado" : "Perfil visible");
+                setListeners(listeners.map(l =>
+                    l.id === listener.id
+                        ? { ...l, isHidden: newVisibility }
+                        : l
+                ));
+            } else {
+                toast.error(result.error || "Error al cambiar visibilidad");
             }
         });
     };
@@ -282,6 +309,13 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
                                 <Edit className="h-4 w-4 mr-2" /> editar
                             </Button>
                             <Button
+                                className={`flex-1 h-12 rounded-none border-2 border-black ${listener.isHidden ? 'bg-gray-200 text-gray-500' : 'bg-white text-black'} font-black uppercase text-xs hover:bg-[#A68363] hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1`}
+                                onClick={() => handleToggleVisibility(listener)}
+                            >
+                                {listener.isHidden ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
+                                {listener.isHidden ? "Oculto" : "Visible"}
+                            </Button>
+                            <Button
                                 className="flex-1 h-12 rounded-none border-2 border-black bg-white text-black font-black uppercase text-xs hover:bg-black hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1"
                                 onClick={() => window.open(`/api/ref/${listener.userId}`, '_blank')}
                             >
@@ -304,7 +338,7 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
                 {filteredListeners.length === 0 && (
                     <div className="col-span-full py-20 bg-gray-50 border-4 border-dashed border-gray-200 flex flex-col items-center justify-center text-center">
                         <Users className="h-16 w-16 text-gray-200 mb-4" />
-                        <h3 className="text-xl font-black uppercase text-gray-400 italic">No se encontraron oyentes</h3>
+                        <h3 className="text-xl font-black uppercase text-gray-400 italic">No se encontraron psicólogos</h3>
                         <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-2">Prueba otra búsqueda o añade un profesional</p>
                     </div>
                 )}
@@ -333,14 +367,29 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
                                 />
                             </div>
                             <div className="space-y-4">
-                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Precio de sesión (€)</label>
+                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Precio de sesión (€) <span className="text-red-500">máx. 30€</span></label>
                                 <Input
                                     value={editData.price}
-                                    onChange={(e) => setEditData({ ...editData, price: e.target.value })}
+                                    onChange={(e) => {
+                                        // Solo dígitos y punto decimal, clamp a 30
+                                        const raw = e.target.value.replace(/[^0-9.]/g, '');
+                                        const num = parseFloat(raw);
+                                        if (!isNaN(num) && num > 30) return;
+                                        setEditData({ ...editData, price: raw });
+                                    }}
+                                    onKeyDown={(e) => {
+                                        const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '.'];
+                                        if (!allowed.includes(e.key) && !/^[0-9]$/.test(e.key)) {
+                                            e.preventDefault();
+                                        }
+                                    }}
                                     className="h-14 border-4 border-black rounded-none font-black text-lg focus:ring-0"
                                     type="number"
+                                    min="0"
+                                    max="30"
                                     step="0.5"
                                 />
+                                <p className="text-[10px] text-gray-400 font-bold">Máximo 30€. Solo números.</p>
                             </div>
                         </div>
 
@@ -351,7 +400,7 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
                                 value={editData.description}
                                 onChange={(e) => setEditData({ ...editData, description: e.target.value })}
                                 className="min-h-[150px] border-4 border-black rounded-none font-bold text-sm focus:ring-0 p-4"
-                                placeholder="Escribe la descripción pública del oyente..."
+                                placeholder="Escribe la descripción pública del psicólogo..."
                             />
                         </div>
 
@@ -463,7 +512,7 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
                     <div className="p-8 space-y-6">
                         <p className="text-sm font-bold text-gray-600 leading-relaxed uppercase tracking-tight">
                             ESTÁS A PUNTO DE ELIMINAR EL PERFIL PROFESIONAL Y LA CUENTA DE USUARIO DE <span className="text-black font-black">"{selectedListener?.fullName}"</span>.
-                            ESTO BORRARÁ SUS DATOS, ESTADÍSTICAS Y ACCESO.
+                            ESTO BORRARÁ SUS DATOS, ESTADÍSTICAS Y ACCESO A LA PLATAFORMA COMO PSICÓLOGO.
                         </p>
 
                         <div className="space-y-4">
