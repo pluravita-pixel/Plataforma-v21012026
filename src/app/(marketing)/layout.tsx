@@ -165,8 +165,16 @@ export default function MarketingLayout({
                             </p>
                         </div>
 
-                        {/* Right Spacer for balance */}
-                        <div className="hidden md:block"></div>
+                        {/* Right Content - Professionals */}
+                        <div className="text-center md:text-right">
+                            <h3 className="font-bold text-[#4A3C31] mb-2 uppercase tracking-widest text-xs">Profesionales</h3>
+                            <Link
+                                href="/register?role=coach"
+                                className="text-xs text-[#A68363] font-bold hover:underline underline-offset-4"
+                            >
+                                Únete como psicólogo
+                            </Link>
+                        </div>
                     </div>
 
                     <div className="mt-12 pt-8 border-t border-gray-50 text-center text-xs text-gray-400">

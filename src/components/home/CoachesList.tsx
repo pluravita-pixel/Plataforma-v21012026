@@ -44,75 +44,58 @@ export function CoachesList({ coaches, currentUser }: CoachesListProps) {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
                     {coaches.slice(0, 3).map((coach) => (
-                        <Card key={coach.id} className="overflow-hidden border-none neo-shadow hover:shadow-2xl transition-all duration-500 rounded-[2.5rem] bg-[#FDFCFB] group flex flex-col">
-                            {/* Photo Section */}
-                            <div className="relative h-72 w-full overflow-hidden">
-                                {coach.image ? (
-                                    <Image
-                                        src={coach.image}
-                                        alt={coach.fullName}
-                                        fill
-                                        className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full bg-[#F2EDE7] flex items-center justify-center font-black text-4xl text-[#A68363]">
-                                        {coach.fullName[0]}
-                                    </div>
-                                )}
-                                <div className="absolute top-6 right-6">
-                                    <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl border border-[#F2EDE7] shadow-sm flex items-center gap-2">
-                                        <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
-                                        <span className="font-black text-[#4A3C31] text-sm">{coach.rating || "5.0"}</span>
-                                    </div>
+                        <div key={coach.id} className="bg-white p-6 rounded-[2rem] neo-shadow-sm hover:neo-shadow transition-all duration-300 flex flex-col gap-6">
+                            {/* Profile Header */}
+                            <div className="flex items-center gap-4">
+                                <div className="relative w-20 h-20 flex-shrink-0 rounded-full overflow-hidden border-2 border-[#F2EDE7] shadow-sm">
+                                    {coach.image ? (
+                                        <Image
+                                            src={coach.image}
+                                            alt={coach.fullName}
+                                            fill
+                                            className="object-cover object-top"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full bg-[#F2EDE7] flex items-center justify-center font-black text-2xl text-[#A68363]">
+                                            {coach.fullName[0]}
+                                        </div>
+                                    )}
                                 </div>
-                                <div className="absolute bottom-6 left-6">
-                                    <div className="bg-emerald-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-                                        Disponible Hoy
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Info Section */}
-                            <div className="p-8 flex-1 flex flex-col">
-                                <div className="mb-6">
-                                    <span className="text-[10px] font-black text-[#A68363] uppercase tracking-[0.2em] mb-2 block">
-                                        {coach.specialty || "Psicólogo Generalista"}
-                                    </span>
-                                    <h3 className="text-2xl font-black text-[#4A3C31] uppercase tracking-tight italic mb-1">
+                                <div className="flex-1 min-w-0">
+                                    <h3 className="text-xl font-black text-[#4A3C31] uppercase tracking-tight truncate leading-none mb-1">
                                         {coach.fullName}
                                     </h3>
-                                    <div className="flex items-center gap-2 text-[#6B6B6B] text-xs font-bold uppercase tracking-wider">
-                                        <ShieldCheck className="h-3 w-3" />
-                                        Col. {coach.licenseNumber || "COP-28741"}
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-[9px] font-black text-[#A68363] uppercase tracking-widest">
+                                            {coach.specialty || "Psicólogo General"}
+                                        </span>
+                                        <span className="text-[8px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                                            <ShieldCheck className="h-2 w-2" />
+                                            Col. {coach.licenseNumber || "COP-28741"}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-1 mt-2">
+                                        <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
+                                        <span className="text-[10px] font-black text-[#4A3C31]">{coach.rating || "5.0"}</span>
+                                        <span className="text-[10px] font-bold text-gray-400 ml-2">{coach.price || "35"}€/sesión</span>
                                     </div>
                                 </div>
-
-                                <div className="flex gap-4 mb-8">
-                                    <div className="bg-white border-2 border-[#F2EDE7] p-4 rounded-3xl flex-1 text-center">
-                                        <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Sesión</div>
-                                        <div className="text-xl font-black text-[#4A3C31]">{coach.price || "35"}€</div>
-                                    </div>
-                                    <div className="bg-white border-2 border-[#F2EDE7] p-4 rounded-3xl flex-1 text-center">
-                                        <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Duración</div>
-                                        <div className="text-xl font-black text-[#4A3C31]">60 min</div>
-                                    </div>
-                                </div>
-
-                                <BookingModal
-                                    listenerId={coach.id}
-                                    listenerName={coach.fullName}
-                                    price={Number(coach.price) || 35}
-                                    currentUser={currentUser}
-                                    customTrigger={
-                                        <Button className="w-full bg-[#4A3C31] hover:bg-[#3A2E26] text-white rounded-2xl h-14 font-black uppercase tracking-widest text-xs transition-all shadow-lg hover:shadow-xl group-hover:scale-[1.02]">
-                                            Reservar Cita Ahora
-                                        </Button>
-                                    }
-                                />
                             </div>
-                        </Card>
+
+                            <BookingModal
+                                listenerId={coach.id}
+                                listenerName={coach.fullName}
+                                price={Number(coach.price) || 35}
+                                currentUser={currentUser}
+                                customTrigger={
+                                    <Button className="w-full bg-[#A68363] hover:bg-[#8C6F56] text-white rounded-xl h-12 font-black uppercase tracking-widest text-[10px] transition-all shadow-md hover:shadow-lg">
+                                        Reservar ya
+                                    </Button>
+                                }
+                            />
+                        </div>
                     ))}
                 </div>
             </div>
