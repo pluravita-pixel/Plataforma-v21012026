@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/accordion";
 import { getGlobalStats } from "@/app/actions/stats";
 import { getCurrentUser } from "@/app/actions/auth";
+import { getOyentes } from "@/app/actions/oyentes";
+import { CoachesList } from "@/components/home/CoachesList";
 
 // Premium Vibe Button Component
 // Premium Clean Button Component
@@ -43,6 +45,8 @@ export default function LandingPage() {
     const [stats, setStats] = useState({ realUsers: 0, realSessions: 0, realListeners: 0 });
     const [hasCompletedTest, setHasCompletedTest] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [currentUser, setCurrentUser] = useState<any>(null);
+    const [coaches, setCoaches] = useState<any[]>([]);
 
     useEffect(() => {
         getGlobalStats().then(data => setStats({
@@ -54,7 +58,14 @@ export default function LandingPage() {
             if (user) {
                 setIsLoggedIn(true);
                 setHasCompletedTest(user.hasCompletedAffinity);
+                setCurrentUser(user);
             }
+        });
+
+        getOyentes().then(data => {
+            // Randomize and pick 3
+            const shuffled = [...data].sort(() => 0.5 - Math.random());
+            setCoaches(shuffled.slice(0, 3));
         });
     }, []);
 
@@ -235,6 +246,9 @@ export default function LandingPage() {
                 </div>
             </section>
 
+            {/* NEW: Direct Booking Section */}
+            <CoachesList coaches={coaches} currentUser={currentUser} />
+
             {/* Guarantee Section */}
             <section id="trusted-psychologists" className="bg-white py-24 scroll-mt-20">
                 <div className="container mx-auto px-6 md:px-12 lg:px-20">
@@ -242,7 +256,7 @@ export default function LandingPage() {
                         <div className="relative rounded-[3rem] overflow-hidden shadow-2xl h-[450px] border-4 border-[#F2EDE7]">
                             <Image
                                 src="/images/hero-illustration.jpg"
-                                alt="Sesión de oyente empática"
+                                alt="Sesión de psicólogo empática"
                                 fill
                                 className="object-cover"
                             />

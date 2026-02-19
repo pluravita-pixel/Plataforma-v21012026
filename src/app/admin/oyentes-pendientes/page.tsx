@@ -86,13 +86,13 @@ export default function PendingCoachesPage() {
         <div className="space-y-8">
             <div>
                 <h1 className="text-3xl font-black text-[#4A3C31] uppercase tracking-tighter">
-                    Solicitudes de Oyentes
+                    Solicitudes de Psicólogos
                 </h1>
                 <p className="text-gray-500 mt-2 font-medium">
-                    Revisa y aprueba a los nuevos oyentes que quieren unirse a la plataforma.
+                    Revisa y aprueba a los nuevos psicólogos que quieren unirse a la plataforma.
                 </p>
                 <p className="text-gray-500 mt-2 font-medium">
-                    Al añadir un oyente, este se marcará con acceso especial en el sistema.
+                    Al añadir un psicólogo, este se marcará con acceso especial en el sistema.
                 </p>
             </div>
 
@@ -110,8 +110,8 @@ export default function PendingCoachesPage() {
                             <Card
                                 onClick={() => toggleExpand(app.id)}
                                 className={`cursor-pointer border-4 border-black rounded-none transition-all duration-300 ${expandedIds.has(app.id)
-                                        ? "p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white scale-[1.01]"
-                                        : "p-4 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-gray-50/50"
+                                    ? "p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white scale-[1.01]"
+                                    : "p-4 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-gray-50/50"
                                     }`}
                             >
                                 {expandedIds.has(app.id) ? (

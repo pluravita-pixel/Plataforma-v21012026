@@ -20,7 +20,8 @@ import {
     X as XIcon,
     Languages as LanguagesIcon,
     Eye,
-    EyeOff
+    EyeOff,
+    ShieldCheck
 } from "lucide-react";
 import Image from "next/image";
 import { deleteOyente, toggleOyenteVisibility } from "@/app/actions/admin";
@@ -56,6 +57,7 @@ interface Listener {
     description?: string | null;
     languages?: string[] | null;
     tags?: string[] | null;
+    licenseNumber?: string | null;
     isHidden?: boolean;
 }
 
@@ -231,8 +233,11 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
                                 <h3 className="text-xl font-black uppercase tracking-tight truncate mb-1 italic leading-none">
                                     {listener.fullName}
                                 </h3>
-                                <p className="text-[#A68363] text-[10px] font-black uppercase tracking-widest flex items-center gap-1 mb-2">
-                                    <Briefcase className="h-3 w-3" /> {listener.specialty || 'Generalist'}
+                                <p className="text-[#A68363] text-[10px] font-black uppercase tracking-widest flex items-center gap-1 mb-1">
+                                    <Briefcase className="h-3 w-3" /> {listener.specialty || 'Psicólogo Generalista'}
+                                </p>
+                                <p className="text-gray-400 text-[9px] font-bold uppercase tracking-widest mb-2 flex items-center gap-1">
+                                    <ShieldCheck className="h-3 w-3" /> Col. {listener.licenseNumber || 'COP-00000'}
                                 </p>
                                 <div className="flex items-center gap-2">
                                     <div className="px-3 py-1 bg-black text-white text-[8px] font-black uppercase tracking-tighter">
@@ -507,7 +512,7 @@ export function CoachesManagementClient({ coaches: initialListeners }: { coaches
                     <div className="bg-red-600 p-8 text-black border-b-4 border-black">
                         <AlertTriangle className="h-12 w-12 mb-4" />
                         <DialogTitle className="text-3xl font-black uppercase italic tracking-tighter leading-none">Acción Irreversible</DialogTitle>
-                        <DialogDescription className="sr-only">Confirmación para eliminar al oyente</DialogDescription>
+                        <DialogDescription className="sr-only">Confirmación para eliminar al psicólogo</DialogDescription>
                     </div>
                     <div className="p-8 space-y-6">
                         <p className="text-sm font-bold text-gray-600 leading-relaxed uppercase tracking-tight">

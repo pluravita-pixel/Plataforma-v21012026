@@ -64,7 +64,7 @@ export default function CookiesPolicyPage() {
                 <h3 className="text-xl font-bold text-[#4A3C31] mt-6 mb-2">Cookies Técnicas y de Funcionalidad</h3>
                 <ul className="list-disc pl-6 space-y-2">
                     <li><strong>Cookies de Autenticación Supabase (sb-*-auth-token):</strong> Estas cookies son esenciales para gestionar su sesión en la plataforma Pluravita. Nos permiten reconocerle cuando inicia sesión, mantener su sesión activa de forma segura y proteger sus datos de usuario.</li>
-                    <li><strong>Stripe (Cookies de pago y seguridad):</strong> Utilizamos Stripe como pasarela de pago segura. Stripe utiliza cookies (como <em>__stripe_mid</em>, <em>__stripe_sid</em> y <em>m</em>) para garantizar la seguridad de las transacciones, prevenir el fraude y procesar los pagos correctamente. Estas cookies son necesarias para poder contratar los servicios de los oyentes.</li>
+                    <li><strong>Stripe (Cookies de pago y seguridad):</strong> Utilizamos Stripe como pasarela de pago segura. Stripe utiliza cookies (como <em>__stripe_mid</em>, <em>__stripe_sid</em> y <em>m</em>) para garantizar la seguridad de las transacciones, prevenir el fraude y procesar los pagos correctamente. Estas cookies son necesarias para poder contratar los servicios de los psicólogos.</li>
                 </ul>
 
                 <h3 className="text-xl font-bold text-[#4A3C31] mt-6 mb-2">Cookies de Análisis y Rendimiento</h3>

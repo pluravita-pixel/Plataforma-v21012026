@@ -102,7 +102,7 @@ export function UsersListClient({ users }: { users: UserData[] }) {
 
     const getRoleLabel = (role: string) => {
         const normalizedRole = role.toLowerCase();
-        if (['oyente', 'psychologist', 'coach'].includes(normalizedRole)) return 'OYENTE';
+        if (['oyente', 'psychologist', 'coach'].includes(normalizedRole)) return 'PSICÓLOGO';
         if (['usuario', 'patient'].includes(normalizedRole)) return 'USUARIO';
         return role.toUpperCase();
     };
@@ -129,7 +129,7 @@ export function UsersListClient({ users }: { users: UserData[] }) {
                         >
                             <option value="all">Todos los roles</option>
                             <option value="usuario">Usuarios</option>
-                            <option value="oyente">Oyentes</option>
+                            <option value="oyente">Psicólogos</option>
                             <option value="admin">Administradores</option>
                         </select>
                     </div>
@@ -305,7 +305,7 @@ export function UsersListClient({ users }: { users: UserData[] }) {
                                                     gender: "¿Con qué género te identificas?",
                                                     practical_exercises: "¿Te gustaría recibir ideas para aplicar en tu día a día?",
                                                     focus_area: "¿En qué te gustaría enfocarte más?",
-                                                    therapist_gender: "¿Prefieres que tu oyente sea hombre o mujer?",
+                                                    therapist_gender: "¿Prefieres que tu psicólogo sea hombre o mujer?",
                                                     age: "¿Qué edad tienes?"
                                                 };
 

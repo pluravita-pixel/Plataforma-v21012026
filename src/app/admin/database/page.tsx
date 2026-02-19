@@ -41,13 +41,13 @@ export default async function DatabasePage() {
                         <div className="p-3 bg-white rounded-2xl shadow-sm text-blue-600">
                             <TableIcon className="h-6 w-6" />
                         </div>
-                        <h2 className="text-xl font-black text-gray-900 uppercase">Tabla: Oyentes</h2>
+                        <h2 className="text-xl font-black text-gray-900 uppercase">Tabla: Psicólogos</h2>
                     </div>
                     <div className="relative">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <input
                             type="text"
-                            placeholder="Buscar en oyentes..."
+                            placeholder="Buscar en psicólogos..."
                             className="bg-white border-none rounded-[1rem] pl-12 pr-4 py-3 text-xs font-bold w-64 focus:ring-2 focus:ring-blue-500/10"
                         />
                     </div>

@@ -47,6 +47,7 @@ const mapOyente = (p: any) => p ? ({
     payoutName: p.payout_name,
     payoutCountry: p.payout_country,
     studies: p.studies,
+    licenseNumber: p.license_number,
     lastLogin: p.last_login,
     completedSessions: p.completed_sessions,
     createdAt: p.created_at,
@@ -54,7 +55,6 @@ const mapOyente = (p: any) => p ? ({
     meetingLink: p.meeting_link,
     benefits: p.benefits,
     experience: p.experience,
-    licenseNumber: p.license_number,
     isHidden: p.is_hidden,
 }) : null;
 
