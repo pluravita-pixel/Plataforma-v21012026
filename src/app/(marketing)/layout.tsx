@@ -54,7 +54,7 @@ export default function MarketingLayout({
                             onClick={handleCoachesLinkClick}
                             className="text-[#6B6B6B] hover:text-[#A68363] transition-colors"
                         >
-                            Oyentes en línea
+                            Psicólogos en línea
                         </Link>
                         {(!user || !hasCompletedTest) && (
                             <Link
@@ -66,10 +66,8 @@ export default function MarketingLayout({
                         )}
                         <Link href="#faq" className="text-[#6B6B6B] hover:text-[#A68363] transition-colors">Preguntas frecuentes</Link>
                         {user?.role === 'oyente' ? (
-                            <Link href="/oyente/dashboard" className="text-[#A68363] font-bold border-l pl-8 hover:opacity-80 transition-opacity">Panel de Oyente</Link>
-                        ) : !user && (
-                            <Link href="/register?role=coach" className="text-[#A68363] font-bold border-l pl-8 hover:opacity-80 transition-opacity">Únete como oyente</Link>
-                        )}
+                            <Link href="/oyente/dashboard" className="text-[#A68363] font-bold border-l pl-8 hover:opacity-80 transition-opacity">Panel de Psicólogo</Link>
+                        ) : null}
                     </nav>
 
                     {/* Desktop Auth Buttons */}
@@ -133,17 +131,9 @@ export default function MarketingLayout({
                                             onClick={() => setMobileMenuOpen(false)}
                                             className="text-[#A68363] font-bold py-3 px-4 rounded-lg hover:bg-[#F2EDE7] block"
                                         >
-                                            Panel de Oyente
+                                            Panel de Psicólogo
                                         </Link>
-                                    ) : !user && (
-                                        <Link
-                                            href="/register?role=coach"
-                                            onClick={() => setMobileMenuOpen(false)}
-                                            className="text-[#A68363] font-bold py-3 px-4 rounded-lg hover:bg-[#F2EDE7] block"
-                                        >
-                                            Únete como oyente
-                                        </Link>
-                                    )}
+                                    ) : null}
                                 </div>
 
                                 <div className="border-t border-gray-100 pt-4 mt-4">
@@ -171,7 +161,7 @@ export default function MarketingLayout({
                         <div className="text-center max-w-sm mx-auto">
                             <h3 className="font-bold text-[#4A3C31] mb-2 uppercase tracking-widest text-xs">Sobre nosotros</h3>
                             <p className="text-xs text-[#6B6B6B] leading-relaxed">
-                                pluravita es una plataforma de oyentes en línea. Ayudamos a las personas a encontrar a su oyente ideal y a comenzar su proceso en línea de forma fácil, segura y privada.
+                                pluravita es una plataforma de psicólogos en línea. Ayudamos a las personas a encontrar a su psicólogo ideal y a comenzar su proceso en línea de forma fácil, segura y privada.
                             </p>
                         </div>
 
@@ -187,6 +177,9 @@ export default function MarketingLayout({
                         <Link href="/aviso-legal" className="hover:text-[#A68363] transition-colors">Aviso Legal</Link>
                         <Link href="/politica-privacidad" className="hover:text-[#A68363] transition-colors">Política de Privacidad</Link>
                         <Link href="/politica-cookies" className="hover:text-[#A68363] transition-colors">Política de Cookies</Link>
+                        {!user && (
+                            <Link href="/register?role=coach" className="hover:text-[#A68363] transition-colors font-bold">Únete como psicólogo</Link>
+                        )}
                     </div>
                 </div>
             </footer>
