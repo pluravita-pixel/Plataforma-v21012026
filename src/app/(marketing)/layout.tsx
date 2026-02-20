@@ -105,7 +105,7 @@ export default function MarketingLayout({
                                     }}
                                     className="text-[#6B6B6B] hover:text-[#A68363] transition-colors py-3 px-4 rounded-lg hover:bg-[#F2EDE7] font-medium"
                                 >
-                                    Oyentes en línea
+                                    Psicólogos en línea
                                 </Link>
                                 {(!user || !hasCompletedTest) && (
                                     <Link

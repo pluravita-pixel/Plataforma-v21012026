@@ -86,22 +86,22 @@ export default function LandingPage() {
 
     const landingStats = [
         { number: "Sin listas de espera", label: "Disponibilidad inmediata", quote: '"¿Por qué esperar meses cuando puedes hablar esta semana?"' },
-        { number: "Desde 35€", label: "Accesible de verdad", quote: '"La salud mental no debería ser un lujo reservado para pocos"' },
+        { number: "Desde 15€", label: "Accesible de verdad", quote: '"La salud mental no debería ser un lujo reservado para pocos"' },
         { number: "Psicólogos colegiados", label: "Profesionales verificados", quote: '"Misma calidad que una consulta privada, sin el precio desorbitado"' }
     ];
 
     const faqs = [
         {
             question: "¿Qué es pluravita?",
-            answer: "Somos una plataforma que conecta a personas con psicólogos colegiados a precios accesibles. Entendemos que la terapia tradicional puede costar 80€–120€ por sesión y que las listas de espera de la sanidad pública pueden durar meses. Aquí encuentras apoyo profesional desde 35€, sin esperas."
+            answer: "Somos una plataforma que conecta a personas con psicólogos colegiados a precios accesibles. Entendemos que la terapia tradicional puede costar 80€–120€ por sesión y que las listas de espera de la sanidad pública pueden durar meses. Aquí encuentras apoyo profesional desde 15€, sin esperas."
         },
         {
             question: "¿Por qué es tan difícil acceder a un psicólogo hoy en día?",
-            answer: "En España, la sanidad pública tiene listas de espera de 3 a 6 meses para salud mental. Y la privada puede costar más de 100€ por sesión. Pluravita existe para romper esa barrera: psicólogos reales, precios justos, disponibilidad en días."
+            answer: "En España, la sanidad pública tiene listas de espera de 3 a 6 meses para salud mental. Y la privada puede costar más de 100€ por sesión. Pluravita existe para romper esa barrera: psicólogos reales, precios justos, disponibilidad en días. Sesiones desde 15€."
         },
         {
             question: "¿Cuánto cuesta una sesión en pluravita?",
-            answer: "Las sesiones comienzan desde 35€ (precio base). Cada psicólogo fija su tarifa. Es transparente: ves el precio antes de reservar. Sin cuotas mensuales ni compromisos. Pagas solo cuando quieres."
+            answer: "Las sesiones comienzan desde 15€ (precio base). Cada psicólogo fija su tarifa. Es transparente: ves el precio antes de reservar. Sin cuotas mensuales ni compromisos. Pagas solo cuando quieres."
         },
         {
             question: "¿Son psicólogos de verdad?",
@@ -149,17 +149,23 @@ export default function LandingPage() {
                                     no en 6 meses
                                 </h1>
                                 <p className="text-lg md:text-xl text-[#6B6B6B] font-medium leading-relaxed max-w-xl">
-                                    Psicólogos colegiados a precios accesibles. Sin listas de espera, sin desplazamientos. Desde casa, a tu ritmo y desde solo 35€ por sesión.
+                                    Psicólogos colegiados a precios accesibles. Sin listas de espera, sin desplazamientos. Desde casa, a tu ritmo y desde solo 15€ por sesión.
                                 </p>
                                 <div className="text-sm font-bold text-[#A68363] uppercase tracking-widest pt-2">
-                                    Sesiones desde 35€ · Psicólogos verificados y colegiados
+                                    Sesiones desde 15€ · Psicólogos verificados y colegiados
                                 </div>
                             </div>
 
                             <div className="flex flex-col sm:flex-row gap-6">
                                 <VibeButton
-                                    href="/affinity-test"
-                                    onClick={handleBrowsingClick}
+                                    href="#section-psychologists"
+                                    onClick={(e) => {
+                                        const el = document.getElementById('section-psychologists');
+                                        if (el) {
+                                            e.preventDefault();
+                                            el.scrollIntoView({ behavior: 'smooth' });
+                                        }
+                                    }}
                                 >
                                     Ver psicólogos
                                 </VibeButton>
@@ -237,8 +243,14 @@ export default function LandingPage() {
                 <div className="mt-16 text-center flex justify-center">
                     {/* 2. HOW IT WORKS BUTTON */}
                     <VibeButton
-                        href="/affinity-test"
-                        onClick={handleBrowsingClick}
+                        href="#section-psychologists"
+                        onClick={(e) => {
+                            const el = document.getElementById('section-psychologists');
+                            if (el) {
+                                e.preventDefault();
+                                el.scrollIntoView({ behavior: 'smooth' });
+                            }
+                        }}
                         className="scale-100"
                     >
                         Ver psicólogos disponibles
@@ -269,7 +281,7 @@ export default function LandingPage() {
 
                             <div className="space-y-4 text-gray-700 font-medium">
                                 <p>
-                                    Una sesión con un psicólogo privado cuesta de media 80€–120€. En pluravita pagas desde 35€ por el mismo nivel de profesionalidad, pero sin el alquiler de consulta ni los intermediarios.
+                                    Una sesión con un psicólogo privado cuesta de media 80€–120€. En pluravita pagas desde 15€ por el mismo nivel de profesionalidad, pero sin el alquiler de consulta ni los intermediarios.
                                 </p>
                                 <p>
                                     Si en tu primera sesión sientes que no encaja, no te preocupes. <span className="font-bold text-[#A68363]">Te regalamos otra sesión</span> con un psicólogo diferente sin que pagues ni un euro más. El objetivo es que lo encuentres.

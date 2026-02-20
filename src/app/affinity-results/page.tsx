@@ -75,7 +75,7 @@ function AffinityResultsContent() {
                                 Tus resultados están listos
                             </h1>
                             <p className="text-lg text-[#6B6B6B] font-medium max-w-lg">
-                                Utiliza el cupón <span className="text-[#A68363] font-bold">PRIMERA25</span> y obtén 25% de descuento en tu primera sesión de coaching en línea en pluravita.
+                                Utiliza el cupón <span className="text-[#A68363] font-bold">PRIMERA25</span> y obtén 25% de descuento en tu primera sesión de psicología en línea en pluravita.
                             </p>
                         </div>
 
@@ -102,7 +102,7 @@ function AffinityResultsContent() {
                             className="bg-[#A68363] hover:opacity-90 text-white font-bold py-7 px-10 rounded-xl text-lg shadow-lg shadow-gray-200 transition-all active:scale-[0.98]"
                             asChild
                         >
-                            <Link href="#recommended">Ver mis coaches</Link>
+                            <Link href="#recommended">Ver mis psicólogos</Link>
                         </Button>
                     </motion.div>
                 </div>
@@ -117,8 +117,8 @@ function AffinityResultsContent() {
                         {[
                             {
                                 icon: <UserCircle className="h-8 w-8 text-[#A68363]" />,
-                                title: "Elige a tu coach",
-                                desc: "Conoce a los coaches que hemos seleccionado especialmente para ti."
+                                title: "Elige a tu psicólogo",
+                                desc: "Conoce a los psicólogos que hemos seleccionado especialmente para ti."
                             },
                             {
                                 icon: <Calendar className="h-8 w-8 text-[#A68363]" />,
@@ -153,17 +153,17 @@ function AffinityResultsContent() {
                 <div id="recommended" className="space-y-10 scroll-mt-24">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                         <h2 className="text-2xl md:text-3xl font-extrabold text-[#4A3C31] flex items-center gap-3">
-                            Coaches recomendados <span className="animate-bounce">👇</span>
+                            Psicólogos recomendados <span className="animate-bounce">👇</span>
                         </h2>
                         <Link href={currentUser ? "/usuario/search" : "/register"} className="text-[#A68363] font-bold text-sm hover:underline">
-                            Ver todos los coaches
+                            Ver todos los psicólogos
                         </Link>
                     </div>
 
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-20 gap-4">
                             <div className="w-12 h-12 border-4 border-[#A68363] border-t-transparent rounded-full animate-spin" />
-                            <p className="text-[#6B6B6B] font-medium italic">Cargando coaches para ti...</p>
+                            <p className="text-[#6B6B6B] font-medium italic">Cargando psicólogos para ti...</p>
                         </div>
                     ) : psychologists.length > 0 ? (
                         <div className="grid lg:grid-cols-3 gap-8">
@@ -249,7 +249,7 @@ function AffinityResultsContent() {
                             <div className="w-20 h-20 bg-[#F2EDE7] rounded-full flex items-center justify-center mx-auto mb-6">
                                 <Search className="h-10 w-10 text-[#4A3C31]" />
                             </div>
-                            <h3 className="text-xl font-bold text-[#4A3C31] mb-2">Aún no hay coaches registrados</h3>
+                            <h3 className="text-xl font-bold text-[#4A3C31] mb-2">Aún no hay psicólogos registrados</h3>
                             <p className="text-[#6B6B6B] max-w-sm mx-auto">
                                 Estamos actualizando nuestra base de datos. Por favor, vuelve a intentarlo en unos momentos o contáctanos para ayudarte.
                             </p>

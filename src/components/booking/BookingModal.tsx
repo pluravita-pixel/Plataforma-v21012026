@@ -144,8 +144,13 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
         if (step === 1) {
             // Unauthenticated Flow
             if (!currentUser) {
-                if (!formData.name || !formData.email || !formData.password) {
-                    toast.error("Por favor completa todos los campos.");
+                if (!formData.name || !formData.email) {
+                    toast.error("Por favor completa tu nombre y correo.");
+                    return;
+                }
+
+                if (!selectedSlot) {
+                    toast.error("Por favor selecciona un horario.");
                     return;
                 }
 
@@ -159,9 +164,10 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
                         // We allow them to continue to step 2 as "identified but not auth'd"
                     } else {
                         // 2. Attempt Registration ONLY if doesn't exist
+                        const generatedPassword = Math.random().toString(36).slice(-10);
                         const { data, error } = await supabase.auth.signUp({
                             email: formData.email,
-                            password: formData.password,
+                            password: formData.password || generatedPassword,
                             options: {
                                 emailRedirectTo: typeof window !== 'undefined' ? window.location.href : undefined,
                                 data: { full_name: formData.name }
@@ -419,24 +425,13 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
                                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                             />
                                         </div>
-                                        <div className="space-y-2">
-                                            <Label className="text-[#A68363] font-bold text-xs uppercase tracking-wider">Contraseña</Label>
-                                            <Input
-                                                type="password"
-                                                placeholder="******"
-                                                className="rounded-xl border-gray-200 focus:border-[#A68363] h-12"
-                                                value={formData.password}
-                                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                            />
-                                            <p className="text-[10px] text-gray-400">✨ Crea tu cuenta gratis en 30 segundos para reservar</p>
-                                        </div>
-
+                                        {/* REMOVED PASSWORD FIELD AS REQUESTED */}
                                         <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-100 mt-4">
                                             <div className="flex items-center gap-2">
                                                 <EyeOff className="h-4 w-4 text-[#A68363]" />
                                                 <div>
                                                     <p className="text-sm font-bold text-[#4A3C31]">Modo Anónimo</p>
-                                                    <p className="text-[10px] text-gray-400">Ocultar mi nombre real al oyente</p>
+                                                    <p className="text-[10px] text-gray-400">Ocultar mi nombre real al psicólogo</p>
                                                 </div>
                                             </div>
                                             <Switch
@@ -447,6 +442,42 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
                                         </div>
                                     </div>
                                 )}
+
+                                {/* MINI FORM: ADD SLOT PICKER DIRECTLY HERE */}
+                                <div className="space-y-3 pt-4 border-t border-gray-100">
+                                    <Label className="text-[#A68363] font-bold text-[10px] uppercase tracking-wider flex items-center justify-between">
+                                        <span>Selecciona tu horario</span>
+                                        <div className="flex items-center gap-1 text-gray-400 normal-case font-medium">
+                                            <CalendarIcon className="h-3 w-3" />
+                                            {selectedDate ? format(selectedDate, "d MMM", { locale: es }) : "..."}
+                                        </div>
+                                    </Label>
+
+                                    <div className="flex items-center justify-between gap-2 mb-2">
+                                        <Button variant="ghost" size="sm" onClick={() => changeDate(-1)} className="h-8 w-8 p-0"><ChevronLeft className="h-4 w-4" /></Button>
+                                        <span className="text-[10px] font-bold text-gray-500 uppercase">
+                                            {selectedDate ? format(selectedDate, "EEEE", { locale: es }) : "..."}
+                                        </span>
+                                        <Button variant="ghost" size="sm" onClick={() => changeDate(1)} className="h-8 w-8 p-0"><ChevronRight className="h-4 w-4" /></Button>
+                                    </div>
+
+                                    <div className="grid grid-cols-3 gap-2 max-h-[120px] overflow-y-auto pr-1 py-1">
+                                        {availableSlots.length === 0 ? (
+                                            <p className="col-span-3 text-center text-gray-400 text-[10px] py-4">No hay disponibilidad</p>
+                                        ) : (availableSlots.slice(0, 9).map((slot) => (
+                                            <button
+                                                key={slot.id}
+                                                onClick={() => setSelectedSlot(slot)}
+                                                className={`py-2 rounded-lg border text-[10px] font-black flex items-center justify-center transition-all ${selectedSlot?.id === slot.id
+                                                    ? "bg-[#A68363] text-white border-[#A68363] shadow-inner"
+                                                    : "bg-white border-gray-100 text-gray-600 hover:border-[#A68363]/30"
+                                                    }`}
+                                            >
+                                                {format(new Date(slot.startTime), "HH:mm")}
+                                            </button>
+                                        )))}
+                                    </div>
+                                </div>
 
                                 {/* Discount Code Input (Moved from Step 3) */}
                                 <div className="space-y-2 pt-2 border-t border-gray-100 mt-2">
@@ -483,9 +514,9 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
                                 <Button
                                     onClick={handleNextStep}
                                     disabled={isLoading}
-                                    className="w-full mt-4 bg-[#4A3C31] hover:bg-[#3A2E26] text-white rounded-xl h-12 font-bold shadow-lg"
+                                    className="w-full mt-4 bg-[#A68363] hover:bg-[#8C6B4D] text-white rounded-xl h-14 font-black uppercase tracking-widest text-xs shadow-lg"
                                 >
-                                    {isLoading ? "Procesando..." : (selectedSlot ? "Reservar y Pagar" : "Continuar")}
+                                    {isLoading ? "Procesando..." : (selectedSlot ? `Reservar y Pagar ${(finalPrice * 1.21).toFixed(2)}€` : "Seleccionar horario")}
                                 </Button>
                             </motion.div>
                         )}

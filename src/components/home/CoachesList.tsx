@@ -26,7 +26,7 @@ export function CoachesList({ coaches, currentUser }: CoachesListProps) {
     if (coaches.length === 0) return null;
 
     return (
-        <section className="bg-white py-24">
+        <section id="section-psychologists" className="bg-white py-24">
             <div className="container mx-auto px-6 md:px-12 lg:px-20">
                 <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
                     <div className="max-w-2xl text-left">
@@ -79,7 +79,7 @@ export function CoachesList({ coaches, currentUser }: CoachesListProps) {
                                     <div className="flex items-center gap-1 mt-2">
                                         <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
                                         <span className="text-[10px] font-black text-[#4A3C31]">{coach.rating || "5.0"}</span>
-                                        <span className="text-[10px] font-bold text-gray-400 ml-2">{coach.price || "35"}€/sesión</span>
+                                        <span className="text-[10px] font-bold text-gray-400 ml-2">{coach.price || "15"}€/sesión</span>
                                     </div>
                                 </div>
                             </div>
@@ -87,7 +87,7 @@ export function CoachesList({ coaches, currentUser }: CoachesListProps) {
                             <BookingModal
                                 listenerId={coach.id}
                                 listenerName={coach.fullName}
-                                price={Number(coach.price) || 35}
+                                price={Number(coach.price) || 15}
                                 currentUser={currentUser}
                                 customTrigger={
                                     <Button className="w-full bg-[#A68363] hover:bg-[#8C6F56] text-white rounded-xl h-12 font-black uppercase tracking-widest text-[10px] transition-all shadow-md hover:shadow-lg">
