@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Calendar as CalendarIcon, Clock, CreditCard, ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, Eye, EyeOff, Lock } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, CreditCard, ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, Eye, EyeOff, Lock, Star, User, BookOpen, Award, Languages, MapPin, Sparkles, GraduationCap } from "lucide-react";
 import { getAvailabilitySlots, createPendingAppointment, confirmAppointmentPayment } from "@/app/actions/booking";
 import { createCheckoutSession } from "@/app/actions/stripe";
 import { checkUserExists } from "@/app/actions/auth";
@@ -17,6 +17,7 @@ import { validateDiscountCode } from "@/app/actions/discounts";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 
 interface Slot {
     id: string;
@@ -34,9 +35,37 @@ interface BookingModalProps {
     defaultOpen?: boolean;
     initialSlotId?: string;
     initialSlot?: Slot | null;
+    // New profile fields
+    description?: string | null;
+    tags?: string[] | null;
+    experience?: string | null;
+    studies?: string | null;
+    specialty?: string | null;
+    rating?: string | number | null;
+    licenseNumber?: string | null;
+    completedSessions?: number | null;
+    image?: string | null;
 }
 
-export function BookingModal({ listenerId, listenerName, price, currentUser, customTrigger, defaultOpen = false, initialSlotId, initialSlot: propInitialSlot }: BookingModalProps) {
+export function BookingModal({
+    listenerId,
+    listenerName,
+    price,
+    currentUser,
+    customTrigger,
+    defaultOpen = false,
+    initialSlotId,
+    initialSlot: propInitialSlot,
+    description,
+    tags,
+    experience,
+    studies,
+    specialty,
+    rating,
+    licenseNumber,
+    completedSessions,
+    image
+}: BookingModalProps) {
     const supabase = createClient();
     const router = useRouter();
     const [step, setStep] = useState(initialSlotId || propInitialSlot ? 1 : 1);
@@ -78,9 +107,8 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
     useEffect(() => {
         setIsMounted(true);
 
-        // Initial date (Enforce 2 days notice)
+        // Initial date (Allow today)
         const minDate = new Date();
-        minDate.setDate(minDate.getDate() + 2);
         minDate.setHours(0, 0, 0, 0);
         setSelectedDate(minDate);
 
@@ -122,21 +150,36 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
         }
     }, [searchParams, listenerId, propInitialSlot]);
 
+    const [multiDaySlots, setMultiDaySlots] = useState<{ [key: string]: Slot[] }>({});
+
     // --- Fetch Slots ---
     useEffect(() => {
-        if (isOpen && step === 2 && selectedDate) {
+        if (isOpen && selectedDate) {
             const fetchSlots = async () => {
                 const start = new Date(selectedDate);
                 start.setHours(0, 0, 0, 0);
+
+                // Fetch 4 days of slots
                 const end = new Date(selectedDate);
+                end.setDate(end.getDate() + 4);
                 end.setHours(23, 59, 59, 999);
 
                 const slots = await getAvailabilitySlots(listenerId, start, end);
+
+                // Group by date
+                const grouped: { [key: string]: Slot[] } = {};
+                slots.forEach(slot => {
+                    const dateKey = format(new Date(slot.startTime), "yyyy-MM-dd");
+                    if (!grouped[dateKey]) grouped[dateKey] = [];
+                    grouped[dateKey].push(slot);
+                });
+
+                setMultiDaySlots(grouped);
                 setAvailableSlots(slots);
             };
             fetchSlots();
         }
-    }, [selectedDate, isOpen, step, listenerId]);
+    }, [selectedDate, isOpen, listenerId]);
 
     // --- Actions ---
 
@@ -325,9 +368,8 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
         const newDate = new Date(selectedDate);
         newDate.setDate(newDate.getDate() + days);
 
-        // Enforce 2 days rule
+        // Allow today
         const minDate = new Date();
-        minDate.setDate(minDate.getDate() + 2);
         minDate.setHours(0, 0, 0, 0);
 
         const checkDate = new Date(newDate);
@@ -347,360 +389,372 @@ export function BookingModal({ listenerId, listenerName, price, currentUser, cus
                     </Button>
                 )}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px] p-0 bg-[#FDFCFB] overflow-hidden rounded-3xl border-none shadow-2xl">
-                <DialogDescription className="sr-only">Proceso de reserva de cita con un especialista.</DialogDescription>
+            <DialogContent className="sm:max-w-[1000px] p-0 bg-[#FDFCFB] overflow-hidden rounded-[2rem] border-none shadow-2xl flex flex-col md:flex-row h-[90vh] md:h-auto max-h-[800px]">
+                <DialogDescription className="sr-only">Proceso de reserva de cita con {listenerName}.</DialogDescription>
 
-                {/* Header */}
-                <div className="bg-[#A68363] p-6 text-white relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10" />
-                    <DialogTitle className="text-2xl font-black relative z-10">
-                        {step === 4 ? "Tu cita ha sido reservada" : `Reservar con ${listenerName}`}
-                    </DialogTitle>
-                    <p className="text-white/80 text-sm mt-1 relative z-10 font-medium">
-                        {step === 1 && (currentUser ? "Confirma tus datos" : "Crea tu cuenta")}
-                        {step === 2 && "Selecciona un horario"}
-                        {step === 3 && "Pago y Confirmación"}
-                    </p>
+                {/* LEFT SIDE: PSYCHOLOGIST PROFILE (Hidden on mobile) */}
+                <div className="hidden md:flex flex-[0.8] bg-[#F9F5F0] border-r border-[#F2EDE7] flex-col overflow-y-auto custom-scrollbar">
+                    <div className="p-8 space-y-8">
+                        {/* Profile Header Block */}
+                        <div className="bg-white p-6 rounded-3xl shadow-sm border border-[#F2EDE7]">
+                            <div className="flex flex-col items-center text-center space-y-4">
+                                <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-[#F9F5F0] shadow-md">
+                                    {image ? (
+                                        <Image src={image} alt={listenerName} fill className="object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full bg-[#A68363] flex items-center justify-center text-white text-3xl font-black">
+                                            {listenerName[0]}
+                                        </div>
+                                    )}
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-black text-[#4A3C31] uppercase tracking-tight">{listenerName}</h3>
+                                    <p className="text-xs font-bold text-[#A68363] uppercase tracking-widest">{specialty || "Psicólogo General"}</p>
+                                    <div className="flex items-center justify-center gap-1 mt-2">
+                                        <Star className="h-3 w-3 text-amber-500 fill-amber-500" />
+                                        <span className="text-xs font-black text-[#4A3C31]">{rating || "5.0"}</span>
+                                        <span className="text-[10px] text-gray-400 font-medium ml-1">({completedSessions || 1300}+ citas)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2 mt-6">
+                                <div className="bg-[#F9F5F0] p-2 rounded-xl text-center">
+                                    <p className="text-[8px] font-bold text-gray-400 uppercase tracking-tighter">Nacionalidad</p>
+                                    <p className="text-[10px] font-bold text-[#4A3C31]">Española</p>
+                                </div>
+                                <div className="bg-[#F9F5F0] p-2 rounded-xl text-center">
+                                    <p className="text-[8px] font-bold text-gray-400 uppercase tracking-tighter">Experiencia</p>
+                                    <p className="text-[10px] font-bold text-[#4A3C31]">+8 años</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* About Me */}
+                        <div className="space-y-3">
+                            <h4 className="flex items-center gap-2 text-sm font-black text-[#4A3C31] uppercase tracking-wider">
+                                <User className="h-4 w-4 text-[#A68363]" /> Sobre mí
+                            </h4>
+                            <p className="text-xs text-gray-600 leading-relaxed font-medium">
+                                {description || "Psicólogo colegiado comprometido con el bienestar emocional de sus pacientes, utilizando herramientas prácticas y evidencia científica."}
+                            </p>
+                        </div>
+
+                        {/* Areas of focus */}
+                        {tags && tags.length > 0 && (
+                            <div className="space-y-3">
+                                <h4 className="flex items-center gap-2 text-sm font-black text-[#4A3C31] uppercase tracking-wider">
+                                    <Sparkles className="h-4 w-4 text-[#A68363]" /> Áreas de atención
+                                </h4>
+                                <div className="flex flex-wrap gap-2">
+                                    {tags.map((tag, i) => (
+                                        <span key={i} className="bg-white px-3 py-1 rounded-full text-[9px] font-bold text-[#A68363] border border-[#F2EDE7] shadow-sm">
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Experience */}
+                        <div className="space-y-3">
+                            <h4 className="flex items-center gap-2 text-sm font-black text-[#4A3C31] uppercase tracking-wider">
+                                <Award className="h-4 w-4 text-[#A68363]" /> Experiencia Profesional
+                            </h4>
+                            <ul className="space-y-2">
+                                {experience?.split(',').map((exp, i) => (
+                                    <li key={i} className="text-[10px] text-gray-600 font-medium flex items-start gap-2">
+                                        <div className="w-1 h-1 rounded-full bg-[#A68363] mt-1.5 flex-shrink-0" />
+                                        {exp.trim()}
+                                    </li>
+                                )) || (
+                                        <li className="text-[10px] text-gray-600 font-medium italic">Información profesional verificada por Pluravita.</li>
+                                    )}
+                            </ul>
+                        </div>
+
+                        {/* Education */}
+                        <div className="space-y-3">
+                            <h4 className="flex items-center gap-2 text-sm font-black text-[#4A3C31] uppercase tracking-wider">
+                                <GraduationCap className="h-4 w-4 text-[#A68363]" /> Formación Académica
+                            </h4>
+                            <ul className="space-y-2">
+                                {studies?.split(',').map((std, i) => (
+                                    <li key={i} className="text-[10px] text-gray-600 font-medium flex items-start gap-2">
+                                        <div className="w-1 h-1 rounded-full bg-[#A68363] mt-1.5 flex-shrink-0" />
+                                        {std.trim()}
+                                    </li>
+                                )) || (
+                                        <li className="text-[10px] text-gray-600 font-medium italic">Grado en Psicología y Máster habilitante.</li>
+                                    )}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="p-6">
-                    <AnimatePresence mode="wait">
+                {/* RIGHT SIDE: BOOKING FLOW */}
+                <div className="flex-1 flex flex-col overflow-hidden">
+                    <div className="bg-[#A68363] p-6 md:p-8 text-white relative overflow-hidden flex-shrink-0">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10" />
+                        <DialogTitle className="text-2xl font-black relative z-10 flex items-center justify-between">
+                            <span>{step === 4 ? "¡Todo listo!" : "Reserva tu sesión"}</span>
+                            {step < 4 && <span className="bg-white/20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">{price.toFixed(0)}€</span>}
+                        </DialogTitle>
+                        <p className="text-white/80 text-xs mt-1 relative z-10 font-black uppercase tracking-widest">
+                            {step === 1 && "Paso 1: Elige horario y datos"}
+                            {step === 2 && "Paso 2: Confirmación"}
+                            {step === 3 && "Paso 3: Pago Seguro"}
+                        </p>
+                    </div>
 
-                        {/* STEP 1: CONTACT INFO / AUTH */}
-                        {step === 1 && (
-                            <motion.div
-                                key="step1"
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                                className="space-y-4"
-                            >
-                                {currentUser ? (
-                                    // LOGGED IN VIEW
-                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-4">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <div className="w-10 h-10 rounded-full bg-[#A68363] flex items-center justify-center text-white font-bold">
-                                                {currentUser.fullName ? currentUser.fullName[0] : (currentUser.email ? currentUser.email[0] : "U")}
-                                            </div>
-                                            <div>
-                                                <p className="font-bold text-[#4A3C31]">{currentUser.fullName || "Usuario"}</p>
-                                                <p className="text-xs text-gray-400">{currentUser.email || "---"}</p>
-                                            </div>
-                                        </div>
+                    <div className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar bg-white">
+                        <AnimatePresence mode="wait">
 
-                                        <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-100">
-                                            <div className="flex items-center gap-2">
-                                                {isAnonymous ? <EyeOff className="h-4 w-4 text-[#A68363]" /> : <Eye className="h-4 w-4 text-gray-400" />}
-                                                <div>
-                                                    <p className="text-sm font-bold text-[#4A3C31]">Modo Anónimo</p>
-                                                    <p className="text-[10px] text-gray-400">Ocultar mi nombre real al profesional</p>
-                                                </div>
-                                            </div>
-                                            <Switch
-                                                checked={isAnonymous}
-                                                onCheckedChange={setIsAnonymous}
-                                                className="data-[state=checked]:bg-[#A68363]"
-                                            />
-                                        </div>
-                                    </div>
-                                ) : (
-                                    // GUEST / REGISTER VIEW
-                                    <div className="space-y-4">
-                                        <div className="space-y-2">
-                                            <Label className="text-[#A68363] font-bold text-xs uppercase tracking-wider">Nombre Completo</Label>
-                                            <Input
-                                                placeholder="Ej. Juan Pérez"
-                                                className="rounded-xl border-gray-200 focus:border-[#A68363] h-12"
-                                                value={formData.name}
-                                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label className="text-[#A68363] font-bold text-xs uppercase tracking-wider">Correo Electrónico</Label>
-                                            <Input
-                                                type="email"
-                                                placeholder="juan@ejemplo.com"
-                                                className="rounded-xl border-gray-200 focus:border-[#A68363] h-12"
-                                                value={formData.email}
-                                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                            />
-                                        </div>
-                                        {/* REMOVED PASSWORD FIELD AS REQUESTED */}
-                                        <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-100 mt-4">
-                                            <div className="flex items-center gap-2">
-                                                <EyeOff className="h-4 w-4 text-[#A68363]" />
-                                                <div>
-                                                    <p className="text-sm font-bold text-[#4A3C31]">Modo Anónimo</p>
-                                                    <p className="text-[10px] text-gray-400">Ocultar mi nombre real al psicólogo</p>
-                                                </div>
-                                            </div>
-                                            <Switch
-                                                checked={isAnonymous}
-                                                onCheckedChange={setIsAnonymous}
-                                                className="data-[state=checked]:bg-[#A68363]"
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* MINI FORM: ADD SLOT PICKER DIRECTLY HERE */}
-                                <div className="space-y-3 pt-4 border-t border-gray-100">
-                                    <Label className="text-[#A68363] font-bold text-[10px] uppercase tracking-wider flex items-center justify-between">
-                                        <span>Selecciona tu horario</span>
-                                        <div className="flex items-center gap-1 text-gray-400 normal-case font-medium">
-                                            <CalendarIcon className="h-3 w-3" />
-                                            {selectedDate ? format(selectedDate, "d MMM", { locale: es }) : "..."}
-                                        </div>
-                                    </Label>
-
-                                    <div className="flex items-center justify-between gap-2 mb-2">
-                                        <Button variant="ghost" size="sm" onClick={() => changeDate(-1)} className="h-8 w-8 p-0"><ChevronLeft className="h-4 w-4" /></Button>
-                                        <span className="text-[10px] font-bold text-gray-500 uppercase">
-                                            {selectedDate ? format(selectedDate, "EEEE", { locale: es }) : "..."}
-                                        </span>
-                                        <Button variant="ghost" size="sm" onClick={() => changeDate(1)} className="h-8 w-8 p-0"><ChevronRight className="h-4 w-4" /></Button>
-                                    </div>
-
-                                    <div className="grid grid-cols-3 gap-2 max-h-[120px] overflow-y-auto pr-1 py-1">
-                                        {availableSlots.length === 0 ? (
-                                            <p className="col-span-3 text-center text-gray-400 text-[10px] py-4">No hay disponibilidad</p>
-                                        ) : (availableSlots.slice(0, 9).map((slot) => (
-                                            <button
-                                                key={slot.id}
-                                                onClick={() => setSelectedSlot(slot)}
-                                                className={`py-2 rounded-lg border text-[10px] font-black flex items-center justify-center transition-all ${selectedSlot?.id === slot.id
-                                                    ? "bg-[#A68363] text-white border-[#A68363] shadow-inner"
-                                                    : "bg-white border-gray-100 text-gray-600 hover:border-[#A68363]/30"
-                                                    }`}
-                                            >
-                                                {format(new Date(slot.startTime), "HH:mm")}
-                                            </button>
-                                        )))}
-                                    </div>
-                                </div>
-
-                                {/* Discount Code Input (Moved from Step 3) */}
-                                <div className="space-y-2 pt-2 border-t border-gray-100 mt-2">
-                                    <Label className="text-[#A68363] font-bold text-[10px] uppercase tracking-wider">¿Tienes un código de descuento?</Label>
-                                    <div className="flex gap-2">
-                                        <Input
-                                            placeholder="ej. PRIMERA25"
-                                            value={discountCode}
-                                            onChange={(e) => setDiscountCode(e.target.value)}
-                                            className="rounded-xl border-gray-200 focus:border-[#A68363] h-10 text-sm"
-                                        />
-                                        <Button
-                                            type="button"
-                                            onClick={handleApplyDiscount}
-                                            className="bg-[#4A3C31] text-white rounded-xl px-4 h-10 text-xs font-bold shadow-md"
-                                        >
-                                            Aplicar
-                                        </Button>
-                                    </div>
-                                    {appliedDiscount && (
-                                        <p className="text-green-600 text-[10px] font-black uppercase flex items-center gap-1">
-                                            <CheckCircle2 className="h-3 w-3" />
-                                            Código {appliedDiscount.code} aplicado (-{appliedDiscount.percent}%)
-                                        </p>
-                                    )}
-                                    {validationError && (
-                                        <p className="text-red-500 text-[10px] font-bold flex items-center gap-1">
-                                            <AlertCircle className="h-3 w-3" />
-                                            {validationError}
-                                        </p>
-                                    )}
-                                </div>
-
-                                <Button
-                                    onClick={handleNextStep}
-                                    disabled={isLoading}
-                                    className="w-full mt-4 bg-[#A68363] hover:bg-[#8C6B4D] text-white rounded-xl h-14 font-black uppercase tracking-widest text-xs shadow-lg"
+                            {/* STEP 1: MULTI-DAY PICKER + FORM */}
+                            {step === 1 && (
+                                <motion.div
+                                    key="step1"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="space-y-8"
                                 >
-                                    {isLoading ? "Procesando..." : (selectedSlot ? `Reservar y Pagar ${(finalPrice * 1.21).toFixed(2)}€` : "Seleccionar horario")}
-                                </Button>
-                            </motion.div>
-                        )}
+                                    {/* Multi-Day Slot Picker */}
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <h4 className="text-xs font-black text-[#A68363] uppercase tracking-widest">Selecciona un horario disponible</h4>
+                                            <div className="flex items-center gap-1">
+                                                <Button variant="ghost" size="icon" onClick={() => changeDate(-1)} className="h-6 w-6 rounded-full"><ChevronLeft className="h-4 w-4" /></Button>
+                                                <Button variant="ghost" size="icon" onClick={() => changeDate(1)} className="h-6 w-6 rounded-full"><ChevronRight className="h-4 w-4" /></Button>
+                                            </div>
+                                        </div>
 
-                        {/* STEP 2: CALENDAR & SLOTS */}
-                        {step === 2 && (
-                            <motion.div
-                                key="step2"
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                                className="space-y-6"
-                            >
-                                <div className="flex items-center justify-between bg-gray-50 p-3 rounded-xl border border-gray-100">
-                                    <Button variant="ghost" size="icon" onClick={() => changeDate(-1)}><ChevronLeft className="h-4 w-4 text-gray-400" /></Button>
-                                    <div className="text-center">
-                                        <p className="font-black text-[#4A3C31] uppercase text-sm">
-                                            {selectedDate ? format(selectedDate, "EEEE", { locale: es }) : "..."}
-                                        </p>
-                                        <p className="text-xs text-gray-500 font-bold">
-                                            {selectedDate ? format(selectedDate, "d 'de' MMMM", { locale: es }) : "..."}
-                                        </p>
-                                    </div>
-                                    <Button variant="ghost" size="icon" onClick={() => changeDate(1)}><ChevronRight className="h-4 w-4 text-gray-400" /></Button>
-                                </div>
+                                        <div className="grid grid-cols-4 gap-2 bg-[#F9F5F0] p-2 rounded-[1.5rem] border border-[#F2EDE7]">
+                                            {[0, 1, 2, 3].map(i => {
+                                                const date = new Date(selectedDate || new Date());
+                                                date.setDate(date.getDate() + i);
+                                                const dateKey = format(date, "yyyy-MM-dd");
+                                                const daySlots = multiDaySlots[dateKey] || [];
+                                                const isToday = i === 0;
 
-                                <div className="grid grid-cols-2 gap-3 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
-                                    {availableSlots.length === 0 ? (
-                                        <p className="col-span-2 text-center text-gray-400 text-sm py-8 font-medium">No hay disponibilidad para este día.</p>
-                                    ) : (availableSlots.map((slot) => (
-                                        <button
-                                            key={slot.id}
-                                            onClick={() => setSelectedSlot(slot)}
-                                            className={`p-3 rounded-xl border text-sm font-bold flex items-center justify-center gap-2 transition-all ${selectedSlot?.id === slot.id
-                                                ? "bg-[#A68363] text-white border-[#A68363] shadow-md transform scale-[1.02]"
-                                                : "bg-white border-gray-100 text-gray-600 hover:border-[#A68363]/50 hover:bg-[#A68363]/5 hover:text-[#A68363]"
-                                                }`}
-                                        >
-                                            <Clock className="h-3 w-3" />
-                                            {slot.startTime ? format(new Date(slot.startTime), "HH:mm") : "--:--"}
-                                        </button>
-                                    )))}
-                                </div>
-
-                                <div className="flex gap-3">
-                                    <Button variant="outline" onClick={() => setStep(1)} className="flex-1 rounded-xl h-12 font-bold border-gray-200">Atrás</Button>
-                                    <Button
-                                        onClick={() => setStep(3)}
-                                        disabled={!selectedSlot}
-                                        className="flex-1 bg-[#4A3C31] hover:bg-[#3A2E26] text-white rounded-xl h-12 font-bold disabled:opacity-50"
-                                    >
-                                        Continuar al Pago →
-                                    </Button>
-                                </div>
-                            </motion.div>
-                        )}
-
-
-                        {/* STEP 3: PAYMENT SUMMARY & REDIRECT */}
-                        {step === 3 && (
-                            <motion.div
-                                key="step3"
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                            >
-                                {isCanceledReturn && (
-                                    <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 mb-6 flex items-start gap-3">
-                                        <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
-                                        <div>
-                                            <p className="text-sm font-black text-amber-900">Has cancelado el pago</p>
-                                            <p className="text-xs text-amber-700">Tus datos y el horario siguen reservados por unos minutos. Si quieres proceder, pulsa el botón de abajo.</p>
+                                                return (
+                                                    <div key={i} className="flex flex-col gap-2">
+                                                        <div className="text-center py-2 border-b border-[#F2EDE7] mb-1">
+                                                            <p className="text-[8px] font-black text-[#A68363] uppercase tracking-tighter">
+                                                                {isToday ? "Hoy" : format(date, "EEE", { locale: es })}
+                                                            </p>
+                                                            <p className="text-[10px] font-bold text-[#4A3C31]">{format(date, "d MMM")}</p>
+                                                        </div>
+                                                        <div className="flex flex-col gap-1.5 max-h-[180px] overflow-y-auto pr-1 py-1 custom-scrollbar scrollbar-mini">
+                                                            {daySlots.length === 0 ? (
+                                                                <span className="text-[8px] text-gray-300 text-center py-4 italic">Sin huecos</span>
+                                                            ) : daySlots.slice(0, 10).map(slot => (
+                                                                <button
+                                                                    key={slot.id}
+                                                                    onClick={() => setSelectedSlot(slot)}
+                                                                    className={`py-2 rounded-lg border text-[9px] font-black transition-all ${selectedSlot?.id === slot.id
+                                                                        ? "bg-[#A68363] text-white border-[#A68363] shadow-md scale-[1.05]"
+                                                                        : "bg-white border-white text-gray-500 hover:border-[#A68363]/50 hover:text-[#A68363]"
+                                                                        }`}
+                                                                >
+                                                                    {format(new Date(slot.startTime), "HH:mm")}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
-                                )}
-                                <div className="space-y-4 mb-6">
-                                    <div className="bg-gray-50 p-5 rounded-[1.5rem] space-y-3 border border-gray-100">
-                                        <div className="flex justify-between items-center text-sm">
-                                            <span className="text-gray-500 font-bold">Base (sin IVA)</span>
-                                            <span className="font-medium text-gray-700">{price.toFixed(2)}€</span>
+
+                                    {/* User Form */}
+                                    <div className="grid md:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+                                        <div className="space-y-4">
+                                            <div className="space-y-1.5">
+                                                <Label className="text-[10px] font-black text-[#A68363] uppercase tracking-wider ml-1">Tu Nombre</Label>
+                                                <Input
+                                                    placeholder="Ej. Juan Pérez"
+                                                    className="rounded-xl border-gray-100 bg-[#F9F5F0]/50 focus:bg-white h-11 text-sm border-2"
+                                                    value={formData.name}
+                                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                                />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <Label className="text-[10px] font-black text-[#A68363] uppercase tracking-wider ml-1">Tu Correo</Label>
+                                                <Input
+                                                    type="email"
+                                                    placeholder="juan@ejemplo.com"
+                                                    className="rounded-xl border-gray-100 bg-[#F9F5F0]/50 focus:bg-white h-11 text-sm border-2"
+                                                    value={formData.email}
+                                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <div className="flex items-center justify-between bg-[#F9F5F0]/50 p-3 rounded-xl border-2 border-gray-100 h-11 mt-[26px]">
+                                                <div className="flex items-center gap-2">
+                                                    <EyeOff className="h-3.5 w-3.5 text-[#A68363]" />
+                                                    <span className="text-[10px] font-bold text-[#4A3C31]">Modo Anónimo</span>
+                                                </div>
+                                                <Switch
+                                                    checked={isAnonymous}
+                                                    onCheckedChange={setIsAnonymous}
+                                                    className="data-[state=checked]:bg-[#A68363] scale-75"
+                                                />
+                                            </div>
+
+                                            <div className="flex gap-2 h-11">
+                                                <Input
+                                                    placeholder="Cupón DESCUENTO"
+                                                    value={discountCode}
+                                                    onChange={(e) => setDiscountCode(e.target.value)}
+                                                    className="rounded-xl border-gray-100 h-full text-xs font-bold uppercase"
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    onClick={handleApplyDiscount}
+                                                    variant="secondary"
+                                                    className="h-full rounded-xl bg-[#4A3C31] text-white hover:bg-black text-[10px] uppercase font-black px-4"
+                                                >
+                                                    <Sparkles className="h-3 w-3 mr-1" /> OK
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {appliedDiscount && (
+                                        <p className="text-[10px] font-black text-green-600 uppercase flex items-center gap-1 bg-green-50 p-2 rounded-lg">
+                                            <CheckCircle2 className="h-3 w-3" /> ¡Cupón {appliedDiscount.code} activo! (-{appliedDiscount.percent}%)
+                                        </p>
+                                    )}
+
+                                    <Button
+                                        onClick={handleNextStep}
+                                        disabled={isLoading || !selectedSlot}
+                                        className="w-full bg-[#A68363] hover:bg-[#8C6B4D] text-white rounded-2xl h-16 font-black uppercase tracking-[0.2em] text-[11px] shadow-xl transition-all hover:scale-[1.01] active:scale-[0.98]"
+                                    >
+                                        {isLoading ? (
+                                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                        ) : (
+                                            <>Continuar reserva {(finalPrice * 1.21).toFixed(0)}€ →</>
+                                        )}
+                                    </Button>
+                                </motion.div>
+                            )}
+
+                            {/* STEP 3: PAYMENT / SUMMARY */}
+                            {step === 3 && (
+                                <motion.div
+                                    key="step3"
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    className="space-y-6"
+                                >
+                                    <div className="bg-[#F9F5F0] p-6 rounded-[2rem] border border-[#F2EDE7] space-y-4">
+                                        <div className="flex justify-between items-center text-xs font-bold text-gray-500 uppercase">
+                                            <span>Sesión individual (60 min.)</span>
+                                            <span>{price.toFixed(2)}€</span>
                                         </div>
                                         {appliedDiscount && (
-                                            <div className="flex justify-between items-center text-sm text-green-700 bg-green-50 p-3 rounded-xl border border-green-100">
-                                                <span className="font-bold flex items-center gap-2">
-                                                    <CheckCircle2 className="h-4 w-4" />
-                                                    Cupón {appliedDiscount.code} (-{appliedDiscount.percent}%)
-                                                </span>
-                                                <span className="font-bold">-{((price * appliedDiscount.percent) / 100).toFixed(2)}€</span>
+                                            <div className="flex justify-between items-center text-xs text-green-600 bg-green-50 p-3 rounded-xl">
+                                                <span className="font-black">DESCUENTO ({appliedDiscount.code})</span>
+                                                <span className="font-black">-{((price * appliedDiscount.percent) / 100).toFixed(2)}€</span>
                                             </div>
                                         )}
-                                        <div className="flex justify-between items-center text-sm">
-                                            <span className="text-gray-500 font-bold">IVA (21%)</span>
-                                            <span className="font-medium text-gray-700">
-                                                {((price * (appliedDiscount ? (1 - appliedDiscount.percent / 100) : 1)) * 0.21).toFixed(2)}€
-                                            </span>
+                                        <div className="flex justify-between items-center text-xs font-bold text-gray-500 uppercase">
+                                            <span>IVA (21%)</span>
+                                            <span>{((finalPrice) * 0.21).toFixed(2)}€</span>
                                         </div>
-                                        {selectedSlot && selectedSlot.startTime && (
-                                            <div className="flex justify-between items-center text-sm border-t border-dashed border-gray-200 pt-2">
-                                                <span className="text-gray-400 font-medium text-xs">Fecha</span>
-                                                <span className="font-medium text-gray-500 text-xs">{format(new Date(selectedSlot.startTime), "d MMM, HH:mm", { locale: es })}</span>
+                                        <div className="pt-4 border-t border-dashed border-[#F2EDE7] flex justify-between items-end">
+                                            <div>
+                                                <p className="text-[9px] font-black text-[#A68363] uppercase tracking-widest">{format(new Date(selectedSlot!.startTime), "EEEE d MMMM", { locale: es })}</p>
+                                                <p className="text-sm font-black text-[#4A3C31]">{format(new Date(selectedSlot!.startTime), "HH:mm")}h</p>
                                             </div>
-                                        )}
-                                        <div className="border-t border-gray-200/50 pt-4 flex justify-between items-center">
-                                            <span className="font-black text-[#4A3C31] uppercase tracking-wider text-xs">Total a Pagar</span>
-                                            <span className="font-black text-[#A68363] text-3xl">
-                                                {(price * (appliedDiscount ? (1 - appliedDiscount.percent / 100) : 1) * 1.21).toFixed(2)}€
-                                            </span>
+                                            <div className="text-right">
+                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Total a pagar</p>
+                                                <p className="text-4xl font-black text-[#A68363]">{(finalPrice * 1.21).toFixed(2)}€</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div className="space-y-4">
-                                    <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-start gap-3">
-                                        <Lock className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                                        <p className="text-xs text-blue-700">
-                                            {(price * (appliedDiscount ? (1 - appliedDiscount.percent / 100) : 1) * 1.21) === 0
-                                                ? "Esta sesión es gratuita. Pulsa el botón para confirmar tu reserva."
-                                                : "Elige tu método de pago para completar la reserva."}
-                                        </p>
-                                    </div>
-
-                                    <div className="space-y-3">
+                                    <div className="space-y-4">
                                         <Button
                                             onClick={handleStripePayment}
                                             disabled={isLoading}
-                                            className="w-full bg-[#A68363] hover:bg-[#8C6B4D] text-white rounded-xl h-14 font-extrabold flex items-center justify-center gap-2 group transition-all"
+                                            className="w-full bg-[#A68363] hover:bg-[#8C6B4D] text-white rounded-2xl h-16 font-black uppercase tracking-widest text-xs shadow-xl flex items-center justify-center gap-3"
                                         >
                                             {isLoading ? (
-                                                <>
-                                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                                    <span>Procesando Pago Seguro...</span>
-                                                </>
-                                            ) : (price * (appliedDiscount ? (1 - appliedDiscount.percent / 100) : 1) * 1.21) === 0 ? (
-                                                "Confirmar Reserva Gratuita"
+                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                                             ) : (
                                                 <>
-                                                    <CreditCard className="h-5 w-5 transition-transform group-hover:scale-110" />
-                                                    Pagar {(price * (appliedDiscount ? (1 - appliedDiscount.percent / 100) : 1) * 1.21).toFixed(2)}€ Ahora
+                                                    <CreditCard className="h-5 w-5" />
+                                                    Pagar Seguro Ahora
                                                 </>
                                             )}
                                         </Button>
-
-
-
                                         <Button
                                             variant="ghost"
-                                            onClick={() => setStep(2)}
-                                            className="w-full text-gray-400 hover:text-gray-600 font-bold"
+                                            onClick={() => setStep(1)}
+                                            className="w-full text-gray-400 font-bold hover:bg-transparent hover:text-gray-600 text-xs uppercase"
                                         >
-                                            Volver a Horarios
+                                            ← Modificar elección
                                         </Button>
                                     </div>
-                                </div>
-                            </motion.div>
-                        )}
 
-                        {/* STEP 4: SUCCESS */}
-                        {step === 4 && (
-                            <motion.div
-                                key="step4"
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="text-center py-8 space-y-4"
-                            >
-                                <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
-                                    <CheckCircle2 className="h-12 w-12 text-green-600" />
-                                </div>
-                                <h3 className="text-2xl font-black text-[#4A3C31] tracking-tight">Tu cita ha sido reservada</h3>
-                                <p className="text-gray-500 max-w-[280px] mx-auto text-sm font-medium leading-relaxed">
-                                    Hemos enviado los detalles de tu cita con {listenerName} a <span className="text-[#4A3C31] font-bold">{formData.email}</span>.
-                                </p>
-                                <Button
-                                    onClick={() => {
-                                        setIsOpen(false);
-                                        router.push('/usuario/dashboard');
-                                    }}
-                                    className="mt-8 bg-[#A68363] hover:bg-[#8C6B4D] text-white rounded-xl font-bold px-10 h-12 shadow-lg"
+                                    <p className="text-[9px] text-center text-gray-400 font-medium leading-relaxed">
+                                        Pago procesado de forma segura por Stripe. <br />
+                                        Se aplica la política de cancelación de 24 horas.
+                                    </p>
+                                </motion.div>
+                            )}
+
+                            {/* STEP 4: SUCCESS */}
+                            {step === 4 && (
+                                <motion.div
+                                    key="step4"
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="text-center py-12 space-y-6"
                                 >
-                                    Ver mi Dashboard
-                                </Button>
-                            </motion.div>
-                        )}
+                                    <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mx-auto shadow-inner border border-green-100">
+                                        <CheckCircle2 className="h-12 w-12 text-green-600" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <h3 className="text-3xl font-black text-[#4A3C31] uppercase tracking-tight">¡Cita Confirmada!</h3>
+                                        <p className="text-sm text-gray-500 font-medium max-w-[300px] mx-auto">
+                                            Te hemos enviado un correo con el enlace de conexión y los detalles de tu cita con {listenerName}.
+                                        </p>
+                                    </div>
 
-                    </AnimatePresence>
+                                    <div className="bg-[#F9F5F0] p-6 rounded-3xl border border-[#F2EDE7] max-w-sm mx-auto">
+                                        <div className="flex justify-between items-center text-left">
+                                            <div>
+                                                <p className="text-[10px] font-black text-[#A68363] uppercase tracking-widest">Profesional</p>
+                                                <p className="text-sm font-bold text-[#4A3C31]">{listenerName}</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-[10px] font-black text-[#A68363] uppercase tracking-widest">Horario</p>
+                                                <p className="text-sm font-bold text-[#4A3C31]">{format(new Date(selectedSlot!.startTime), "d MMM, HH:mm")}h</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <Button
+                                        onClick={() => {
+                                            setIsOpen(false);
+                                            router.push('/usuario/dashboard');
+                                        }}
+                                        className="bg-[#A68363] hover:bg-[#8C6B4D] text-white rounded-2xl font-black uppercase tracking-widest text-[11px] px-12 h-14 shadow-lg"
+                                    >
+                                        Ir a mi Dashboard
+                                    </Button>
+                                </motion.div>
+                            )}
+
+                        </AnimatePresence>
+                    </div>
                 </div>
             </DialogContent>
         </Dialog>

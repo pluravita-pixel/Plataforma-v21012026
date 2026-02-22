@@ -63,9 +63,13 @@ export default function LandingPage() {
         });
 
         getOyentes().then(data => {
-            // Randomize and pick 3
-            const shuffled = [...data].sort(() => 0.5 - Math.random());
-            setCoaches(shuffled.slice(0, 3));
+            // Prioritize María López, Carlos Martínez, and Laura Fernández
+            const targets = ['6b532a5e-0bf2-41d4-8ab7-1fd1cd6f3ea3', '2a442c0c-a9e2-46e3-b723-94832cb9c07f', '1a1f652b-9ae9-4739-a563-b355b47302cf'];
+            const prioritized = data.filter(c => targets.includes(c.id));
+            const others = data.filter(c => !targets.includes(c.id)).sort(() => 0.5 - Math.random());
+
+            const finalCoaches = [...prioritized, ...others].slice(0, 3);
+            setCoaches(finalCoaches);
         });
     }, []);
 

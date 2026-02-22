@@ -30,10 +30,7 @@ async function verifyOyente(oyenteId?: string) {
 
 export async function getAvailabilitySlots(oyenteId: string, startDate?: Date, endDate?: Date) {
     const now = new Date();
-    const minAdvance = new Date(now);
-    minAdvance.setHours(now.getHours() + 48); // Enforce 48h (2 days) rule
-
-    const start = startDate && startDate > minAdvance ? startDate : minAdvance;
+    const start = startDate && startDate > now ? startDate : now;
     const end = endDate || new Date(new Date().setDate(new Date().getDate() + 64)); // Increased to ~2 months (64 days to be safe)
 
     const slots = await db
@@ -247,13 +244,13 @@ export async function createPendingAppointment(data: {
         throw new Error("No puedes reservar citas para otra persona.");
     }
 
-    // Double check 48h rule on server side
+    // Double check 0h rule on server side (allow same day)
     const now = new Date();
     const startTime = new Date(data.startTime);
     const diff = (startTime.getTime() - now.getTime()) / (1000 * 60 * 60);
 
-    if (diff < 48) {
-        return { error: "Las citas deben reservarse con al menos 48 horas de antelación." };
+    if (diff < 0) {
+        return { error: "No se pueden reservar citas en el pasado." };
     }
 
     try {

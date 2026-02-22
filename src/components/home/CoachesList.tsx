@@ -15,6 +15,11 @@ interface Psychologist {
     price: string | number | null;
     rating: string | number | null;
     licenseNumber?: string | null;
+    description?: string | null;
+    tags?: string[] | null;
+    experience?: string | null;
+    studies?: string | null;
+    completedSessions?: number | null;
 }
 
 interface CoachesListProps {
@@ -89,6 +94,16 @@ export function CoachesList({ coaches, currentUser }: CoachesListProps) {
                                 listenerName={coach.fullName}
                                 price={Number(coach.price) || 15}
                                 currentUser={currentUser}
+                                // Additional profile data
+                                description={coach.description}
+                                tags={coach.tags}
+                                experience={coach.experience}
+                                studies={coach.studies}
+                                specialty={coach.specialty}
+                                rating={coach.rating}
+                                licenseNumber={coach.licenseNumber}
+                                completedSessions={coach.completedSessions}
+                                image={coach.image}
                                 customTrigger={
                                     <Button className="w-full bg-[#A68363] hover:bg-[#8C6F56] text-white rounded-xl h-12 font-black uppercase tracking-widest text-[10px] transition-all shadow-md hover:shadow-lg">
                                         Reservar ya
