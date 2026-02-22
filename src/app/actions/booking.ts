@@ -34,7 +34,7 @@ export async function getAvailabilitySlots(oyenteId: string, startDate?: Date, e
     minAdvance.setHours(now.getHours() + 48); // Enforce 48h (2 days) rule
 
     const start = startDate && startDate > minAdvance ? startDate : minAdvance;
-    const end = endDate || new Date(new Date().setDate(new Date().getDate() + 30));
+    const end = endDate || new Date(new Date().setDate(new Date().getDate() + 64)); // Increased to ~2 months (64 days to be safe)
 
     const slots = await db
         .select()
