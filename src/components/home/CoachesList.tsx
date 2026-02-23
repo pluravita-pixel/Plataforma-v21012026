@@ -38,11 +38,11 @@ export function CoachesList({ coaches, currentUser }: CoachesListProps) {
                 <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
                     <div className="max-w-2xl text-left">
                         <h2 className="text-4xl md:text-5xl font-black text-[#4A3C31] uppercase tracking-tighter mb-4 leading-none">
-                            Nuestros Psicólogos <br />
-                            <span className="text-[#A68363]">Colegiados</span>
+                            Nuestros <br />
+                            <span className="text-[#A68363]">Profesionales</span>
                         </h2>
                         <p className="text-lg text-[#6B6B6B] font-medium">
-                            Profesionales verificados, listos para escucharte hoy mismo. Sin listas de espera y a un precio justo.
+                            Perfiles verificados y comprometidos con tu crecimiento personal. Encuentra el acompañamiento que necesitas hoy mismo.
                         </p>
                     </div>
                     <Link href="/affinity-test" className="text-[#A68363] font-black uppercase tracking-widest text-xs flex items-center gap-2 group border-b-2 border-[#A68363] pb-1 hover:text-[#4A3C31] hover:border-[#4A3C31] transition-all">

@@ -91,51 +91,47 @@ export default function LandingPage() {
     };
 
     const landingStats = [
-        { number: "Sin listas de espera", label: "Disponibilidad inmediata", quote: '"¿Por qué esperar meses cuando puedes hablar esta semana?"' },
-        { number: "Desde 15€", label: "Accesible de verdad", quote: '"La salud mental no debería ser un lujo reservado para pocos"' },
-        { number: "Psicólogos colegiados", label: "Profesionales verificados", quote: '"Misma calidad que una consulta privada, sin el precio desorbitado"' }
+        {
+            number: "Bienestar Real",
+            label: "Procesos de cambio",
+            quote: '"Cada persona tiene una historia única de crecimiento y evolución personal"'
+        },
+        {
+            number: "Sesiones con Propósito",
+            label: "Encuentros para ti",
+            quote: '"Cada sesión es un paso firme hacia tu bienestar y equilibrio emocional"'
+        },
+        {
+            number: "Profesionales Listos",
+            label: "Acompañamiento experto",
+            quote: '"Especialistas capacitados para escucharte y apoyarte cuando más lo necesites"'
+        }
     ];
 
     const faqs = [
         {
             question: "¿Qué es pluravita?",
-            answer: "Somos una plataforma que conecta a personas con psicólogos colegiados a precios accesibles. Entendemos que la terapia tradicional puede costar 80€–120€ por sesión y que las listas de espera de la sanidad pública pueden durar meses. Aquí encuentras apoyo profesional desde 15€, sin esperas."
+            answer: "Somos una plataforma diseñada para conectar a personas con profesionales del bienestar de forma sencilla. Nuestra misión es facilitar el acceso a acompañamiento profesional, eliminando barreras y tiempos de espera innecesarios."
         },
         {
-            question: "¿Por qué es tan difícil acceder a un psicólogo hoy en día?",
-            answer: "En España, la sanidad pública tiene listas de espera de 3 a 6 meses para salud mental. Y la privada puede costar más de 100€ por sesión. Pluravita existe para romper esa barrera: psicólogos reales, precios justos, disponibilidad en días. Sesiones desde 15€."
+            question: "¿Cómo puedo elegir al profesional adecuado?",
+            answer: "Contamos con un Test de Afinidad que te ayuda a identificar a los profesionales que mejor encajan con lo que buscas. También puedes explorar el listado completo y filtrar por sus áreas de enfoque, precio e idioma."
         },
         {
-            question: "¿Cuánto cuesta una sesión en pluravita?",
-            answer: "Las sesiones comienzan desde 15€ (precio base). Cada psicólogo fija su tarifa. Es transparente: ves el precio antes de reservar. Sin cuotas mensuales ni compromisos. Pagas solo cuando quieres."
+            question: "¿Qué puedo esperar de mi primera sesión?",
+            answer: "Es un espacio seguro y privado para ti. Podrás conversar sobre lo que te preocupa, tus objetivos o simplemente sobre cómo te sientes. La sesión se realiza por videollamada para que te sientas cómodo desde donde estés."
         },
         {
-            question: "¿Son psicólogos de verdad?",
-            answer: "Sí. Todos nuestros profesionales están colegiados y tienen su número de licencia verificado. Pueden ser psicólogos clínicos, sanitarios o con otras especializaciones. Siempre verás su número de colegiado en el perfil."
+            question: "¿Cómo funciona la garantía de conexión?",
+            answer: "Tu bienestar es nuestra prioridad. Si en tu primera sesión sientes que no has logrado conectar con el profesional, te facilitamos agendar una nueva sesión con otra persona sin coste adicional, hasta que encuentres a tu profesional ideal."
         },
         {
-            question: "¿Cuánto tiempo hasta tener mi primera cita?",
-            answer: "Mucho menos que en la pública. Muchos psicólogos tienen disponibilidad en pocos días. Eligues el horario que mejor te va, reservas en un clic y listo. Sin formularios, sin esperar a que te llamen."
+            question: "¿Es un servicio privado y confidencial?",
+            answer: "Totalmente. El respeto a tu privacidad es fundamental. Todas las sesiones se realizan bajo estrictos estándares de confidencialidad para que puedas expresarte con total libertad y tranquilidad."
         },
         {
-            question: "¿Qué pasa exactamente en una sesión?",
-            answer: "Es tu espacio. Hablarás de lo que te preocupa, de tus metas o simplemente de cómo te sientes hoy. La sesión se hace por videollamada desde donde tú estés. Sin desplazamientos, sin sala de espera."
-        },
-        {
-            question: "¿Cómo elijo al psicólogo adecuado?",
-            answer: "Tenemos un Test de Afinidad que hace el trabajo por ti. Te sugerimos a los psicólogos que más encajan con tu situación y personalidad. También puedes filtrar por especialidad, precio e idioma. El objetivo es que el 'clic' sea inmediato."
-        },
-        {
-            question: "¿Es confidencial?",
-            answer: "100%. Lo que hables con tu psicólogo es completamente privado. Cumplimos con el RGPD y el secreto profesional del Código Deontológico de la psicología. Puedes incluso elegir el modo anónimo al reservar."
-        },
-        {
-            question: "¿Y si no funciona con el primero?",
-            answer: "Lo entendemos perfectamente. Si en tu primera sesión sientes que no hay química, te regalamos otra con un psicólogo diferente sin coste adicional. Queremos que encuentres a tu persona, no solo a cualquiera."
-        },
-        {
-            question: "¿Es normal sentir nervios antes de la primera vez?",
-            answer: "¡Totalmente! A nosotros también nos pasaría. Es ese saltito al vacío que da vértigo, pero te prometemos que aquí hay una red esperándote. El primer paso es el más valiente, y el más barato que darás por tu salud mental."
+            question: "¿Cómo agendo una sesión?",
+            answer: "El proceso es inmediato. Una vez elijas a tu profesional, podrás ver su calendario con disponibilidad real, elegir el hueco que mejor te venga y confirmar tu reserva en pocos segundos."
         }
     ];
 
@@ -150,15 +146,15 @@ export default function LandingPage() {
                         <div className="flex flex-col items-start text-left space-y-8 animate-fade-in-up">
                             <div className="space-y-4">
                                 <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-[#4A3C31] leading-[1.1] tracking-tight uppercase">
-                                    Tu psicólogo <br />
-                                    <span className="text-[#A68363]">esta semana</span>, <br />
-                                    no en 6 meses
+                                    Encuentra tu <br />
+                                    <span className="text-[#A68363]">bienestar ideal</span> <br />
+                                    en pocos minutos
                                 </h1>
                                 <p className="text-lg md:text-xl text-[#6B6B6B] font-medium leading-relaxed max-w-xl">
-                                    Psicólogos colegiados a precios accesibles. Sin listas de espera, sin desplazamientos. Desde casa, a tu ritmo y desde solo 15€ por sesión.
+                                    Conecta con profesionales certificados en un espacio seguro y privado. Tú eliges el horario y el perfil que mejor se adapte a lo que necesitas hoy.
                                 </p>
                                 <div className="text-sm font-bold text-[#A68363] uppercase tracking-widest pt-2">
-                                    Sesiones desde 15€ · Psicólogos verificados y colegiados
+                                    Profesionales verificados · Sin listas de espera
                                 </div>
                             </div>
 
@@ -173,7 +169,7 @@ export default function LandingPage() {
                                         }
                                     }}
                                 >
-                                    Ver psicólogos
+                                    Ver profesionales disponibles
                                 </VibeButton>
                             </div>
                         </div>
@@ -214,16 +210,16 @@ export default function LandingPage() {
             {/* How it Works Section */}
             <section className="container mx-auto px-6 md:px-12 lg:px-20 py-20 text-center">
                 <h2 className="text-3xl font-bold text-[#4A3C31] mb-4 uppercase tracking-tighter">¿Cómo funciona? Muy sencillo</h2>
-                <p className="text-[#6B6B6B] mb-16 font-medium">En 3 pasos tienes tu sesión con un psicólogo colegiado. Sin papeleo, sin esperas.</p>
+                <p className="text-[#6B6B6B] mb-16 font-medium">Inicia tu proceso de bienestar en 3 pasos. Sin complicaciones, a tu ritmo.</p>
 
                 <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
                     <div className="flex flex-col items-center space-y-4">
                         <div className="bg-[#F2EDE7] p-6 rounded-full h-40 w-40 flex items-center justify-center mb-4 neo-shadow-sm transition-transform hover:scale-110">
                             <SearchIcon className="h-20 w-20 text-[#4A3C31]" />
                         </div>
-                        <h3 className="text-xl font-bold text-[#4A3C31] uppercase">Elige tu psicólogo</h3>
+                        <h3 className="text-xl font-bold text-[#4A3C31] uppercase">Elige tu profesional</h3>
                         <p className="text-[#6B6B6B] text-sm leading-relaxed font-medium">
-                            Explora perfiles con número de colegiado. Mira su especialidad, precio y disponibilidad real. Sin sorpresas.
+                            Explora perfiles verificados. Mira sus áreas de enfoque y disponibilidad real. Encuentra la conexión que buscas.
                         </p>
                     </div>
                     <div className="flex flex-col items-center space-y-4">
@@ -241,7 +237,7 @@ export default function LandingPage() {
                         </div>
                         <h3 className="text-xl font-bold text-[#4A3C31] uppercase">Tu sesión, desde casa</h3>
                         <p className="text-gray-600 text-sm leading-relaxed font-medium">
-                            Por videollamada, desde donde quieras. Sin desplazamientos, sin sala de espera. Así de cómodo y privado.
+                            Por videollamada segura, desde donde quieras. Sin desplazamientos, manteniendo siempre tu privacidad.
                         </p>
                     </div>
                 </div>
@@ -259,7 +255,7 @@ export default function LandingPage() {
                         }}
                         className="scale-100"
                     >
-                        Ver psicólogos disponibles
+                        Ver profesionales disponibles
                     </VibeButton>
                 </div>
             </section>
@@ -281,16 +277,16 @@ export default function LandingPage() {
                         </div>
                         <div className="space-y-8">
                             <div className="space-y-4">
-                                <h2 className="text-4xl font-black text-[#4A3C31] uppercase tracking-tighter">Calidad privada, precio justo</h2>
-                                <p className="text-lg font-bold text-[#A68363] uppercase tracking-widest">Tu primera sesión tiene red de seguridad</p>
+                                <h2 className="text-4xl font-black text-[#4A3C31] uppercase tracking-tighter">Garantía de satisfacción</h2>
+                                <p className="text-lg font-bold text-[#A68363] uppercase tracking-widest">Te acompañamos en todo tu proceso</p>
                             </div>
 
                             <div className="space-y-4 text-gray-700 font-medium">
                                 <p>
-                                    Una sesión con un psicólogo privado cuesta de media 80€–120€. En pluravita pagas desde 15€ por el mismo nivel de profesionalidad, pero sin el alquiler de consulta ni los intermediarios.
+                                    Queremos que te sientas en confianza desde el primer momento. La conexión profesional es fundamental para que tu proceso sea efectivo y te sientas escuchado.
                                 </p>
                                 <p>
-                                    Si en tu primera sesión sientes que no encaja, no te preocupes. <span className="font-bold text-[#A68363]">Te regalamos otra sesión</span> con un psicólogo diferente sin que pagues ni un euro más. El objetivo es que lo encuentres.
+                                    Si en tu primera cita no encuentras la conexión que necesitas, no te preocupes. <span className="font-bold text-[#A68363]">Puedes agendar otra sesión</span> con una nueva persona sin costo extra, hasta que encuentres a tu profesional ideal.
                                 </p>
                             </div>
 
@@ -300,7 +296,7 @@ export default function LandingPage() {
                                 onClick={handleBrowsingClick}
                                 className="scale-100"
                             >
-                                Elegir psicólogo
+                                Elegir profesional
                             </VibeButton>
                         </div>
                     </div>
@@ -314,17 +310,17 @@ export default function LandingPage() {
                         <div className="space-y-8 order-2 md:order-1">
                             <div className="space-y-4">
                                 <h2 className="text-4xl font-black text-[#4A3C31] uppercase tracking-tighter">
-                                    El psicólogo <br /> ideal para ti
+                                    Encuentra a tu <br /> profesional ideal
                                 </h2>
-                                <p className="text-lg font-bold text-[#A68363] uppercase tracking-widest">Test de afinidad · Resultados en 2 minutos</p>
+                                <p className="text-lg font-bold text-[#A68363] uppercase tracking-widest">Test de afinidad · Encuentra tu match</p>
                             </div>
 
                             <div className="space-y-4 text-gray-700 font-medium leading-relaxed">
                                 <p>
-                                    Por eso creamos nuestro Test de Afinidad. No es un examen, <span className="font-bold underline decoration-[#A68363] decoration-2">es una forma de conocerte</span> para recomendarte al psicólogo que mejor encaja con lo que estás viviendo.
+                                    Por eso diseñamos nuestro Test de Afinidad. <span className="font-bold underline decoration-[#A68363] decoration-2">Es una forma de conocer tus objetivos</span> para sugerirte al perfil que mejor encaja con lo que buscas y necesitas.
                                 </p>
                                 <p>
-                                    Tómate 2 minutos, descubre qué psicólogo es para ti y empieza esta semana. Sin esperas, sin complicaciones.
+                                    Tómate un par de minutos, descubre a tu profesional ideal y comienza hoy mismo. Sin esperas y con total privacidad.
                                 </p>
                             </div>
 
