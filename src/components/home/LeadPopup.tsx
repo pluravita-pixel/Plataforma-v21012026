@@ -13,19 +13,38 @@ export function LeadPopup() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSubmitted, setIsSubmitted] = useState(false)
 
+    // Helper to get cookie
+    const getCookie = (name: string) => {
+        if (typeof document === 'undefined') return null;
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()?.split(';').shift();
+        return null;
+    }
+
+    // Helper to set cookie
+    const setCookie = (name: string, value: string, days: number) => {
+        const d = new Date();
+        d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+        const expires = `expires=${d.toUTCString()}`;
+        document.cookie = `${name}=${value};${expires};path=/;SameSite=Lax`;
+    }
+
     useEffect(() => {
-        const hasSeenPopup = localStorage.getItem('hasSeenDiscountPopup')
-        if (!hasSeenPopup) {
+        // Only show if the "submitted" cookie doesn't exist
+        const hasSubmitted = getCookie('pluravita_lead_submitted')
+
+        if (!hasSubmitted) {
             const timer = setTimeout(() => {
                 setIsOpen(true)
-            }, 5000) // Show after 5 seconds
+            }, 5000)
             return () => clearTimeout(timer)
         }
     }, [])
 
     const handleClose = () => {
         setIsOpen(false)
-        localStorage.setItem('hasSeenDiscountPopup', 'true')
+        // We DON'T set any persistent cookie here, so it will show again on refresh
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -38,9 +57,12 @@ export function LeadPopup() {
 
         if (result.success) {
             setIsSubmitted(true)
+            // SET THE SECRET COOKIE ONLY ON SUCCESS
+            setCookie('pluravita_lead_submitted', 'true', 365)
+
             toast.success('¡Genial! Revisa tu email para el descuento.')
             setTimeout(() => {
-                handleClose()
+                setIsOpen(false)
             }, 3000)
         } else {
             toast.error('Hubo un error. Inténtalo de nuevo.')
