@@ -7,6 +7,8 @@ import { Star, Clock, ShieldCheck, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { motion } from "framer-motion";
+
 interface Psychologist {
     id: string;
     fullName: string;
@@ -50,8 +52,22 @@ export function CoachesList({ coaches, currentUser }: CoachesListProps) {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                    {coaches.slice(0, 3).map((coach) => (
-                        <div key={coach.id} className="bg-white p-6 rounded-[2rem] neo-shadow-sm hover:neo-shadow transition-all duration-300 flex flex-col gap-6">
+                    {coaches.slice(0, 3).map((coach, index) => (
+                        <motion.div
+                            key={coach.id}
+                            initial={{ y: 0 }}
+                            animate={{
+                                y: [0, -10, 0],
+                                scale: [1, 1.02, 1]
+                            }}
+                            transition={{
+                                duration: 4 + index * 0.5,
+                                repeat: Infinity,
+                                ease: "easeInOut",
+                                delay: index * 0.2
+                            }}
+                            className="bg-white p-6 rounded-[2rem] neo-shadow-sm hover:neo-shadow transition-all duration-300 flex flex-col gap-6"
+                        >
                             {/* Profile Header */}
                             <div className="flex items-center gap-4">
                                 <div className="relative w-20 h-20 flex-shrink-0 rounded-full overflow-hidden border-2 border-[#F2EDE7] shadow-sm">
@@ -110,7 +126,7 @@ export function CoachesList({ coaches, currentUser }: CoachesListProps) {
                                     </Button>
                                 }
                             />
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
             </div>

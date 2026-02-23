@@ -16,8 +16,9 @@ import {
 } from "@/components/ui/accordion";
 import { getGlobalStats } from "@/app/actions/stats";
 import { getCurrentUser } from "@/app/actions/auth";
-import { getOyentes } from "@/app/actions/oyentes";
 import { CoachesList } from "@/components/home/CoachesList";
+import { LeadPopup } from "@/components/home/LeadPopup";
+import { LeadFooter } from "@/components/home/LeadFooter";
 
 // Premium Vibe Button Component
 // Premium Clean Button Component
@@ -366,6 +367,12 @@ export default function LandingPage() {
                     ))}
                 </Accordion>
             </section>
+
+            {/* Lead Collection Footer */}
+            <LeadFooter />
+
+            {/* Lead Collection Popup */}
+            <LeadPopup />
         </div>
     );
 }
