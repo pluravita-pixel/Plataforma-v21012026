@@ -1,24 +1,19 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
-import { revalidatePath } from 'next/cache'
+import { client } from "@/db";
 
 export async function createLead(email: string, source: string) {
-    const supabase = await createClient()
+    try {
+        const result = await client`
+            INSERT INTO leads (email, source)
+            VALUES (${email.toLowerCase().trim()}, ${source})
+            ON CONFLICT (email) DO NOTHING
+            RETURNING id;
+        `;
 
-    const { data, error } = await supabase
-        .from('leads')
-        .insert([{ email, source }])
-        .select()
-
-    if (error) {
-        if (error.code === '23505') {
-            // email already exists
-            return { success: true, message: 'Ya estás registrado para el descuento.' }
-        }
-        console.error('Error creating lead:', error)
-        return { success: false, error: error.message }
+        return { success: true, data: result[0] };
+    } catch (error: any) {
+        console.error('Error creating lead:', error);
+        return { success: false, error: error.message };
     }
-
-    return { success: true, data }
 }
