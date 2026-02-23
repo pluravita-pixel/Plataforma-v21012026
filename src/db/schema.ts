@@ -222,6 +222,13 @@ export const blogPosts = pgTable("blog_posts", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const leads = pgTable("leads", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  email: text("email").notNull().unique(),
+  source: text("source"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const oyentesRelations = relations(oyentes, ({ many }) => ({
   withdrawals: many(withdrawals),
   appointments: many(appointments),
@@ -232,3 +239,5 @@ export type AvailabilitySlot = typeof availabilitySlots.$inferSelect;
 export type NewAvailabilitySlot = typeof availabilitySlots.$inferInsert;
 export type BlogPost = typeof blogPosts.$inferSelect;
 export type NewBlogPost = typeof blogPosts.$inferInsert;
+export type Lead = typeof leads.$inferSelect;
+export type NewLead = typeof leads.$inferInsert;
