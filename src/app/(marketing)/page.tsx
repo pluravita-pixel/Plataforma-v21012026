@@ -92,19 +92,19 @@ export default function LandingPage() {
 
     const landingStats = [
         {
-            number: "Bienestar Real",
-            label: "Procesos de cambio",
-            quote: '"Cada persona tiene una historia única de crecimiento y evolución personal"'
+            number: "Vidas transformadas",
+            label: "Bienestar Real",
+            quote: '"Cada persona tiene una historia única de cambio"'
         },
         {
-            number: "Sesiones con Propósito",
-            label: "Encuentros para ti",
-            quote: '"Cada sesión es un paso firme hacia tu bienestar y equilibrio emocional"'
+            number: "Sesiones completadas",
+            label: "Calidad profesional",
+            quote: '"Cada sesión es un paso hacia tu equilibrio"'
         },
         {
-            number: "Profesionales Listos",
+            number: "Profesionales en línea",
             label: "Acompañamiento experto",
-            quote: '"Especialistas capacitados para escucharte y apoyarte cuando más lo necesites"'
+            quote: '"Listos para escucharte cuando lo necesites"'
         }
     ];
 
@@ -146,15 +146,14 @@ export default function LandingPage() {
                         <div className="flex flex-col items-start text-left space-y-8 animate-fade-in-up">
                             <div className="space-y-4">
                                 <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-[#4A3C31] leading-[1.1] tracking-tight uppercase">
-                                    Encuentra tu <br />
-                                    <span className="text-[#A68363]">bienestar ideal</span> <br />
-                                    en pocos minutos
+                                    Psicólogos en línea <br />
+                                    <span className="text-[#A68363]">de lunes a domingo</span>
                                 </h1>
                                 <p className="text-lg md:text-xl text-[#6B6B6B] font-medium leading-relaxed max-w-xl">
-                                    Conecta con profesionales certificados en un espacio seguro y privado. Tú eliges el horario y el perfil que mejor se adapte a lo que necesitas hoy.
+                                    Conecta con psicólogos en línea certificados y comienza tu proceso por videollamada. Atención profesional y privada. Tú eliges fecha y horario.
                                 </p>
                                 <div className="text-sm font-bold text-[#A68363] uppercase tracking-widest pt-2">
-                                    Profesionales verificados · Sin listas de espera
+                                    Encuentra a tu profesional ideal en minutos
                                 </div>
                             </div>
 
@@ -209,35 +208,35 @@ export default function LandingPage() {
 
             {/* How it Works Section */}
             <section className="container mx-auto px-6 md:px-12 lg:px-20 py-20 text-center">
-                <h2 className="text-3xl font-bold text-[#4A3C31] mb-4 uppercase tracking-tighter">¿Cómo funciona? Muy sencillo</h2>
-                <p className="text-[#6B6B6B] mb-16 font-medium">Inicia tu proceso de bienestar en 3 pasos. Sin complicaciones, a tu ritmo.</p>
+                <h2 className="text-3xl font-bold text-[#4A3C31] mb-4 uppercase tracking-tighter">¿Cómo funciona el proceso online?</h2>
+                <p className="text-[#6B6B6B] mb-16 font-medium">Iniciar tu camino con un profesional en línea es muy fácil.</p>
 
                 <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
                     <div className="flex flex-col items-center space-y-4">
                         <div className="bg-[#F2EDE7] p-6 rounded-full h-40 w-40 flex items-center justify-center mb-4 neo-shadow-sm transition-transform hover:scale-110">
                             <SearchIcon className="h-20 w-20 text-[#4A3C31]" />
                         </div>
-                        <h3 className="text-xl font-bold text-[#4A3C31] uppercase">Elige tu profesional</h3>
+                        <h3 className="text-xl font-bold text-[#4A3C31] uppercase">Paso 1: Elige a tu profesional</h3>
                         <p className="text-[#6B6B6B] text-sm leading-relaxed font-medium">
-                            Explora perfiles verificados. Mira sus áreas de enfoque y disponibilidad real. Encuentra la conexión que buscas.
+                            Navega por nuestro listado o utiliza nuestra herramienta de match para encontrar a tu profesional ideal.
                         </p>
                     </div>
                     <div className="flex flex-col items-center space-y-4">
                         <div className="bg-[#FFF5EB] p-6 rounded-full h-40 w-40 flex items-center justify-center mb-4 neo-shadow-sm transition-transform hover:scale-110">
                             <CalendarIcon className="h-20 w-20 text-gray-700" />
                         </div>
-                        <h3 className="text-xl font-bold text-[#4A3C31] uppercase">Reserva en segundos</h3>
+                        <h3 className="text-xl font-bold text-[#4A3C31] uppercase">Paso 2: Agenda una cita online</h3>
                         <p className="text-gray-600 text-sm leading-relaxed font-medium">
-                            Sin llamadas, sin formularios. Elige el hueco que prefieras. Sin esperar a que te llamen de vuelta.
+                            Olvida las esperas. Elige el día y la hora que mejor se adapte a tu rutina, sin complicaciones.
                         </p>
                     </div>
                     <div className="flex flex-col items-center space-y-4">
                         <div className="bg-[#FFF5EB] p-6 rounded-full h-40 w-40 flex items-center justify-center mb-4 neo-shadow-sm transition-transform hover:scale-110">
                             <VideoIcon className="h-20 w-20 text-gray-700" />
                         </div>
-                        <h3 className="text-xl font-bold text-[#4A3C31] uppercase">Tu sesión, desde casa</h3>
+                        <h3 className="text-xl font-bold text-[#4A3C31] uppercase">Paso 3: Inicia tu proceso</h3>
                         <p className="text-gray-600 text-sm leading-relaxed font-medium">
-                            Por videollamada segura, desde donde quieras. Sin desplazamientos, manteniendo siempre tu privacidad.
+                            Conéctate desde cualquier lugar en un entorno seguro, cómodo y privado a través de videollamada.
                         </p>
                     </div>
                 </div>
@@ -278,7 +277,7 @@ export default function LandingPage() {
                         <div className="space-y-8">
                             <div className="space-y-4">
                                 <h2 className="text-4xl font-black text-[#4A3C31] uppercase tracking-tighter">Garantía de satisfacción</h2>
-                                <p className="text-lg font-bold text-[#A68363] uppercase tracking-widest">Te acompañamos en todo tu proceso</p>
+                                <p className="text-lg font-bold text-[#A68363] uppercase tracking-widest">Tu primera sesión sin riesgo</p>
                             </div>
 
                             <div className="space-y-4 text-gray-700 font-medium">
@@ -296,7 +295,7 @@ export default function LandingPage() {
                                 onClick={handleBrowsingClick}
                                 className="scale-100"
                             >
-                                Elegir profesional
+                                Sí, quiero comenzar
                             </VibeButton>
                         </div>
                     </div>
@@ -310,9 +309,9 @@ export default function LandingPage() {
                         <div className="space-y-8 order-2 md:order-1">
                             <div className="space-y-4">
                                 <h2 className="text-4xl font-black text-[#4A3C31] uppercase tracking-tighter">
-                                    Encuentra a tu <br /> profesional ideal
+                                    Encuentra hoy a tu <br /> profesional ideal
                                 </h2>
-                                <p className="text-lg font-bold text-[#A68363] uppercase tracking-widest">Test de afinidad · Encuentra tu match</p>
+                                <p className="text-lg font-bold text-[#A68363] uppercase tracking-widest">Test de afinidad terapéutica</p>
                             </div>
 
                             <div className="space-y-4 text-gray-700 font-medium leading-relaxed">
