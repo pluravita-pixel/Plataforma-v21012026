@@ -209,6 +209,19 @@ export const availabilitySlotsRelations = relations(availabilitySlots, ({ one })
   }),
 }));
 
+export const blogPosts = pgTable("blog_posts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  excerpt: text("excerpt"),
+  image: text("image"),
+  category: text("category").default("General"),
+  author: text("author").default("Pluravita Team"),
+  publishedAt: timestamp("published_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const oyentesRelations = relations(oyentes, ({ many }) => ({
   withdrawals: many(withdrawals),
   appointments: many(appointments),
@@ -217,3 +230,5 @@ export const oyentesRelations = relations(oyentes, ({ many }) => ({
 
 export type AvailabilitySlot = typeof availabilitySlots.$inferSelect;
 export type NewAvailabilitySlot = typeof availabilitySlots.$inferInsert;
+export type BlogPost = typeof blogPosts.$inferSelect;
+export type NewBlogPost = typeof blogPosts.$inferInsert;

@@ -17,7 +17,8 @@ import {
     ChevronLeft,
     ChevronRight,
     Menu,
-    X
+    X,
+    BookOpen
 } from "lucide-react";
 import { LogoutButton } from "@/components/logout-button";
 import { UserNav } from "@/components/user-nav";
@@ -36,6 +37,7 @@ export default function OyenteLayout({
         { icon: Users, label: "Mis Usuarios", href: "/oyente/usuarios" },
         { icon: Calendar, label: "Calendario", href: "/oyente/calendar" },
         { icon: Wallet, label: "Saldo y Pagos", href: "/oyente/balance" },
+        { icon: BookOpen, label: "Blog", href: "/blog" },
         { icon: UserCircle, label: "Editar Perfil", href: "/oyente/profile" },
         { icon: Settings, label: "Configuración", href: "/oyente/settings" },
     ];

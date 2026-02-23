@@ -16,7 +16,8 @@ import {
     ChevronLeft,
     ChevronRight,
     Menu,
-    X
+    X,
+    BookOpen
 } from "lucide-react";
 import { LogoutButton } from "@/components/logout-button";
 import { UserNav } from "@/components/user-nav";
@@ -35,6 +36,7 @@ export default function UsuarioLayout({
         { icon: LayoutDashboard, label: "Inicio", href: "/usuario/dashboard" },
         { icon: Search, label: "Buscar", href: "/usuario/search" },
         { icon: Calendar, label: "Mis Citas", href: "/usuario/appointments" },
+        { icon: BookOpen, label: "Blog", href: "/blog" },
         { icon: UserCircle, label: "Mi Cuenta", href: "/usuario/profile" },
     ];
 

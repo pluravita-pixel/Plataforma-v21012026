@@ -65,6 +65,7 @@ export default function MarketingLayout({
                             </Link>
                         )}
                         <Link href="#faq" className="text-[#6B6B6B] hover:text-[#A68363] transition-colors">Preguntas frecuentes</Link>
+                        <Link href="/blog" className="text-[#6B6B6B] hover:text-[#A68363] transition-colors">Blog</Link>
                         {user?.role === 'oyente' ? (
                             <Link href="/oyente/dashboard" className="text-[#A68363] font-bold border-l pl-8 hover:opacity-80 transition-opacity">Panel de Psicólogo</Link>
                         ) : null}
@@ -122,6 +123,13 @@ export default function MarketingLayout({
                                     className="text-[#6B6B6B] hover:text-[#A68363] transition-colors py-3 px-4 rounded-lg hover:bg-[#F2EDE7] font-medium"
                                 >
                                     Preguntas frecuentes
+                                </Link>
+                                <Link
+                                    href="/blog"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="text-[#6B6B6B] hover:text-[#A68363] transition-colors py-3 px-4 rounded-lg hover:bg-[#F2EDE7] font-medium"
+                                >
+                                    Blog
                                 </Link>
 
                                 <div className="border-t border-gray-100 pt-4 mt-4">

@@ -15,7 +15,9 @@ import {
     ChevronLeft,
     ChevronRight,
     Menu,
-    X
+    X,
+    Calendar,
+    BookOpen
 } from "lucide-react";
 import { LogoutButton } from "@/components/logout-button";
 import { UserNav } from "@/components/user-nav";
@@ -31,10 +33,12 @@ export default function AdminLayout({
 
     const navItems = [
         { icon: LayoutDashboard, label: "Resumen", href: "/admin/dashboard" },
+        { icon: Calendar, label: "Sesiones", href: "/admin/sesiones" },
         { icon: Users, label: "Usuarios", href: "/admin/usuarios" },
         { icon: Users, label: "Psicólogos", href: "/admin/oyentes" },
         { icon: ShieldCheck, label: "Solicitudes", href: "/admin/oyentes-pendientes" },
         { icon: MessageCircle, label: "Soporte", href: "/admin/support" },
+        { icon: BookOpen, label: "Ver Blog", href: "/blog" },
         { icon: Settings, label: "Configuración", href: "/admin/settings" },
     ];
 

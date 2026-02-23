@@ -350,3 +350,18 @@ export async function getUsuarioAppointments(usuarioId: string) {
     });
     return userAppointments;
 }
+
+export async function getAllAppointments() {
+    const user = await getCurrentUser();
+    if (!user || user.role !== 'admin') {
+        throw new Error("No autorizado.");
+    }
+    const allAppointments = await db.query.appointments.findMany({
+        orderBy: [desc(appointments.date)],
+        with: {
+            usuario: true,
+            oyente: true
+        }
+    });
+    return allAppointments;
+}

@@ -340,16 +340,22 @@ export function BookingModal({
                 return;
             }
 
-            // 2. SIMULATED PAYMENT (Fake Door Test)
-            // Instead of redirecting to Stripe, we simulate the process
-            await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate gateway processing
+            // 2. Stripe Checkout Session
+            const session = await createCheckoutSession(result.appointmentId);
 
-            // 3. Confirm Appointment immediately
-            const confirmResult = await confirmAppointmentPayment(result.appointmentId);
+            if (session.error || !session.url) {
+                toast.error(session.error || "Error al iniciar el pago con Stripe");
+                setIsLoading(false);
+                return;
+            }
 
-            setStep(4);
-            toast.success("¡Pago procesado con éxito!");
-            setIsLoading(false);
+            // Save state to recover if canceled
+            localStorage.setItem("last_oyente_id", listenerId);
+            localStorage.setItem("booking_form_data", JSON.stringify(formData));
+            localStorage.setItem("booking_selected_slot", JSON.stringify(selectedSlot));
+
+            // Redirect to Stripe
+            window.location.href = session.url;
 
         } catch (error) {
             console.error("Booking simulation error:", error);
