@@ -81,7 +81,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                         {post.content.split('\n').map((line: string, i: number) => {
                             if (line.startsWith('# ')) return <h1 key={i}>{line.replace('# ', '')}</h1>;
                             if (line.startsWith('## ')) return <h2 key={i} className="mt-12">{line.replace('## ', '')}</h2>;
-                            if (line.startsWith('* ')) return <li key={i}>{line.replace('* ', '')}</li>;
+                            if (line.startsWith('### ')) return <h3 key={i} className="mt-8 text-2xl">{line.replace('### ', '')}</h3>;
+                            if (line.match(/^\d+\. /)) {
+                                return <li key={i} className="ml-4 list-decimal">{line.replace(/^\d+\. /, '')}</li>;
+                            }
+                            if (line.startsWith('* ')) return <li key={i} className="ml-4 list-disc">{line.replace('* ', '')}</li>;
                             if (line.trim() === '') return <br key={i} />;
                             return <p key={i}>{line}</p>;
                         })}
