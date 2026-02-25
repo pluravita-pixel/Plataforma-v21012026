@@ -13,6 +13,7 @@ import {
     Activity,
     Euro
 } from "lucide-react";
+import { MaintenanceActions } from "@/components/admin/MaintenanceActions";
 
 export default async function AdminDashboard() {
     const [statsData, allOyentes] = await Promise.all([
@@ -51,6 +52,9 @@ export default async function AdminDashboard() {
                     </div>
                 ))}
             </div>
+
+            {/* Maintenance Section */}
+            <MaintenanceActions />
 
             <div className="grid grid-cols-1 gap-12">
                 {/* Oyentes List */}

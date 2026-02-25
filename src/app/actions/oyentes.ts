@@ -146,6 +146,28 @@ export async function getOyentes() {
     }
 }
 
+export async function getOyenteByUsername(username: string) {
+    try {
+        const result = await client`
+            SELECT * FROM oyentes 
+            WHERE username = ${username} 
+            AND is_hidden IS NOT TRUE 
+            LIMIT 1
+        `;
+
+        if (result.length > 0) {
+            return mapOyente(result[0]);
+        }
+        return null;
+    } catch (error: any) {
+        if (error.digest === 'DYNAMIC_SERVER_USAGE' || (error.message && error.message.includes('Dynamic server usage'))) {
+            throw error;
+        }
+        console.error("Error in getOyenteByUsername:", error);
+        return null;
+    }
+}
+
 export async function getWithdrawals(oyenteId: string) {
     await ensureOyente(oyenteId);
     try {

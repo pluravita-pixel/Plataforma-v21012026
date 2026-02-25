@@ -65,6 +65,26 @@ export default async function OyenteDashboard() {
                 <p className="text-gray-500 mt-2 font-medium">Aquí tienes un resumen de lo que está pasando hoy.</p>
             </div>
 
+            {/* Public Link Section */}
+            <div className="bg-[#4A3C31] p-6 rounded-[2rem] text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden group">
+                <div className="absolute right-0 top-0 w-32 h-32 bg-white/5 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+                <div className="relative z-10 text-center md:text-left">
+                    <h3 className="text-lg font-black uppercase tracking-widest text-[#A68363]">Tu página personalizada</h3>
+                    <p className="text-xs text-white/70 font-medium mt-1">Comparte este link con tus clientes para que reserven directamente contigo.</p>
+                </div>
+                <div className="flex items-center gap-3 relative z-10 w-full md:w-auto">
+                    <div className="bg-white/10 px-4 py-3 rounded-xl border border-white/10 font-mono text-xs truncate max-w-[200px] md:max-w-xs">
+                        pluravita.com/psicologo/{data.psych.username || '...'}
+                    </div>
+                    <Link
+                        href={`/psicologo/${data.psych.username}`}
+                        className="bg-[#A68363] hover:bg-white hover:text-black transition-all px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2"
+                    >
+                        Ver Perfil
+                    </Link>
+                </div>
+            </div>
+
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {stats.map((stat, i) => (

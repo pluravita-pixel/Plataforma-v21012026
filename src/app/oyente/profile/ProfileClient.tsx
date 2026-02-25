@@ -72,9 +72,9 @@ export function ProfileClient({ psychologist }: ProfileClientProps) {
         setBaseUrl(window.location.origin);
     }, []);
 
-    const publicUrl = psychologist.refCode
-        ? `${baseUrl}/api/ref/${psychologist.refCode}`
-        : `${baseUrl}/usuario/search?search=${profile.username || 'tu-username'}`;
+    const publicUrl = profile.username
+        ? `${baseUrl}/psicologo/${profile.username}`
+        : `${baseUrl}/usuario/search`;
 
     const handleCopyUrl = () => {
         navigator.clipboard.writeText(publicUrl);

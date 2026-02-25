@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 interface Psychologist {
     id: string;
     fullName: string;
+    username: string | null;
     specialty: string | null;
     image: string | null;
     price: string | number | null;
@@ -70,7 +71,7 @@ export function CoachesList({ coaches, currentUser }: CoachesListProps) {
                         >
                             {/* Profile Header */}
                             <div className="flex items-center gap-4">
-                                <div className="relative w-20 h-20 flex-shrink-0 rounded-full overflow-hidden border-2 border-[#F2EDE7] shadow-sm">
+                                <Link href={`/psicologo/${coach.username || coach.id}`} className="relative w-20 h-20 flex-shrink-0 rounded-full overflow-hidden border-2 border-[#F2EDE7] shadow-sm hover:scale-105 transition-transform">
                                     {coach.image ? (
                                         <Image
                                             src={coach.image}
@@ -83,11 +84,13 @@ export function CoachesList({ coaches, currentUser }: CoachesListProps) {
                                             {coach.fullName[0]}
                                         </div>
                                     )}
-                                </div>
+                                </Link>
                                 <div className="flex-1 min-w-0">
-                                    <h3 className="text-xl font-black text-[#4A3C31] uppercase tracking-tight truncate leading-none mb-1">
-                                        {coach.fullName}
-                                    </h3>
+                                    <Link href={`/psicologo/${coach.username || coach.id}`}>
+                                        <h3 className="text-xl font-black text-[#4A3C31] uppercase tracking-tight truncate leading-none mb-1 hover:text-[#A68363] transition-colors">
+                                            {coach.fullName}
+                                        </h3>
+                                    </Link>
                                     <div className="flex flex-col gap-0.5">
                                         <span className="text-[9px] font-black text-[#A68363] uppercase tracking-widest">
                                             {coach.specialty || "Psicólogo General"}

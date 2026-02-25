@@ -46,16 +46,35 @@ export async function getAvailabilitySlots(oyenteId: string, startDate?: Date, e
         )
         .orderBy(availabilitySlots.startTime);
 
-    // Fake Door Test: Si no hay slots reales, devolvemos slots virtuales
+    // Fake Door Test: Si no hay slots reales, devolvemos slots virtuales RANDOMizados
     if (slots.length === 0 && startDate) {
-        const virtualHours = [9, 10, 11, 12, 16, 17, 18];
-        return virtualHours.map(h => {
+        // Horas preferentes para simular realidad (algunas mañanas, algunas tardes)
+        const possibleHours = [9, 10, 11, 12, 13, 16, 17, 18, 19, 20];
+
+        // Generar una semilla basada en el ID y la fecha para que sea consistente pero "random"
+        const seedStr = `${oyenteId}-${startDate.toDateString()}`;
+        const seedNum = seedStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+
+        // Decidir cuántos slots mostrar hoy (entre 2 y 5)
+        const numSlots = (seedNum % 4) + 2;
+
+        // Seleccionar horas basadas en el seed
+        const selectedHours = [];
+        for (let i = 0; i < numSlots; i++) {
+            const hIndex = (seedNum * (i + 1)) % possibleHours.length;
+            selectedHours.push(possibleHours[hIndex]);
+        }
+
+        // Eliminar duplicados
+        const uniqueHours = Array.from(new Set(selectedHours)).sort((a, b) => a - b);
+
+        return uniqueHours.map(h => {
             const slotStart = new Date(startDate);
             slotStart.setHours(h, 0, 0, 0);
             const slotEnd = new Date(startDate);
             slotEnd.setHours(h + 1, 0, 0, 0);
 
-            // Solo devolver si es futuro + 48h
+            // Solo devolver si es futuro + 48h (o la regla que se aplique)
             if (slotStart < start) return null;
 
             return {
