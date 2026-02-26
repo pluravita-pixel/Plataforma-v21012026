@@ -78,7 +78,7 @@ export function ProfileBookingItem({ coach, currentUser }: ProfileBookingItemPro
                     </h3>
                     <div className="flex items-center gap-2 text-[#A68363]">
                         <ShieldCheck className="h-4 w-4" />
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Col. COP-41053</span>
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Psicólogo Colegiado</span>
                     </div>
                 </div>
 
@@ -96,8 +96,8 @@ export function ProfileBookingItem({ coach, currentUser }: ProfileBookingItemPro
 
                 <div className="pt-4 flex items-center gap-6 border-t border-[#F2EDE7]">
                     <div className="flex flex-col">
-                        <span className="text-[9px] font-black text-[#A68363] uppercase tracking-widest mb-1">Colegiado</span>
-                        <span className="text-sm font-black text-[#4A3C31] uppercase">COP-41053</span>
+                        <span className="text-[9px] font-black text-[#A68363] uppercase tracking-widest mb-1">Estatus</span>
+                        <span className="text-sm font-black text-[#4A3C31] uppercase">Colegiado</span>
                     </div>
                     <div className="flex flex-col">
                         <span className="text-[9px] font-black text-[#A68363] uppercase tracking-widest mb-1">Idiomas</span>
