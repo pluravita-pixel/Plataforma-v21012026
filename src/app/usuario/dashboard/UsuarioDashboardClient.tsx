@@ -13,9 +13,12 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { BookingModal } from "@/components/booking/BookingModal";
 import { useEffect, useState } from "react";
+import { CheckCircle2, PartyPopper, X } from "lucide-react";
+import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface UsuarioDashboardClientProps {
     initialData: any;
@@ -25,9 +28,19 @@ export default function UsuarioDashboardClient({ initialData }: UsuarioDashboard
     const [isMounted, setIsMounted] = useState(false);
     const router = useRouter();
 
+    const searchParams = useSearchParams();
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
     useEffect(() => {
         setIsMounted(true);
-    }, []);
+        if (searchParams.get("success") === "true") {
+            setShowSuccessModal(true);
+            // Clean the URL
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, '', newUrl);
+            toast.success("¡Pago confirmado! Tu sesión ya está programada.");
+        }
+    }, [searchParams]);
 
     // Extract data with safe fallbacks
     const user = initialData?.user;
@@ -62,6 +75,59 @@ export default function UsuarioDashboardClient({ initialData }: UsuarioDashboard
 
     return (
         <div className="space-y-10 animate-in fade-in duration-700 pb-20">
+            {/* Success Modal Overlay */}
+            <AnimatePresence>
+                {showSuccessModal && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#4A3C31]/40 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="bg-white rounded-[3.5rem] p-10 max-w-md w-full shadow-2xl relative overflow-hidden text-center"
+                        >
+                            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 to-[#A68363]"></div>
+                            <button
+                                onClick={() => setShowSuccessModal(false)}
+                                className="absolute top-6 right-6 p-2 rounded-full hover:bg-gray-100 text-gray-400 transition-colors"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+
+                            <div className="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+                                <CheckCircle2 className="h-12 w-12 text-emerald-500" />
+                            </div>
+
+                            <h2 className="text-3xl font-black text-[#4A3C31] mb-4">
+                                ¡Reserva Confirmada!
+                            </h2>
+
+                            <p className="text-gray-500 font-medium mb-8 leading-relaxed">
+                                Tu pago se ha procesado correctamente. Hemos enviado los detalles de tu sesión a tu correo electrónico.
+                            </p>
+
+                            {nextAppointment && (
+                                <div className="bg-[#F9F5F0] rounded-3xl p-6 mb-8 border border-[#F2EDE7] text-left">
+                                    <p className="text-[10px] font-black text-[#A68363] uppercase tracking-widest mb-2">Próxima cita</p>
+                                    <p className="text-sm font-black text-[#4A3C31]">
+                                        {format(new Date(nextAppointment.date), "EEEE d 'de' MMMM", { locale: es })}
+                                    </p>
+                                    <p className="text-xs font-bold text-gray-400">
+                                        A las {format(new Date(nextAppointment.date), "HH:mm")} hrs con {nextAppointment.oyente?.fullName}
+                                    </p>
+                                </div>
+                            )}
+
+                            <Button
+                                onClick={() => setShowSuccessModal(false)}
+                                className="w-full bg-[#4A3C31] hover:bg-black text-white h-16 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl"
+                            >
+                                Perfecto, gracias
+                            </Button>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
             {/* Hero Section */}
             <div className="relative overflow-hidden rounded-[3rem] bg-gradient-to-br from-[#4A3C31] to-[#2C241D] p-12 text-white shadow-2xl shadow-[#4A3C31]/20">
                 <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
