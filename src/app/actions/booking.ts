@@ -40,8 +40,7 @@ export async function getAvailabilitySlots(oyenteId: string, startDate?: Date, e
             and(
                 eq(availabilitySlots.oyenteId, oyenteId),
                 gte(availabilitySlots.startTime, start),
-                lte(availabilitySlots.endTime, end),
-                eq(availabilitySlots.isBooked, false)
+                lte(availabilitySlots.endTime, end)
             )
         )
         .orderBy(availabilitySlots.startTime);

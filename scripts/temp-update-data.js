@@ -44,34 +44,43 @@ async function updateData() {
             await sql`DELETE FROM availability_slots WHERE oyente_id = ${oyenteId}`;
 
             const now = new Date();
+            const allSlots = [];
+
+            // Generar 4 slots por día durante 7 días
             for (let i = 0; i < 7; i++) {
                 const day = new Date(now);
                 day.setDate(now.getDate() + i);
                 day.setHours(0, 0, 0, 0);
 
-                // 4 horas al día (ej: 10, 11, 16, 17)
                 const hours = [10, 11, 16, 17];
-
-                // Shuffle hours to book 2-3 randomly
-                const shuffled = [...hours].sort(() => 0.5 - Math.random());
-                const numToBook = Math.floor(Math.random() * 2) + 2; // 2 o 3
-                const bookedHours = shuffled.slice(0, numToBook);
-
                 for (const h of hours) {
                     const startTime = new Date(day);
-                    startTime.setHours(h);
+                    startTime.setHours(h, 0, 0, 0);
 
                     const endTime = new Date(startTime);
-                    endTime.setHours(h + 1);
+                    endTime.setHours(h + 1, 0, 0, 0);
 
-                    const isBooked = bookedHours.includes(h);
-
-                    await sql`INSERT INTO availability_slots (oyente_id, start_time, end_time, is_booked) 
-                              VALUES (${oyenteId}, ${startTime.toISOString()}, ${endTime.toISOString()}, ${isBooked})`;
+                    allSlots.push({
+                        startTime: startTime.toISOString(),
+                        endTime: endTime.toISOString()
+                    });
                 }
             }
+
+            // Seleccionar 3-5 aleatorios para marcar como ocupados
+            const numToBook = Math.floor(Math.random() * 3) + 3; // 3, 4 o 5
+            const shuffledIndices = [...Array(allSlots.length).keys()].sort(() => 0.5 - Math.random());
+            const bookedIndices = new Set(shuffledIndices.slice(0, numToBook));
+
+            for (let idx = 0; idx < allSlots.length; idx++) {
+                const slot = allSlots[idx];
+                const isBooked = bookedIndices.has(idx);
+
+                await sql`INSERT INTO availability_slots (oyente_id, start_time, end_time, is_booked) 
+                          VALUES (${oyenteId}, ${slot.startTime}, ${slot.endTime}, ${isBooked})`;
+            }
         }
-        console.log("✅ Disponibilidad actualizada: 4h/día, 2-3 ocupadas por cada profesional.");
+        console.log("✅ Disponibilidad actualizada: 4h/día, 3-5 ocupadas POR SEMANA.");
 
     } catch (error) {
         console.error("❌ Error:", error);

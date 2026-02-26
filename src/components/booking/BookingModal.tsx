@@ -556,13 +556,16 @@ export function BookingModal({
                                                             ) : daySlots.slice(0, 10).map(slot => (
                                                                 <button
                                                                     key={slot.id}
+                                                                    disabled={slot.isBooked}
                                                                     onClick={() => setSelectedSlot(slot)}
-                                                                    className={`py-2 rounded-lg border text-[9px] font-black transition-all ${selectedSlot?.id === slot.id
-                                                                        ? "bg-[#A68363] text-white border-[#A68363] shadow-md scale-[1.05]"
-                                                                        : "bg-white border-white text-gray-500 hover:border-[#A68363]/50 hover:text-[#A68363]"
+                                                                    className={`py-2 rounded-lg border text-[9px] font-black transition-all ${slot.isBooked
+                                                                        ? "bg-gray-100 border-gray-100 text-gray-300 cursor-not-allowed"
+                                                                        : selectedSlot?.id === slot.id
+                                                                            ? "bg-[#A68363] text-white border-[#A68363] shadow-md scale-[1.05]"
+                                                                            : "bg-white border-white text-gray-500 hover:border-[#A68363]/50 hover:text-[#A68363]"
                                                                         }`}
                                                                 >
-                                                                    {format(new Date(slot.startTime), "HH:mm")}
+                                                                    {slot.isBooked ? "Ocupado" : format(new Date(slot.startTime), "HH:mm")}
                                                                 </button>
                                                             ))}
                                                         </div>
