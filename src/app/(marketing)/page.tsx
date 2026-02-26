@@ -17,7 +17,7 @@ import {
 import { getGlobalStats } from "@/app/actions/stats";
 import { getCurrentUser } from "@/app/actions/auth";
 import { getOyentes } from "@/app/actions/oyentes";
-import { CoachesList } from "@/components/home/CoachesList";
+import { ProfileBookingList } from "@/components/booking/ProfileBookingList";
 import { LeadPopup } from "@/components/home/LeadPopup";
 import { LeadFooter } from "@/components/home/LeadFooter";
 
@@ -259,8 +259,8 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* NEW: Direct Booking Section */}
-            <CoachesList coaches={coaches} currentUser={currentUser} />
+            {/* NEW: Direct Booking Section (Profile Style) */}
+            <ProfileBookingList coaches={coaches} currentUser={currentUser} />
 
             {/* Guarantee Section */}
             <section id="trusted-psychologists" className="bg-white py-24 scroll-mt-20">
