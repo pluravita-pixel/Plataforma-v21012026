@@ -2,6 +2,7 @@
 
 import Stripe from "stripe";
 import { client } from "@/db";
+import { headers } from "next/headers";
 
 const getStripe = () => {
     if (!process.env.STRIPE_SECRET_KEY) {
@@ -15,7 +16,12 @@ const getStripe = () => {
 export async function createCheckoutSession(appointmentId: string, returnUrl?: string) {
     try {
         const stripe = getStripe();
-        const base = process.env.NEXT_PUBLIC_APP_URL || "";
+
+        // Detect base URL dynamically from headers
+        const host = (await headers()).get("host");
+        const protocol = host?.includes("localhost") ? "http" : "https";
+        const base = `${protocol}://${host}`;
+
         const finalReturnUrl = returnUrl || `${base}/usuario/dashboard`;
 
         const apptResults = await client`
