@@ -419,7 +419,6 @@ export function BookingModal({
                                     <div className="flex items-center justify-center gap-1 mt-2">
                                         <Star className="h-3 w-3 text-amber-500 fill-amber-500" />
                                         <span className="text-xs font-black text-[#4A3C31]">{rating || "5.0"}</span>
-                                        <span className="text-[10px] text-gray-400 font-medium ml-1">({completedSessions || 1300}+ citas)</span>
                                     </div>
                                 </div>
                             </div>

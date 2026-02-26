@@ -123,7 +123,7 @@ export default function LandingPage() {
         },
         {
             question: "¿Cómo funciona la garantía de conexión?",
-            answer: "Tu bienestar es nuestra prioridad. Si en tu primera sesión sientes que no has logrado conectar con el profesional, te facilitamos agendar una nueva sesión con otra persona sin coste adicional, hasta que encuentres a tu profesional ideal."
+            answer: "Tu bienestar es nuestra prioridad. Si en tu primera sesión sientes que no has logrado conectar con el profesional, te facilitamos un descuento especial para agendar una nueva sesión con otra persona, ayudándote a encontrar a tu profesional ideal."
         },
         {
             question: "¿Es un servicio privado y confidencial?",
@@ -285,7 +285,7 @@ export default function LandingPage() {
                                     Queremos que te sientas en confianza desde el primer momento. La conexión profesional es fundamental para que tu proceso sea efectivo y te sientas escuchado.
                                 </p>
                                 <p>
-                                    Si en tu primera cita no encuentras la conexión que necesitas, no te preocupes. <span className="font-bold text-[#A68363]">Puedes agendar otra sesión</span> con una nueva persona sin costo extra, hasta que encuentres a tu profesional ideal.
+                                    En Pluravita <span className="font-bold text-[#A68363]">garantizamos una escucha activa</span> de calidad en cada sesión. Si sientes que no conectas con el profesional, te apoyamos para encontrar un perfil que se adapte mejor a ti en tu siguiente paso.
                                 </p>
                             </div>
 

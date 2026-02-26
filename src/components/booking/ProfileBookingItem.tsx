@@ -57,10 +57,6 @@ export function ProfileBookingItem({ coach, currentUser }: ProfileBookingItemPro
                 {/* Overlay Info (Mobile/Hover) */}
                 <div className="absolute bottom-6 left-6 right-6 z-20">
                     <div className="flex flex-wrap gap-2 mb-3">
-                        <span className="px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-[#A68363] text-[10px] font-black uppercase tracking-widest shadow-sm flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            Perfil Verificado
-                        </span>
                     </div>
                 </div>
 
@@ -82,7 +78,7 @@ export function ProfileBookingItem({ coach, currentUser }: ProfileBookingItemPro
                     </h3>
                     <div className="flex items-center gap-2 text-[#A68363]">
                         <ShieldCheck className="h-4 w-4" />
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Col. {coach.licenseNumber || "COP-28741"}</span>
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Col. COP-41053</span>
                     </div>
                 </div>
 
@@ -100,8 +96,8 @@ export function ProfileBookingItem({ coach, currentUser }: ProfileBookingItemPro
 
                 <div className="pt-4 flex items-center gap-6 border-t border-[#F2EDE7]">
                     <div className="flex flex-col">
-                        <span className="text-[9px] font-black text-[#A68363] uppercase tracking-widest mb-1">Sesiones</span>
-                        <span className="text-sm font-black text-[#4A3C31] uppercase">{coach.completedSessions || 0}+</span>
+                        <span className="text-[9px] font-black text-[#A68363] uppercase tracking-widest mb-1">Colegiado</span>
+                        <span className="text-sm font-black text-[#4A3C31] uppercase">COP-41053</span>
                     </div>
                     <div className="flex flex-col">
                         <span className="text-[9px] font-black text-[#A68363] uppercase tracking-widest mb-1">Idiomas</span>
