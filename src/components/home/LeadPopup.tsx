@@ -13,6 +13,8 @@ export function LeadPopup() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSubmitted, setIsSubmitted] = useState(false)
 
+    const [hasScrolledDeep, setHasScrolledDeep] = useState(false)
+
     // Helper to get cookie
     const getCookie = (name: string) => {
         if (typeof document === 'undefined') return null;
@@ -31,16 +33,33 @@ export function LeadPopup() {
     }
 
     useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 600) {
+                setHasScrolledDeep(true)
+                // If it's already open and we scroll deep, we might want to close it
+                // but usually the user wants it NOT to show up if they already scrolled.
+                setIsOpen(false)
+            }
+        }
+
+        window.addEventListener('scroll', handleScroll)
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [])
+
+    useEffect(() => {
         // Only show if the "submitted" cookie doesn't exist
         const hasSubmitted = getCookie('pluravita_lead_submitted')
 
         if (!hasSubmitted) {
             const timer = setTimeout(() => {
-                setIsOpen(true)
-            }, 5000)
+                // ONLY open if the user hasn't scrolled significantly
+                if (window.scrollY < 600 && !hasScrolledDeep) {
+                    setIsOpen(true)
+                }
+            }, 6000) // Slightly longer wait
             return () => clearTimeout(timer)
         }
-    }, [])
+    }, [hasScrolledDeep])
 
     const handleClose = () => {
         setIsOpen(false)
