@@ -43,7 +43,7 @@ export default function MarketingLayout({
             {/* Navbar */}
             <header className={`sticky top-0 z-50 w-full border-b border-gray-100 transition-all duration-300 ${mobileMenuOpen ? 'bg-white shadow-lg' : 'bg-white shadow-sm'}`}>
                 <div className="container mx-auto px-6 md:px-12 lg:px-20 h-20 flex items-center">
-                    <Link href="#" className="flex items-center h-full group">
+                    <Link href="#" className="flex items-center h-full group" aria-label="Pluravita Home">
                         <Logo className="w-48 sm:w-64 h-16 sm:h-20" />
                     </Link>
 
@@ -52,22 +52,22 @@ export default function MarketingLayout({
                         <Link
                             href="/affinity-test"
                             onClick={handleCoachesLinkClick}
-                            className="text-[#6B6B6B] hover:text-[#A68363] transition-colors"
+                            className="text-[#6B6B6B] hover:text-[#826245] transition-colors"
                         >
                             Psicólogos en línea
                         </Link>
                         {(!user || !hasCompletedTest) && (
                             <Link
                                 href={user ? "/affinity-test" : "/register"}
-                                className="text-[#6B6B6B] hover:text-[#A68363] transition-colors"
+                                className="text-[#6B6B6B] hover:text-[#826245] transition-colors"
                             >
                                 Test de Afinidad
                             </Link>
                         )}
-                        <Link href="#faq" className="text-[#6B6B6B] hover:text-[#A68363] transition-colors">Preguntas frecuentes</Link>
-                        <Link href="/blog" className="text-[#6B6B6B] hover:text-[#A68363] transition-colors">Blog</Link>
+                        <Link href="#faq" className="text-[#6B6B6B] hover:text-[#826245] transition-colors">Preguntas frecuentes</Link>
+                        <Link href="/blog" className="text-[#6B6B6B] hover:text-[#826245] transition-colors">Blog</Link>
                         {user?.role === 'oyente' ? (
-                            <Link href="/oyente/dashboard" className="text-[#A68363] font-bold border-l pl-8 hover:opacity-80 transition-opacity">Panel de Psicólogo</Link>
+                            <Link href="/oyente/dashboard" className="text-[#826245] font-bold border-l pl-8 hover:opacity-80 transition-opacity">Panel de Psicólogo</Link>
                         ) : null}
                     </nav>
 
@@ -79,7 +79,7 @@ export default function MarketingLayout({
                     {/* Mobile Menu Button */}
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        className="lg:hidden ml-auto p-2 text-[#6B6B6B] hover:text-[#A68363] transition-colors"
+                        className="lg:hidden ml-auto p-2 text-[#6B6B6B] hover:text-[#826245] transition-colors"
                         aria-label="Toggle menu"
                     >
                         {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -104,7 +104,7 @@ export default function MarketingLayout({
                                         handleCoachesLinkClick(e);
                                         setMobileMenuOpen(false);
                                     }}
-                                    className="text-[#6B6B6B] hover:text-[#A68363] transition-colors py-3 px-4 rounded-lg hover:bg-[#F2EDE7] font-medium"
+                                    className="text-[#6B6B6B] hover:text-[#826245] transition-colors py-3 px-4 rounded-lg hover:bg-[#F2EDE7] font-medium"
                                 >
                                     Psicólogos en línea
                                 </Link>
@@ -112,7 +112,7 @@ export default function MarketingLayout({
                                     <Link
                                         href={user ? "/affinity-test" : "/register"}
                                         onClick={() => setMobileMenuOpen(false)}
-                                        className="text-[#6B6B6B] hover:text-[#A68363] transition-colors py-3 px-4 rounded-lg hover:bg-[#F2EDE7] font-medium"
+                                        className="text-[#6B6B6B] hover:text-[#826245] transition-colors py-3 px-4 rounded-lg hover:bg-[#F2EDE7] font-medium"
                                     >
                                         Test de Afinidad
                                     </Link>
@@ -120,14 +120,14 @@ export default function MarketingLayout({
                                 <Link
                                     href="#faq"
                                     onClick={() => setMobileMenuOpen(false)}
-                                    className="text-[#6B6B6B] hover:text-[#A68363] transition-colors py-3 px-4 rounded-lg hover:bg-[#F2EDE7] font-medium"
+                                    className="text-[#6B6B6B] hover:text-[#826245] transition-colors py-3 px-4 rounded-lg hover:bg-[#F2EDE7] font-medium"
                                 >
                                     Preguntas frecuentes
                                 </Link>
                                 <Link
                                     href="/blog"
                                     onClick={() => setMobileMenuOpen(false)}
-                                    className="text-[#6B6B6B] hover:text-[#A68363] transition-colors py-3 px-4 rounded-lg hover:bg-[#F2EDE7] font-medium"
+                                    className="text-[#6B6B6B] hover:text-[#826245] transition-colors py-3 px-4 rounded-lg hover:bg-[#F2EDE7] font-medium"
                                 >
                                     Blog
                                 </Link>
@@ -137,7 +137,7 @@ export default function MarketingLayout({
                                         <Link
                                             href="/oyente/dashboard"
                                             onClick={() => setMobileMenuOpen(false)}
-                                            className="text-[#A68363] font-bold py-3 px-4 rounded-lg hover:bg-[#F2EDE7] block"
+                                            className="text-[#826245] font-bold py-3 px-4 rounded-lg hover:bg-[#F2EDE7] block"
                                         >
                                             Panel de Psicólogo
                                         </Link>
@@ -178,7 +178,7 @@ export default function MarketingLayout({
                             <h3 className="font-bold text-[#4A3C31] mb-2 uppercase tracking-widest text-xs">Profesionales</h3>
                             <Link
                                 href="/register?role=coach"
-                                className="text-xs text-[#A68363] font-bold hover:underline underline-offset-4"
+                                className="text-xs text-[#826245] font-bold hover:underline underline-offset-4"
                             >
                                 Únete como psicólogo
                             </Link>
@@ -190,11 +190,11 @@ export default function MarketingLayout({
                     </div>
 
                     <div className="mt-4 flex flex-wrap justify-center gap-6 text-xs text-gray-500">
-                        <Link href="/aviso-legal" className="hover:text-[#A68363] transition-colors">Aviso Legal</Link>
-                        <Link href="/politica-privacidad" className="hover:text-[#A68363] transition-colors">Política de Privacidad</Link>
-                        <Link href="/politica-cookies" className="hover:text-[#A68363] transition-colors">Política de Cookies</Link>
+                        <Link href="/aviso-legal" className="hover:text-[#826245] transition-colors">Aviso Legal</Link>
+                        <Link href="/politica-privacidad" className="hover:text-[#826245] transition-colors">Política de Privacidad</Link>
+                        <Link href="/politica-cookies" className="hover:text-[#826245] transition-colors">Política de Cookies</Link>
                         {!user && (
-                            <Link href="/register?role=coach" className="hover:text-[#A68363] transition-colors font-bold">Únete como psicólogo</Link>
+                            <Link href="/register?role=coach" className="hover:text-[#826245] transition-colors font-bold">Únete como psicólogo</Link>
                         )}
                     </div>
                 </div>

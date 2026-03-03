@@ -106,6 +106,7 @@ export function LeadPopup() {
                         <button
                             onClick={handleClose}
                             className="absolute top-6 right-6 p-2 text-gray-400 hover:text-gray-600 transition-colors bg-gray-50 rounded-full"
+                            aria-label="Cerrar descuento"
                         >
                             <X className="h-5 w-5" />
                         </button>

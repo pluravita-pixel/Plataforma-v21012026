@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 
 import { Providers } from "./providers";
 import { PageTransition } from "@/components/page-transition";
+import { CookieConsent } from "@/components/cookie-consent";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
@@ -73,6 +74,7 @@ export default function RootLayout({
           <PageTransition>
             {children}
           </PageTransition>
+          <CookieConsent />
         </Providers>
         <SpeedInsights />
       </body>

@@ -20,11 +20,12 @@ import { getOyentes } from "@/app/actions/oyentes";
 import { ProfileBookingList } from "@/components/booking/ProfileBookingList";
 import { LeadPopup } from "@/components/home/LeadPopup";
 import { LeadFooter } from "@/components/home/LeadFooter";
+import { Testimonials } from "@/components/home/Testimonials";
 
 // Premium Vibe Button Component
 // Premium Clean Button Component
 const VibeButton = ({ children, onClick, href, className = "" }: { children: React.ReactNode, onClick?: (e: any) => void, href?: string, className?: string }) => {
-    const baseClasses = "px-10 py-5 bg-[#A68363] text-white rounded-full font-black uppercase tracking-widest text-sm transition-all duration-300 hover:bg-[#8C6F56] inline-flex items-center justify-center gap-3 border-none ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
+    const baseClasses = "px-10 py-5 bg-[#826245] text-white rounded-full font-black uppercase tracking-widest text-sm transition-all duration-300 hover:bg-[#6C523B] inline-flex items-center justify-center gap-3 border-none ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
 
     if (href) {
         return (
@@ -147,12 +148,12 @@ export default function LandingPage() {
                             <div className="space-y-4">
                                 <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-[#4A3C31] leading-[1.1] tracking-tight uppercase">
                                     Psicólogos en línea <br />
-                                    <span className="text-[#A68363]">de lunes a domingo</span>
+                                    <span className="text-[#826245]">desde 15 euros</span>
                                 </h1>
                                 <p className="text-lg md:text-xl text-[#6B6B6B] font-medium leading-relaxed max-w-xl">
                                     Conecta con psicólogos en línea certificados y comienza tu proceso por videollamada. Atención profesional y privada. Tú eliges fecha y horario.
                                 </p>
-                                <div className="text-sm font-bold text-[#A68363] uppercase tracking-widest pt-2">
+                                <div className="text-sm font-bold text-[#826245] uppercase tracking-widest pt-2">
                                     Encuentra a tu profesional ideal en minutos
                                 </div>
                             </div>
@@ -160,6 +161,7 @@ export default function LandingPage() {
                             <div className="flex flex-col sm:flex-row gap-6">
                                 <VibeButton
                                     href="#section-psychologists"
+                                    aria-label="Ver psicólogos disponibles"
                                     onClick={(e) => {
                                         const el = document.getElementById('section-psychologists');
                                         if (el) {
@@ -186,19 +188,24 @@ export default function LandingPage() {
                                 ></iframe>
                             </div>
                             {/* Decorative element to add premium feel */}
-                            <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-[#A68363]/10 rounded-full blur-2xl -z-10"></div>
+                            <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-[#826245]/10 rounded-full blur-2xl -z-10"></div>
                             <div className="absolute -top-6 -left-6 w-32 h-32 bg-[#F2EDE7] rounded-full blur-xl -z-10"></div>
                         </div>
                     </div>
                 </div>
             </section>
 
+            {/* NEW: Direct Booking Section (Profile Style) */}
+            <div id="section-psychologists">
+                <ProfileBookingList coaches={coaches} currentUser={currentUser} />
+            </div>
+
             {/* Stats Section */}
             <section className="container mx-auto px-6 md:px-12 lg:px-20 py-16">
                 <div className="grid md:grid-cols-3 gap-8">
                     {landingStats.map((stat, i) => (
                         <Card key={i} className="p-10 text-center bg-white border-transparent neo-shadow hover:shadow-2xl transition-all duration-500 rounded-[2rem] border border-gray-50 flex flex-col justify-center items-center">
-                            <div className="text-2xl font-bold text-[#A68363] mb-3 tracking-tight">{stat.number}</div>
+                            <div className="text-2xl font-bold text-[#826245] mb-3 tracking-tight">{stat.number}</div>
                             <div className="text-[#4A3C31] font-bold text-lg mb-4">{stat.label}</div>
                             <p className="text-[#8C8C8C] italic text-sm leading-relaxed">&ldquo;{stat.quote.replace(/"/g, '')}&rdquo;</p>
                         </Card>
@@ -259,9 +266,6 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* NEW: Direct Booking Section (Profile Style) */}
-            <ProfileBookingList coaches={coaches} currentUser={currentUser} />
-
             {/* Guarantee Section */}
             <section id="trusted-psychologists" className="bg-white py-24 scroll-mt-20">
                 <div className="container mx-auto px-6 md:px-12 lg:px-20">
@@ -277,7 +281,7 @@ export default function LandingPage() {
                         <div className="space-y-8">
                             <div className="space-y-4">
                                 <h2 className="text-4xl font-black text-[#4A3C31] uppercase tracking-tighter">Garantía de satisfacción</h2>
-                                <p className="text-lg font-bold text-[#A68363] uppercase tracking-widest">Tu primera sesión sin riesgo</p>
+                                <p className="text-lg font-bold text-[#826245] uppercase tracking-widest">Tu primera sesión sin riesgo</p>
                             </div>
 
                             <div className="space-y-4 text-gray-700 font-medium">
@@ -285,7 +289,7 @@ export default function LandingPage() {
                                     Queremos que te sientas en confianza desde el primer momento. La conexión profesional es fundamental para que tu proceso sea efectivo y te sientas escuchado.
                                 </p>
                                 <p>
-                                    En Pluravita <span className="font-bold text-[#A68363]">garantizamos una escucha activa</span> de calidad en cada sesión. Si sientes que no conectas con el profesional, te apoyamos para encontrar un perfil que se adapte mejor a ti en tu siguiente paso.
+                                    En Pluravita <span className="font-bold text-[#826245]">garantizamos una escucha activa</span> de calidad en cada sesión. Si sientes que no conectas con el profesional, te apoyamos para encontrar un perfil que se adapte mejor a ti en tu siguiente paso.
                                 </p>
                             </div>
 
@@ -311,12 +315,12 @@ export default function LandingPage() {
                                 <h2 className="text-4xl font-black text-[#4A3C31] uppercase tracking-tighter">
                                     Encuentra hoy a tu <br /> profesional ideal
                                 </h2>
-                                <p className="text-lg font-bold text-[#A68363] uppercase tracking-widest">Test de afinidad terapéutica</p>
+                                <p className="text-lg font-bold text-[#826245] uppercase tracking-widest">Test de afinidad terapéutica</p>
                             </div>
 
                             <div className="space-y-4 text-gray-700 font-medium leading-relaxed">
                                 <p>
-                                    Por eso diseñamos nuestro Test de Afinidad. <span className="font-bold underline decoration-[#A68363] decoration-2">Es una forma de conocer tus objetivos</span> para sugerirte al perfil que mejor encaja con lo que buscas y necesitas.
+                                    Por eso diseñamos nuestro Test de Afinidad. <span className="font-bold underline decoration-[#826245] decoration-2">Es una forma de conocer tus objetivos</span> para sugerirte al perfil que mejor encaja con lo que buscas y necesitas.
                                 </p>
                                 <p>
                                     Tómate un par de minutos, descubre a tu profesional ideal y comienza hoy mismo. Sin esperas y con total privacidad.
@@ -343,6 +347,9 @@ export default function LandingPage() {
                 </div>
             </section>
 
+            {/* Testimonials Section */}
+            <Testimonials />
+
             {/* FAQ Section */}
             <section id="faq" className="container mx-auto px-4 py-24 max-w-3xl scroll-mt-20">
                 <div className="text-center mb-16">
@@ -352,8 +359,8 @@ export default function LandingPage() {
 
                 <Accordion type="single" collapsible className="w-full space-y-4">
                     {faqs.map((faq, i) => (
-                        <AccordionItem key={i} value={`item-${i}`} className="border-none bg-white rounded-3xl px-8 neo-shadow transition-all data-[state=open]:ring-2 ring-[#A68363]/20 overflow-hidden">
-                            <AccordionTrigger className="text-left font-bold text-[#4A3C31] hover:text-[#A68363] hover:no-underline py-6 uppercase tracking-tight text-lg">
+                        <AccordionItem key={i} value={`item-${i}`} className="border-none bg-white rounded-3xl px-8 neo-shadow transition-all data-[state=open]:ring-2 ring-[#826245]/20 overflow-hidden">
+                            <AccordionTrigger className="text-left font-bold text-[#4A3C31] hover:text-[#826245] hover:no-underline py-6 uppercase tracking-tight text-lg">
                                 {faq.question}
                             </AccordionTrigger>
                             <AccordionContent className="text-[#6B6B6B] pb-8 leading-relaxed font-medium text-base">
