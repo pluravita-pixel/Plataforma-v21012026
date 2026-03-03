@@ -196,9 +196,7 @@ export default function LandingPage() {
             </section>
 
             {/* NEW: Direct Booking Section (Profile Style) */}
-            <div id="section-psychologists">
-                <ProfileBookingList coaches={coaches} currentUser={currentUser} />
-            </div>
+            <ProfileBookingList coaches={coaches} currentUser={currentUser} />
 
             {/* Stats Section */}
             <section className="container mx-auto px-6 md:px-12 lg:px-20 py-16">
